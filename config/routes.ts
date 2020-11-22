@@ -7,6 +7,13 @@ export default [
       { path: '/balloons', component: '@/pages/balloons/index' },
       { path: '/part', component: '@/pages/part/index' },
       { path: '/demo', component: '@/pages/demo/index' },
+
+
+
+
+
+      { path: '/sameKey', component: '@/pages/sameKey/index' },
+
       { exact: true, path: '/', redirect: '/balloons' },
     ]
   },

@@ -1,4 +1,3 @@
-
 /**
  * @description 零件
  */
@@ -7,6 +6,7 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
+import useComponents from '@/hooks/useComponents';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -19,11 +19,12 @@ const [question] = [
 const assertMap = {
   question,
 }
-const canvasId = 'part-container'
+const canvasId = 'same-key-container'
 interface PropTypes {}
 const sessionKey = 'optionPos';
-const Part: FC<PropTypes> = function(props) {
+const SameKey: FC<PropTypes> = function(props) {
   const {visible, setVisible, onClose} = useReward()
+  const { createBlueBlock, createQuestionLabel} = useComponents()
   const answer = 'blue'
   const { stage } = useStage({
     elId: canvasId,
@@ -37,16 +38,19 @@ const Part: FC<PropTypes> = function(props) {
       return session.clear();
     };
   }, []);
+  function createLayout() {
+    const xs = [240, 433, 626], ys = [243, 457]
+    const posList = xs.map(x => {
+      return ys.map(y => {
+        return [x, y]
+      })
+    }).flat()
+    return createBlueBlock(posList)
+  }
   function initPage() {
+
     setEles([
-      {
-        type: EleTypeEnums.LABEL,
-        option: {
-          text: '哪个是机器人!',
-          fontSize: 34,
-          pos: [61, 93],
-        },
-      },
+      createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
       {
         type: EleTypeEnums.SPRITE,
         option: {
@@ -55,7 +59,7 @@ const Part: FC<PropTypes> = function(props) {
           size: [85.57, 85.56]
         },
       },
-      ...createOptionsBlock()
+      ...createLayout()
     ]);
   }
   function createOptionsBlock() {
@@ -89,5 +93,4 @@ const Part: FC<PropTypes> = function(props) {
     </>
   );
 };
-
-export default Part;
+export default SameKey

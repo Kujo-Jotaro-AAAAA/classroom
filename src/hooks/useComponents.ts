@@ -11,6 +11,39 @@ interface PropTypes {
 }
 export default function useComponents() {
   /**
+   * @description 题干
+   * @param text
+   */
+  function createQuestionLabel(text: string): ElesConfig {
+    return {
+      type: EleTypeEnums.LABEL,
+      option: {
+        text,
+        fontSize: 34,
+        pos: [61, 93],
+      },
+    }
+  }
+  /**
+   * @description 通用蓝框盒子
+   * @param posList
+   */
+  function createBlueBlock(posList: number[][]): ElesConfig[] {
+    return posList.map((pos, idx) => {
+      const boxW = 158;
+      return {
+        type: EleTypeEnums.BLOCK,
+        option: {
+          size: [boxW, 123],
+          pos,
+          border: [2, '#759AFF'],
+          pointerEvents: 'none', // 此属性要指给不捕获事件的元素
+          borderRadius: 10,
+        },
+      };
+    });
+  }
+  /**
    * @description 生成选项框
    * @param num
    */
@@ -33,6 +66,8 @@ export default function useComponents() {
     });
   }
   return {
-    createOptionsBlock
+    createQuestionLabel,
+    createOptionsBlock,
+    createBlueBlock
   }
 }
