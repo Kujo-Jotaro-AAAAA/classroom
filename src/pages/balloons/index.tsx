@@ -6,6 +6,7 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
+import useReward from '@/hooks/useReward';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -20,7 +21,7 @@ const [blue, red, yellow] = [
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
-  const [visible, setVisible] = useState<boolean>(false)
+  const {visible, setVisible, onClose} = useReward()
   const answer = 'balloons2'
   const { stage } = useStage({
     elId: 'balloons-container',
@@ -234,7 +235,7 @@ const Balloons: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={() => setVisible(false)} />
+      <RewardModal visible={visible} star={3} onClose={onClose} />
     </>
   );
 };
