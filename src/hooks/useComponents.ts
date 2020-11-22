@@ -28,8 +28,8 @@ export default function useComponents() {
    * @description 通用蓝框盒子
    * @param posList
    */
-  function createBlueBlock(posList: number[][]): ElesConfig[] {
-    return posList.map((pos, idx) => {
+  function createBlueBlock(posList: number[][], pointerEvents = 'none'): ElesConfig[] {
+    return posList.map((pos) => {
       const boxW = 158;
       return {
         type: EleTypeEnums.BLOCK,
@@ -37,7 +37,7 @@ export default function useComponents() {
           size: [boxW, 123],
           pos,
           border: [2, '#759AFF'],
-          pointerEvents: 'none', // 此属性要指给不捕获事件的元素
+          pointerEvents, // 此属性要指给不捕获事件的元素
           borderRadius: 10,
         },
       };

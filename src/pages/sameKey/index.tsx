@@ -12,6 +12,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+import styles from './styles/index.less';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const keysImg = [
   require('@/assets/keys/1.png'),
@@ -25,8 +26,10 @@ interface PropTypes {}
 const sessionKey = 'optionPos';
 const SameKey: FC<PropTypes> = function(props) {
   const {visible, setVisible, onClose} = useReward()
+  const answerRef = useRef<number[]>([])
+  const answer = [0, 5] // 正确答案
+  const blockElmRef = useRef<any[]>([])
   const { createBlueBlock, createQuestionLabel} = useComponents()
-  const answer = 'blue'
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -39,19 +42,6 @@ const SameKey: FC<PropTypes> = function(props) {
       return session.clear();
     };
   }, []);
-  function createLayout() {
-    const xs = [240, 433, 626], ys = [243, 457]
-    const posList = xs.map(x => {
-      return ys.map(y => {
-        return [x, y]
-      })
-    }).flat()
-    return createBlueBlock(posList)
-  }
-  useEffect(() => {
-    console.log('llll', eles);
-
-  }, [eles])
   function initPage() {
     setEles([
       createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
@@ -59,10 +49,71 @@ const SameKey: FC<PropTypes> = function(props) {
       ...createKeys()
     ]);
   }
+  useEffect(() => {
+    if (!Array.isArray(elements) || elements.length === 0) return;
+    blockElmRef.current = getBlocks()
+  }, [elements]);
+  function getBlocks() {
+    return elements.filter(el => {
+      return el.name
+    });
+  }
+  function createLayout() {
+    const xs = [240, 433, 626], ys = [243, 457]
+    const posList = ys.map(y => {
+      return xs.map(x => {
+        return [x, y]
+      })
+    }).flat()
+    const blueBlockConfigs = createBlueBlock(posList, 'visible')
+    return blueBlockConfigs.map((config, idx) => {
+      config.option.name = `block-${idx}`
+      return {
+        ...config,
+        evt: [{
+          type: EvtNameEnum.CLICK,
+          callback: (evt, elm) => {
+            onBlockClick(elm)
+          }
+        }]
+      }
+    })
+  }
+  /**
+   * @description 点击方块
+   * @param elm
+   */
+  function onBlockClick(elm) {
+    const [p, key] = elm.name.split('-')
+    answerRef.current.push(Number(key))
+    console.log('answerRef.current ==>', answerRef.current);
+
+    if (answerRef.current.length >= 2) {
+      const correct = answer.every(a => answerRef.current.includes(a))
+      if (correct) {
+        handleCorrect()
+      } else {
+        // 重置
+        resetBlockBg()
+      }
+      answerRef.current = []
+      return
+    }
+    elm.attributes.bgcolor = 'rgba(21, 210, 223, 0.5)'
+  }
+  function handleCorrect() {
+    setVisible(true)
+    answer.forEach(an => {
+      blockElmRef.current[an].attr({
+        bgcolor : '#F89674'
+      })
+    })
+  }
+
   function createKeys(): ElesConfig[] {
     const xs = [293, 494, 681], ys = [249, 463]
-    const posList = xs.map(x => {
-      return ys.map(y => {
+    const posList = ys.map(y => {
+      return xs.map(x => {
         return [x, y]
       })
     }).flat()
@@ -78,9 +129,16 @@ const SameKey: FC<PropTypes> = function(props) {
       }
     })
   }
-  useEffect(() => {
-    if (!Array.isArray(elements) || elements.length === 0) return;
-  }, [elements]);
+  /**
+   * @description 重置block背景
+   */
+  function resetBlockBg() {
+    blockElmRef.current.forEach(el => {
+      el.attr({
+        bgcolor: '#fff'
+      })
+    })
+  }
   return (
     <>
       <div
@@ -90,7 +148,10 @@ const SameKey: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={3} onClose={() => {
+        resetBlockBg()
+        onClose()
+      }} />
     </>
   );
 };

@@ -109,7 +109,6 @@ const Balloons: FC<PropTypes> = function(props) {
     const balloons = eles.filter(el => {
       return el.option.name
     });
-    console.log('balloons', balloons);
     const defaultPos = balloons.map(b => {
       return b.option.pos;
     });

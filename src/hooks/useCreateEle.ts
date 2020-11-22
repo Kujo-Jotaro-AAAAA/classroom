@@ -18,6 +18,7 @@ export enum EvtNameEnum {
   TOUCH_MOVE = 'touchmove',
   TOUCH_END = 'touchend',
   DROP_CAPTURE = 'drop',
+  CLICK = 'click',
 }
 export interface EleEventTypes  {
   type: EvtNameEnum,
@@ -73,8 +74,6 @@ export default function useCreateEle(props: PropTypes) {
       handleEvent(el, events)
       handleAnimates(el, animates)
     })
-    console.log('elements', elements);
-
   }
   /**
    * @description 处理挂载的事件
