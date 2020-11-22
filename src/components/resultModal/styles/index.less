@@ -1,0 +1,64 @@
+@starSize: 69px;
+@bg-height: 269px;
+.result_modal {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  &-mask {
+    // position: absolute;
+    // top: 0;
+    // left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #6A6A6A;
+    opacity: .64;
+    // z-index: 10;
+  }
+  &-content {
+    &-fraction {
+      color: #fff;
+      font-size: 34px;
+      position: absolute;
+      bottom: 628px;
+      left: 50%;
+      width: 60px;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+    &-star {
+      position: absolute;
+      bottom: 528px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      &-item { // 具体的星星
+        width: @starSize;
+        height: @starSize;
+        border-radius: @starSize / 2;
+        border: 1px solid #fff;
+        & > img {
+          width: 100%;
+        }
+        &:nth-child(2n) {
+          transform: translateY(-(@starSize / 2));
+          margin: 0 20px;
+        }
+      }
+    }
+    &-bg {
+      position: absolute;
+      bottom: @bg-height - 10px;
+      left: 50%;
+      width: 365px;
+      height: @bg-height;
+      transform: translateX(-50%);
+      background: url(~@/assets/巧虎.png) no-repeat center/contain;
+      z-index: 11;
+    }
+  }
+}

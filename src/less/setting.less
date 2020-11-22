@@ -1,0 +1,15 @@
+@import './theme.less';
+@import './variable.less';
+
+@vw_base: 375;
+@vw_fontsize: 20;
+html {
+  font-size: 20px; //不支持vw单位时，回退到px单位
+  font-size: (@vw_fontsize / @vw_base) * 100vw;
+}
+@media screen and (orientation: landscape) {
+  html {
+    font-size: 20px;
+    font-size: (@vw_fontsize / @vw_base) * 100vh;
+  }
+}

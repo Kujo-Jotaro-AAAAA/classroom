@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "incremental": true, // 增量编译, 相当于sourceMap
+    "tsBuildInfoFile": "./dist/tsBuildInfo",
+    "outDir": "build/dist",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["esnext", "dom", "ES6"],
+    "sourceMap": true,
+    "baseUrl": ".",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "removeComments": true,
+    "paths": {
+      "@/*": ["src/*"],
+      // "@@/*": ["./src/.umi-production/*"]
+      "@@/*": ["src/.umi/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "scripts",
+    "src/.umi/*",
+    "webpack",
+    "jest"
+  ]
+}

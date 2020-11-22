@@ -1,0 +1,27 @@
+*.zip
+# eslint report
+report_*.xml
+# dependencies
+/node_modules
+/npm-debug.log*
+/yarn-error.log
+/yarn.lock
+/package-lock.json
+/config/config.local.ts
+# production
+/dist
+.idea
+# misc
+.DS_Store
+
+# vscode
+.history
+
+# umi
+.umi
+.umi-production
+.umirc.local.js
+# vscode
+.history
+
+*.zip
