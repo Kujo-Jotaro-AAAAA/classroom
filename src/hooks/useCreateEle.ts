@@ -55,8 +55,6 @@ export default function useCreateEle(props: PropTypes) {
   useEffect(() => {
     // 只能初始化生成页面， 动态加载的逻辑写在页面上, 否则死循环
     const queue = createQueue();
-    console.log('eles', eles);
-
     setElements(queue)
   }, [eles])
   useEffect(() => {
@@ -74,7 +72,6 @@ export default function useCreateEle(props: PropTypes) {
       const animates = eles[idx].animates
       handleEvent(el, events)
       handleAnimates(el, animates)
-
     })
   }
   /**

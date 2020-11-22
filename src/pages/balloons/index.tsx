@@ -19,13 +19,17 @@ const [blue, red, yellow] = [
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
-  // const [optionPos, setOptionPos] = useState<any[]>([]); // 记录默认位置
-  const { stage, vpWidth, vpHeight } = useStage({
+  const isAnswer = useRef<boolean>(false); // 是否回答
+  const { stage } = useStage({
     elId: 'balloons-container',
   });
   const { elements, setEles, eles } = useCreateEle({
     stage,
   });
+  // useEffect(() => {
+  //   console.log('stage', stage);
+
+  // }, [stage])
   useEffect(() => {
     setEles([
       {
@@ -73,6 +77,12 @@ const Balloons: FC<PropTypes> = function(props) {
    */
   async function init() {
     getOptionInitPos();
+  }
+  /**
+   * @description 获取选项的气球
+   */
+  function getOptionBalloons() {
+
   }
   /**
    * @description 获取气球的默认位置
@@ -178,10 +188,14 @@ const Balloons: FC<PropTypes> = function(props) {
    * @param idx
    */
   async function onOptionDragEnd(evt, el, idx) {
-    const [w, h, x, y] = [110, 132, 884, 210];
-    console.log(x, evt.x, x + w);
-    console.log(y - h, evt.y, y + h);
+    const [w, h, x, y] = [110, 132, 884, 210]
     if (x < evt.x && evt.x < x + w && y - h < evt.y && evt.y < y + h) {
+      if (isAnswer.current) {
+        // 已经回答过,把其他气球重置回去
+        console.log('isAnswer.current', isAnswer.current);
+
+      }
+      // 贴合到答案框中间
       await el.animate([{ pos: [x + w / 2, y + h / 2] }], {
         duration: 400,
         easing: 'ease-in',
@@ -189,6 +203,7 @@ const Balloons: FC<PropTypes> = function(props) {
         iterations: 1,
         fill: 'forwards',
       });
+      isAnswer.current = true
       return;
     }
     const defaultPos = session.getKey(sessionKey);
