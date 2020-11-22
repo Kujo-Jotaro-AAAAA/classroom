@@ -1,6 +1,5 @@
-
 /**
- * @description 零件
+ * @description 手套
  */
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { session } from '@/utils/store';
@@ -14,11 +13,10 @@ import useCreateEle, {
 } from '@/hooks/useCreateEle';
 import useComponents from '@/hooks/useComponents';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
-const [question, first, center, last] = [
-  require('@/assets/part/question.png'),
-  require('@/assets/part/first.png'),
-  require('@/assets/part/center.png'),
-  require('@/assets/part/last.png'),
+const [first, center, last] = [
+  require('@/assets/glove/first.png'),
+  require('@/assets/glove/center.png'),
+  require('@/assets/glove/last.png'),
 ];
 const assertMap = {
   first,
@@ -31,7 +29,7 @@ interface PropTypes {}
 const sessionKey = 'optionPos';
 const Part: FC<PropTypes> = function(props) {
   const {visible, setVisible, onClose} = useReward()
-  const answer = 'first'
+  const answer = 'center'
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -49,7 +47,7 @@ const Part: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.LABEL,
         option: {
-          text: '哪个是和机器人零件一模一样的呢？点点看吧',
+          text: '哪个是和上面的手套一模一样的呢？点点看吧',
           fontSize: 34,
           pos: [61, 93],
         },
@@ -57,13 +55,13 @@ const Part: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.SPRITE,
         option: {
-          texture: question,
-          pos: [469, 246.29],
-          size: [85.57, 85.56]
+          texture: center,
+          pos: [469, 251],
+          size: [86.88, 84.25]
         },
       },
       // 选项区
-      ...createOptionsParts(),
+      ...createOptionsGloves(),
       ...createOptionsBlock(3)
     ]);
   }
@@ -71,22 +69,22 @@ const Part: FC<PropTypes> = function(props) {
 /**
    * @description 选项区
    */
-  function createOptionsParts(): ElesConfig[] {
+  function createOptionsGloves(): ElesConfig[] {
     const arr = ['first', 'center', 'last'];
     // colorMap
-    const parts = arr.map((imgKey, idx) => {
-      const balloonW = 85.56;
-      const initPosX = 268 + balloonW / 2;
-      const initPosY = 476;
+    const gloves = arr.map((imgKey, idx) => {
+      const balloonW = 86.88;
+      const initPosX = 263;
+      const initPosY = 477;
       return {
         type: EleTypeEnums.SPRITE,
         option: {
           name: imgKey,
           texture: assertMap[imgKey],
-          size: [balloonW, 85.58],
-          anchor: [0.5, 0.5],
+          size: [balloonW, 84.25],
+          // anchor: [0.5, 0.5],
           zIndex: 200,
-          pos: [initPosX + (107 + balloonW) * idx, initPosY + 85.58 / 2],
+          pos: [initPosX + (103 + balloonW) * idx, initPosY],
         },
         evt: [
           {
@@ -104,7 +102,7 @@ const Part: FC<PropTypes> = function(props) {
         ]
       };
     });
-    return parts;
+    return gloves;
   }
 
   useEffect(() => {
@@ -125,3 +123,4 @@ const Part: FC<PropTypes> = function(props) {
 };
 
 export default Part;
+

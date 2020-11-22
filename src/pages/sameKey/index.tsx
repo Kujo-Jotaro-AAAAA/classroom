@@ -1,5 +1,6 @@
 /**
- * @description 零件
+ * @description 钥匙
+ * TODO 背景颜色
  */
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { session } from '@/utils/store';
@@ -100,13 +101,13 @@ const SameKey: FC<PropTypes> = function(props) {
       answerRef.current = []
       return
     }
-    elm.attributes.bgcolor = 'rgba(21, 210, 223, 0.5)'
+    elm.attributes.bgcolor = '#F1F5FF'
   }
   function handleCorrect() {
     setVisible(true)
     answer.forEach(an => {
       blockElmRef.current[an].attr({
-        bgcolor : '#F89674'
+        bgcolor : '#FFEEE4'
       })
     })
   }
