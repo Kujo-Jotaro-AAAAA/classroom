@@ -7,9 +7,23 @@ import {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+const [reloadHorn] = [require('@/assets/重播按钮.png')]
 interface PropTypes {
 }
 export default function useComponents() {
+  /**
+   * @description 喇叭
+   */
+  function createHorn():ElesConfig {
+    return {
+      type: EleTypeEnums.SPRITE,
+      option: {
+        texture: reloadHorn,
+        pos: [922, 99],
+        size: [41.86, 35.33]
+      }
+    }
+  }
   /**
    * @description 题干
    * @param text
@@ -66,6 +80,7 @@ export default function useComponents() {
     });
   }
   return {
+    createHorn,
     createQuestionLabel,
     createOptionsBlock,
     createBlueBlock

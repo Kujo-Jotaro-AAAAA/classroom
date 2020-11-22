@@ -29,7 +29,7 @@ const SameKey: FC<PropTypes> = function(props) {
   const answerRef = useRef<number[]>([])
   const answer = [0, 5] // 正确答案
   const blockElmRef = useRef<any[]>([])
-  const { createBlueBlock, createQuestionLabel} = useComponents()
+  const { createHorn, createBlueBlock, createQuestionLabel} = useComponents()
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -44,6 +44,7 @@ const SameKey: FC<PropTypes> = function(props) {
   }, []);
   function initPage() {
     setEles([
+      createHorn(),
       createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
       ...createLayout(),
       ...createKeys()
