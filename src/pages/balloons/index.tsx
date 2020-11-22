@@ -7,6 +7,7 @@ import RewardModal from '@/components/rewardModal';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
+import useComponents from '@/hooks/useComponents';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -28,6 +29,7 @@ const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
   const balloonElm = useRef<any[]>([])
   const {visible, setVisible, onClose} = useReward()
+  const { createOptionsBlock } = useComponents()
   const answer = 'blue'
   const { stage } = useStage({
     elId: 'balloons-container',
@@ -78,6 +80,7 @@ const Balloons: FC<PropTypes> = function(props) {
       },
       // 选项区
       ...createOptionsBalloons(),
+      ...createOptionsBlock(3)
     ]);
   }
   useEffect(() => {
@@ -180,22 +183,7 @@ const Balloons: FC<PropTypes> = function(props) {
         ],
       };
     });
-    const boxs = arr.map((_, idx) => {
-      const initPosX = 232;
-      const initPosY = 457;
-      const boxW = 158;
-      return {
-        type: EleTypeEnums.BLOCK,
-        option: {
-          size: [boxW, 123],
-          pos: [initPosX + (boxW + 35) * idx, initPosY],
-          border: [2, '#759AFF'],
-          pointerEvents: 'none', // 此属性要指给不捕获事件的元素
-          borderRadius: 10,
-        },
-      };
-    });
-    return [...balloons, ...boxs];
+    return balloons;
   }
   /**
    * @description 选项拖拽结束
@@ -233,6 +221,9 @@ const Balloons: FC<PropTypes> = function(props) {
       fill: 'forwards',
     });
   }
+  /**
+   * @description 重置气球的位置
+   */
   function resetBalloons() {
     const balloons = balloonElm.current
     const ballPos = session.getKey(sessionKey)

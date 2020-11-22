@@ -10,20 +10,27 @@ import {
 interface PropTypes {
 }
 export default function useComponents() {
-  function createOptionsBlock() {
-    const arr = [[240, 457]]
-    return arr.map(pos => {
+  /**
+   * @description 生成选项框
+   * @param num
+   */
+  function createOptionsBlock(num: number): ElesConfig[] {
+    const arr = new Array(num).fill(0)
+    return arr.map((_, idx) => {
+      const initPosX = 232;
+      const initPosY = 457;
+      const boxW = 158;
       return {
         type: EleTypeEnums.BLOCK,
         option: {
-          pos: pos,
-          size: [158, 123],
+          size: [boxW, 123],
+          pos: [initPosX + (boxW + 35) * idx, initPosY],
           border: [2, '#759AFF'],
           pointerEvents: 'none', // 此属性要指给不捕获事件的元素
           borderRadius: 10,
         },
-      }
-    })
+      };
+    });
   }
   return {
     createOptionsBlock
