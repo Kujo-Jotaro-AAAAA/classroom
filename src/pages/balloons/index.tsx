@@ -3,6 +3,7 @@
  */
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { session } from '@/utils/store';
+import RewardModal from '@/components/rewardModal';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
 import useCreateEle, {
@@ -19,7 +20,8 @@ const [blue, red, yellow] = [
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
-  const isAnswer = useRef<boolean>(false); // 是否回答
+  const [visible, setVisible] = useState<boolean>(false)
+  const answer = 'balloons2'
   const { stage } = useStage({
     elId: 'balloons-container',
   });
@@ -31,6 +33,12 @@ const Balloons: FC<PropTypes> = function(props) {
 
   // }, [stage])
   useEffect(() => {
+    initPage()
+    return () => {
+      return session.clear();
+    };
+  }, []);
+  function initPage() {
     setEles([
       {
         type: EleTypeEnums.LABEL,
@@ -64,10 +72,7 @@ const Balloons: FC<PropTypes> = function(props) {
       // 选项区
       ...createOptionsBalloons(),
     ]);
-    return () => {
-      return session.clear();
-    };
-  }, []);
+  }
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
     init();
@@ -190,11 +195,9 @@ const Balloons: FC<PropTypes> = function(props) {
   async function onOptionDragEnd(evt, el, idx) {
     const [w, h, x, y] = [110, 132, 884, 210]
     if (x < evt.x && evt.x < x + w && y - h < evt.y && evt.y < y + h) {
-      if (isAnswer.current) {
-        // 已经回答过,把其他气球重置回去
-        console.log('isAnswer.current', isAnswer.current);
+      console.log('el', el);
 
-      }
+
       // 贴合到答案框中间
       await el.animate([{ pos: [x + w / 2, y + h / 2] }], {
         duration: 400,
@@ -203,9 +206,16 @@ const Balloons: FC<PropTypes> = function(props) {
         iterations: 1,
         fill: 'forwards',
       });
-      isAnswer.current = true
+      if (answer === el.name) {
+        // 已经回答过,把其他气球重置回去
+        setVisible(true)
+      } else {
+        // initPage()
+        location.reload()
+      }
       return;
     }
+    // 未拖放到答案框
     const defaultPos = session.getKey(sessionKey);
     await el.animate([{ pos: [evt.x, evt.y] }, { pos: defaultPos[idx] }], {
       duration: 400,
@@ -219,12 +229,12 @@ const Balloons: FC<PropTypes> = function(props) {
     <>
       <div
         id={'balloons-container'}
-        // onDropCapture
         style={{
           width: '100vw',
           height: '100vh',
         }}
       />
+      <RewardModal visible={visible} star={3} onClose={() => setVisible(false)} />
     </>
   );
 };
