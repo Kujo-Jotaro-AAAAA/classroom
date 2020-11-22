@@ -73,6 +73,8 @@ export default function useCreateEle(props: PropTypes) {
       handleEvent(el, events)
       handleAnimates(el, animates)
     })
+    console.log('elements', elements);
+
   }
   /**
    * @description 处理挂载的事件

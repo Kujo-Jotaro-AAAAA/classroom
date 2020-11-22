@@ -18,11 +18,16 @@ const [blue, red, yellow] = [
   require('@/assets/png0016.png'),
   require('@/assets/png0017.png'),
 ];
+const colorMap = {
+  blue,
+  red,
+  yellow
+}
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
   const {visible, setVisible, onClose} = useReward()
-  const answer = 'balloons2'
+  const answer = 'blue'
   const { stage } = useStage({
     elId: 'balloons-container',
   });
@@ -88,15 +93,18 @@ const Balloons: FC<PropTypes> = function(props) {
    * @description 获取选项的气球
    */
   function getOptionBalloons() {
-
+    return elements.filter(el => {
+      return el.name
+    });
   }
   /**
    * @description 获取气球的默认位置
    */
   function getOptionInitPos() {
     const balloons = eles.filter(el => {
-      return el.option.name?.startsWith('balloons');
+      return el.option.name
     });
+    console.log('balloons', balloons);
     const defaultPos = balloons.map(b => {
       return b.option.pos;
     });
@@ -138,16 +146,17 @@ const Balloons: FC<PropTypes> = function(props) {
    * @description 选项区
    */
   function createOptionsBalloons(): ElesConfig[] {
-    const arr = [red, yellow, blue];
-    const balloons = arr.map((img, idx) => {
+    const arr = ['red', 'yellow', 'blue'];
+    // colorMap
+    const balloons = arr.map((imgKey, idx) => {
       const balloonW = 48.35;
       const initPosX = 287 + balloonW / 2;
       const initPosY = 469;
       return {
         type: EleTypeEnums.SPRITE,
         option: {
-          name: `balloons${idx}`,
-          texture: img,
+          name: imgKey,
+          texture: colorMap[imgKey],
           size: [balloonW, 100],
           anchor: [0.5, 0.5],
           zIndex: 200,
@@ -188,7 +197,6 @@ const Balloons: FC<PropTypes> = function(props) {
   }
   /**
    * @description 选项拖拽结束
-   * TODO 放置成功后，将另外气球挪回原位置
    * @param evt
    * @param el
    * @param idx
@@ -196,9 +204,6 @@ const Balloons: FC<PropTypes> = function(props) {
   async function onOptionDragEnd(evt, el, idx) {
     const [w, h, x, y] = [110, 132, 884, 210]
     if (x < evt.x && evt.x < x + w && y - h < evt.y && evt.y < y + h) {
-      console.log('el', el);
-
-
       // 贴合到答案框中间
       await el.animate([{ pos: [x + w / 2, y + h / 2] }], {
         duration: 400,
@@ -208,11 +213,11 @@ const Balloons: FC<PropTypes> = function(props) {
         fill: 'forwards',
       });
       if (answer === el.name) {
-        // 已经回答过,把其他气球重置回去
         setVisible(true)
       } else {
+        resetBalloons()
         // initPage()
-        location.reload()
+        // location.reload()
       }
       return;
     }
@@ -225,6 +230,22 @@ const Balloons: FC<PropTypes> = function(props) {
       iterations: 1,
       fill: 'forwards',
     });
+  }
+  function resetBalloons() {
+    const balloons = getOptionBalloons()
+    const ballPos = session.getKey(sessionKey)
+    console.log('重置', balloons, ballPos, elements);
+    balloons.forEach(async (ball, idx) => {
+      await ball.animate([{
+        pos: ballPos[idx]
+      }], {
+        duration: 400,
+        easing: 'ease-in',
+        direction: 'alternate',
+        iterations: 1,
+        fill: 'forwards',
+      })
+    })
   }
   return (
     <>
