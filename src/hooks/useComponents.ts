@@ -9,7 +9,7 @@ import {
 } from '@/hooks/useCreateEle';
 interface PropTypes {
 }
-export default function useReward() {
+export default function useComponents() {
   function createOptionsBlock() {
     const arr = [[240, 457]]
     return arr.map(pos => {

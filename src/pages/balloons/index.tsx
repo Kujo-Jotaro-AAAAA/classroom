@@ -26,6 +26,7 @@ const colorMap = {
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
+  const balloonElm = useRef<any[]>([])
   const {visible, setVisible, onClose} = useReward()
   const answer = 'blue'
   const { stage } = useStage({
@@ -88,6 +89,7 @@ const Balloons: FC<PropTypes> = function(props) {
    */
   async function init() {
     getOptionInitPos();
+    balloonElm.current = getOptionBalloons()
   }
   /**
    * @description 获取选项的气球
@@ -232,9 +234,8 @@ const Balloons: FC<PropTypes> = function(props) {
     });
   }
   function resetBalloons() {
-    const balloons = getOptionBalloons()
+    const balloons = balloonElm.current
     const ballPos = session.getKey(sessionKey)
-    console.log('重置', balloons, ballPos, elements);
     balloons.forEach(async (ball, idx) => {
       await ball.animate([{
         pos: ballPos[idx]
