@@ -115,7 +115,7 @@ export default function useCreateEle(props: PropTypes) {
   function createLabel(op: Types.Label) {
     return new Label(op)
   }
-  function createSprite(op: Types.Sprite) {
+  function createSprite(op: any) {
     return new Sprite(op)
   }
   function createRect(op: Types.Rect) {

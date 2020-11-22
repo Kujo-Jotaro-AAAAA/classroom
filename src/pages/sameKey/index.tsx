@@ -13,12 +13,13 @@ import useCreateEle, {
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
-const [question] = [
-  require('@/assets/part/question.png'),
+const keysImg = [
+  require('@/assets/keys/1.png'),
+  require('@/assets/keys/2.png'),
+  require('@/assets/keys/3.png'),
+  require('@/assets/keys/4.png'),
+  require('@/assets/keys/5.png'),
 ];
-const assertMap = {
-  question,
-}
 const canvasId = 'same-key-container'
 interface PropTypes {}
 const sessionKey = 'optionPos';
@@ -29,7 +30,7 @@ const SameKey: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, eles } = useCreateEle({
+  const { elements, setEles, eles, createSprite } = useCreateEle({
     stage,
   });
   useEffect(() => {
@@ -47,33 +48,33 @@ const SameKey: FC<PropTypes> = function(props) {
     }).flat()
     return createBlueBlock(posList)
   }
-  function initPage() {
+  useEffect(() => {
+    console.log('llll', eles);
 
+  }, [eles])
+  function initPage() {
     setEles([
       createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
-      {
-        type: EleTypeEnums.SPRITE,
-        option: {
-          texture: question,
-          pos: [469, 246.29],
-          size: [85.57, 85.56]
-        },
-      },
-      ...createLayout()
+      ...createLayout(),
+      ...createKeys()
     ]);
   }
-  function createOptionsBlock() {
-    const arr = [[240, 457]]
-    return arr.map(pos => {
+  function createKeys(): ElesConfig[] {
+    const xs = [293, 494, 681], ys = [249, 463]
+    const posList = xs.map(x => {
+      return ys.map(y => {
+        return [x, y]
+      })
+    }).flat()
+    const concatKeys = [...keysImg, keysImg[0]]
+    return concatKeys.map((url, idx) => {
       return {
-        type: EleTypeEnums.BLOCK,
+        type: EleTypeEnums.SPRITE,
         option: {
-          pos: pos,
-          size: [158, 123],
-          border: [2, '#759AFF'],
-          pointerEvents: 'none', // 此属性要指给不捕获事件的元素
-          borderRadius: 10,
-        },
+          texture: url,
+          pos: posList[idx],
+          size: [52, 111]
+        }
       }
     })
   }
