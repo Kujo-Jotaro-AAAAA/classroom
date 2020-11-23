@@ -1,7 +1,7 @@
 /**
  * @description 零件
  */
-import React, { FC, useState, useEffect, useRef } from 'react';
+import React, { FC, useState, useEffect, useRef, useMemo } from 'react';
 import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
@@ -20,24 +20,31 @@ const assertMap = {
 };
 const canvasId = 'blocks-container';
 interface PropTypes {}
-const sessionKey = 'optionPos';
+const sessionKey = 'replyKeys';
+
 const Blocks: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose } = useReward();
   const answer = ['yellow', 'red', 'blue']; // 答案
-  const [reply, setReply] = useState<string[]>([])
+  const [reply, setReply] = useState<string[]>([]);
   const colorBolcksRef = useRef([]);
   const initColorPos = useRef({});
   const answerBolcksRef = useRef([]);
   const initAnswerPos = useRef({});
-
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, eles, findElesByNames, resetElmsAttr } = useCreateEle({
+  const {
+    elements,
+    setEles,
+    eles,
+    findElesByNames,
+    resetElmsAttr,
+  } = useCreateEle({
     stage,
   });
   const { createHorn, createOptionsBlock } = useComponents();
   useEffect(() => {
+    session.clear();
     initPage();
     return () => {
       return session.clear();
@@ -172,7 +179,8 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleMove(evt, ele) {
-    // const curr = ele.name
+    const newReply = session.getKey(sessionKey) || [];
+    if (newReply?.includes(ele.name)) return;
     ele.attr({
       pos: [evt.x, evt.y],
     });
@@ -183,19 +191,48 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleEnd(evt, ele) {
-    // 进入到答题区域时，将另外两个色块做动画回到
-    replaceColorBlock(ele);
-    pullRightBlock(ele);
+    const newReply = session.getKey(sessionKey) || [];
+    if (newReply?.includes(ele.name)) return;
+    const isEdit = replaceColorBlock(ele);
+    const isDone = pullRightBlock(ele);
+    console.log('xxx =>', reply);
+    if (!isEdit && isDone) {
+      newReply.push(ele.name);
+      session.setKey(sessionKey, newReply);
+      setReply(newReply);
+    }
+  }
+  useEffect(() => {
+    console.log('useEff reply ==>', session.getKey(sessionKey));
+    if (reply.length === 3) {
+      submit();
+    }
+  }, [reply]);
+  /**
+   * @description 提交答案
+   */
+  function submit() {
+    const correct = answer.every((an, idx) => an === reply[idx]);
+    if (correct) {
+      setVisible(true);
+      return;
+    }
+    // 提交错误
+    moveColorBlockToInitPos();
+    setReply([]);
   }
   /**
    * @description 进入到答题区域时，将同位置的色块做动画回到初始位置
    * @param ele
    */
   function replaceColorBlock(ele) {
+    let isEdit = false;
     colorBolcksRef.current.forEach(async elm => {
       const [x, y] = ele.attr().pos;
       const isCover = elm.isPointCollision(x, y); // 跟当前色块覆盖了
       if (elm.name !== ele.name && isCover) {
+        const newReply = session.getKey(sessionKey) || [];
+        isEdit = true;
         const pos = initColorPos.current[elm.name];
         await elm.animate([{ pos }], {
           duration: 400,
@@ -204,28 +241,16 @@ const Blocks: FC<PropTypes> = function(props) {
           iterations: 1,
           fill: 'forwards',
         });
+        const index = newReply.findIndex(c => c === elm.name);
+        newReply.splice(index, 1, ele.name);
+        // console.log(newReply, index, ele.name);
+        session.setKey(sessionKey, newReply);
+        setReply(newReply);
       }
     });
+    return isEdit;
   }
-  useEffect(() => {
-    console.log('reply ==>', reply);
-    if (reply.length === 3) {
-      submit()
-    }
-  }, [reply])
-  /**
-   * @description 提交答案
-   */
-  function submit() {
-    const correct = answer.every((an, idx) => an === reply[idx])
-    if(correct) {
-      setVisible(true)
-      return
-    }
-    // 提交错误
-    moveColorBlockToInitPos()
-    setReply([])
-  }
+
   /**
    * @description 放置到答题框并纠正方块的位置
    */
@@ -235,7 +260,7 @@ const Blocks: FC<PropTypes> = function(props) {
       const [x, y] = ele.attr().pos;
       const isCover = answerBlock.isPointCollision(x, y); // 已放进回答框
       if (isCover) {
-        flag = true
+        flag = true;
         const pos = initAnswerPos.current[answerBlock.name];
         await ele.animate([{ pos }], {
           duration: 400,
@@ -244,13 +269,9 @@ const Blocks: FC<PropTypes> = function(props) {
           iterations: 1,
           fill: 'forwards',
         });
-        setReply(reply => {
-          reply.push(ele.name)
-          return [...reply]
-        })
-        return
+        return;
       }
-      if (flag) return
+      if (flag) return;
       const initPos = initColorPos.current[ele.name];
       await ele.animate([{ pos: initPos }], {
         duration: 400,
@@ -260,21 +281,23 @@ const Blocks: FC<PropTypes> = function(props) {
         fill: 'forwards',
       });
     });
+    return flag;
   }
+  /**
+   * @description 将颜色块放回原位
+   */
   function moveColorBlockToInitPos() {
+    session.clear();
     colorBolcksRef.current.forEach(async elm => {
-      const pos = initColorPos.current[elm.name]
-      console.log(pos, elm.name, initColorPos);
-      await elm.animate([
-        {pos}
-      ],{
-         duration: 400,
+      const pos = initColorPos.current[elm.name];
+      await elm.animate([{ pos }], {
+        duration: 400,
         easing: 'ease-in',
         direction: 'alternate',
         iterations: 1,
         fill: 'forwards',
-      })
-    })
+      });
+    });
   }
   return (
     <>
@@ -285,7 +308,14 @@ const Blocks: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal
+        visible={visible}
+        star={3}
+        onClose={() => {
+          onClose();
+          moveColorBlockToInitPos();
+        }}
+      />
     </>
   );
 };

@@ -48,7 +48,7 @@ const Reward: FC<PropTypes> = function(props) {
     await assets.animate.coin.animate([
       {text: 18 + props.star},
     ], {
-      duration: 3000,
+      duration: 500,
       iterations: 1,
       easing: 'ease-out',
       fill: 'forwards'
