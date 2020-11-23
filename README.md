@@ -1,15 +1,23 @@
-# umi project
+# SpriteJS
 
-## Getting Started
+## 类型
 
-Install dependencies,
+### Block
 
-```bash
-$ yarn
+### 使用
+```ts
+const block = new Block({
+  size: [w, h],
+  pos: [x, y],
+  bgcolor: '#fff',
+})
 ```
+## 继承来的node属性
 
-Start the dev server,
+`el.name` : 目前看来是给组件绑定的唯一标识
 
-```bash
-$ yarn start
+`el.removeAttribute` 重置某个类型为初始状态
+
+```ts
+block.removeAttribute('bgcolor')
 ```

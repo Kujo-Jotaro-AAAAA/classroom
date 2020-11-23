@@ -26,7 +26,7 @@ export default function useComponents() {
   }
   /**
    * @description 题干
-   * @param text
+   * @param text 问题
    */
   function createQuestionLabel(text: string): ElesConfig {
     return {
@@ -42,7 +42,7 @@ export default function useComponents() {
    * @description 通用蓝框盒子
    * @param posList
    */
-  function createBlueBlock(posList: number[][], pointerEvents = 'none'): ElesConfig[] {
+  function createBlueBlock(posList: number[][], pointerEvents: string = 'none'): ElesConfig[] {
     return posList.map((pos) => {
       const boxW = 158;
       return {

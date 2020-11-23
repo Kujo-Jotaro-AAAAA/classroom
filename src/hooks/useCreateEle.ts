@@ -123,9 +123,23 @@ export default function useCreateEle(props: PropTypes) {
   function createBlock(op: Types.Block) {
     return new Block(op)
   }
-  function findEle(name: string) {
-    return elements.find(ele => {
+  /**
+   * @description 根据元素名称，查到到对应的元素
+   * @param name
+   */
+  function findEleByName(elm, name: string) {
+    return elm.find(ele => {
       return ele.name === name
+    })
+  }
+  /**
+   * @description 根据元素名称列表，查到到对应的元素
+   * @param name
+   */
+  function findElesByNames(elm, names: string[]) {
+    if (!Array.isArray(names)) return null
+    return names.map(name => {
+      return findEleByName(elm, name)
     })
   }
   return {
@@ -134,7 +148,8 @@ export default function useCreateEle(props: PropTypes) {
     createSprite,
     createRect,
     createBlock,
-    findEle,
+    findEleByName,
+    findElesByNames,
     eles,
     setEles
   }
