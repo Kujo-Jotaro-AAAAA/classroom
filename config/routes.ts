@@ -9,9 +9,15 @@ export default [
       { path: '/demo', component: '@/pages/demo/index' },
       { path: '/glove', component: '@/pages/glove/index' },
       { path: '/sameKey', component: '@/pages/sameKey/index' },
-
+      {
+        path: '/radioGroup',
+        component: '@/pages/radioGroup/index',
+        // routes: [
+        //   { path: '/radioGroup', component: '@/pages/demo/index' },
+        // ],
+      },
       { exact: true, path: '/', redirect: '/balloons' },
-    ]
+    ],
   },
   { exact: true, path: '/', redirect: '/' },
-]
+];
