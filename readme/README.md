@@ -39,6 +39,17 @@ import useCreateEle, {
 
 ## 通用工具函数
 
+### useStage
+
+创建舞台的简便方法
+
+```ts
+import useStage from '@/hooks/useStage';
+const { stage } = useStage({
+  elId: canvasId,
+});
+```
+
 ### useCreateEle
 
 创建元素的`hook` , 以及暴露出来的工具函数
@@ -81,7 +92,7 @@ setEles([
 
 - `elements` : 携带了 `setEles` 创建出来的所有元素信息
 
-- `resetElmsAttr`: 重置元素的属性
+- `resetElmsAttr`: 重置元素的属性, 允许给多个元素的多条属性进行删除
 
 ```ts
 resetElmsAttr(elements, ['bgcolor']);
@@ -102,3 +113,22 @@ optionElms.current = payloadEvtsByNames(elements, blocks, [
 ]);
 ```
 
+### useComponents
+
+项目相关的组件封装，以及通用标识的存取
+
+- `createOptionsBlock` 
+
+创建单条，最多为3个的选项区。
+
+返回`ElesConfig`类型的数据
+
+一般挂载到`useCreateEle`的`setEles`配置表里面。
+
+```ts
+...createOptionsBlock(3)
+```
+
+- `commonBlock`
+
+自动生成选项区的`elements` 的`name`标识

@@ -30,18 +30,18 @@ const canvasId = 'part-container';
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Part: FC<PropTypes> = function(props) {
-  const { createOptionsBlock, commonBlock } = useComponents();
   const { visible, setVisible, onClose } = useReward();
-  const answer = `${commonBlock}-0`;
   const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
   });
+  const { createOptionsBlock, createHorn, commonBlock } = useComponents();
   const { elements, setEles, resetElmsAttr, payloadEvtsByNames } = useCreateEle(
     {
       stage,
     },
   );
+  const answer = `${commonBlock}-0`;
   useEffect(() => {
     initPage();
     return () => {
@@ -50,6 +50,7 @@ const Part: FC<PropTypes> = function(props) {
   }, []);
   function initPage() {
     setEles([
+      createHorn(),
       {
         type: EleTypeEnums.LABEL,
         option: {
