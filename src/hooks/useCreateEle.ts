@@ -47,14 +47,13 @@ export default function useCreateEle(props: PropTypes) {
       setEles(props.eles)
     }
   }, [])
-  const createFnMap = {
+  const createFnMap = { // 生成配置项的方法
     label: createLabel,
     sprite: createSprite,
     rect: createRect,
     block: createBlock
   }
   useEffect(() => {
-    // 只能初始化生成页面， 动态加载的逻辑写在页面上, 否则死循环
     const queue = createQueue();
     setElements(queue)
   }, [eles])
@@ -123,6 +122,7 @@ export default function useCreateEle(props: PropTypes) {
   function createBlock(op: Types.Block) {
     return new Block(op)
   }
+  /* ********=*****************  工具函数   ******************************************************** */
   /**
    * @description 根据元素名称，查到到对应的元素
    * @param name
@@ -142,6 +142,32 @@ export default function useCreateEle(props: PropTypes) {
       return findEleByName(elm, name)
     })
   }
+  /**
+   * @description 给对应的元素挂载事件列表
+   */
+  function payloadEvtsByNames(elm, names: string[], evts: EleEventTypes[]) {
+    const elms = findElesByNames(elm, names)
+    elms.forEach(el => {
+      evts.forEach(evt => {
+        el.addEventListener(evt.type, (e) => {
+          evt.callback(e, el)
+        })
+      })
+    })
+    return elms
+  }
+  /**
+   * @description 重置elm的属性
+   * @param elms
+   * @param attrKeys
+   */
+  function resetElmsAttr(elms, attrKeys: string[]) {
+    elms.forEach(elm => {
+      attrKeys.forEach(attr => {
+        elm.removeAttribute(attr)
+      })
+    });
+  }
   return {
     elements,
     createLabel,
@@ -151,6 +177,8 @@ export default function useCreateEle(props: PropTypes) {
     findEleByName,
     findElesByNames,
     eles,
-    setEles
+    setEles,
+    payloadEvtsByNames,
+    resetElmsAttr
   }
 }

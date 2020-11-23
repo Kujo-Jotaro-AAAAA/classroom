@@ -6,10 +6,12 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
+import { success_color, fail_color } from '@/utils/theme';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
   EvtNameEnum,
+  EleEventTypes,
 } from '@/hooks/useCreateEle';
 import useComponents from '@/hooks/useComponents';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
@@ -28,15 +30,18 @@ const canvasId = 'part-container';
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Part: FC<PropTypes> = function(props) {
-const { createOptionsBlock, commonBlock, } = useComponents();
+  const { createOptionsBlock, commonBlock } = useComponents();
   const { visible, setVisible, onClose } = useReward();
-  const answer = 'first';
+  const answer = `${commonBlock}-0`;
+  const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles,  findElesByNames } = useCreateEle({
-    stage,
-  });
+  const { elements, setEles, resetElmsAttr, payloadEvtsByNames } = useCreateEle(
+    {
+      stage,
+    },
+  );
   useEffect(() => {
     initPage();
     return () => {
@@ -85,32 +90,42 @@ const { createOptionsBlock, commonBlock, } = useComponents();
           size: [balloonW, 85.58],
           anchor: [0.5, 0.5],
           zIndex: 200,
+          pointerEvents: 'none',
           pos: [initPosX + (107 + balloonW) * idx, initPosY + 85.58 / 2],
         },
-        evt: [
-          {
-            type: EvtNameEnum.CLICK,
-            callback: (evt, el) => {
-              if (answer === el.name) {
-                setVisible(true);
-              } else {
-                console.log('答错了');
-                // initPage()
-                // location.reload()
-              }
-            },
-          },
-        ],
       };
     });
     return parts;
   }
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
-    const blocks = [0,1,2].map(n => `${commonBlock}-${n}`)
-    const ref = findElesByNames(elements, blocks)
-    console.log('ref ==>', elements, ref);
+    const blocks = [0, 1, 2].map(n => `${commonBlock}-${n}`);
+    // const ref = findElesByNames(elements, blocks)
+    optionElms.current = payloadEvtsByNames(elements, blocks, [
+      {
+        type: EvtNameEnum.CLICK,
+        callback: (evt, el) => {
+          onSubmit(el);
+        },
+      },
+    ]);
+    // console.log('ref ==>', ref);
   }, [elements]);
+  function onSubmit(el) {
+    const correct = el.name === answer;
+    const bgcolorStatus = correct ? success_color : fail_color;
+    if (correct) {
+      setVisible(true);
+    } else {
+      // TODO 播放，重置
+      setTimeout(() => {
+        resetElmsAttr(elements, ['bgcolor']);
+      }, 1000);
+    }
+    el.attr({
+      bgcolor: bgcolorStatus,
+    });
+  }
   return (
     <>
       <div
