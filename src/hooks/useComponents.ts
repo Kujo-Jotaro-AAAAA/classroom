@@ -63,7 +63,7 @@ export default function useComponents() {
    * @description 生成单排的选项框
    * @param num
    */
-  function createOptionsBlock(num: number): ElesConfig[] {
+  function createOptionsBlock(num: number, pointerEvents: string = 'visible'): ElesConfig[] {
     const initPosX = 232,
       initPosY = 457,
       w = 158,
@@ -71,13 +71,13 @@ export default function useComponents() {
     const arr = new Array(num).fill(0).map((_, idx) => {
       return [initPosX + (w + 35) * idx, initPosY];
     });
-    return createBlueBlock(arr);
+    return createBlueBlock(arr, pointerEvents);
   }
   /**
    * @description 生成两排的选项框
    * @param num
    */
-  function createDoubleOptionsBlock(): ElesConfig[] {
+  function createDoubleOptionsBlock(pointerEvents: string = 'visible'): ElesConfig[] {
     const xs = [240, 433, 626],
       ys = [243, 457];
     const posList = ys
@@ -87,7 +87,7 @@ export default function useComponents() {
         });
       })
       .flat();
-    return createBlueBlock(posList);
+    return createBlueBlock(posList, pointerEvents);
   }
 
   return {

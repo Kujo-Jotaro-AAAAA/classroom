@@ -7,12 +7,10 @@ export default [
       { path: '/balloons', component: '@/pages/balloons/index' },
       { path: '/demo', component: '@/pages/demo/index' },
       { path: '/sameKey', component: '@/pages/sameKey/index' },
+      { path: '/blocks', component: '@/pages/blocks/index' },
       {
         path: '/radiogroup',
         component: '@/pages/radioGroup/index',
-        // routes: [
-        //   { path: '/radioGroup', component: '@/pages/demo/index' },
-        // ],
       },
       { exact: true, path: '/', redirect: '/balloons' },
     ],
