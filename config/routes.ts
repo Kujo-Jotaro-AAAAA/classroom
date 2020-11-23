@@ -10,7 +10,7 @@ export default [
       { path: '/glove', component: '@/pages/glove/index' },
       { path: '/sameKey', component: '@/pages/sameKey/index' },
       {
-        path: '/radioGroup',
+        path: '/radiogroup',
         component: '@/pages/radioGroup/index',
         // routes: [
         //   { path: '/radioGroup', component: '@/pages/demo/index' },
