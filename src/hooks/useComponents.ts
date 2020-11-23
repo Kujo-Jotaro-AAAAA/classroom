@@ -7,6 +7,7 @@ import {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+import {main_color} from '@/utils/theme';
 const [reloadHorn] = [require('@/assets/重播按钮.png')]
 interface PropTypes {
 }
@@ -50,7 +51,7 @@ export default function useComponents() {
         option: {
           size: [boxW, 123],
           pos,
-          border: [2, '#759AFF'],
+          border: [2, main_color],
           pointerEvents, // 此属性要指给不捕获事件的元素
           borderRadius: 10,
         },
@@ -72,7 +73,7 @@ export default function useComponents() {
         option: {
           size: [boxW, 123],
           pos: [initPosX + (boxW + 35) * idx, initPosY],
-          border: [2, '#759AFF'],
+          border: [2, main_color],
           pointerEvents: 'none', // 此属性要指给不捕获事件的元素
           borderRadius: 10,
         },

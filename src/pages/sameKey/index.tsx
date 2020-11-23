@@ -13,6 +13,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+import {main_color, fail_color} from '@/utils/theme';
 import styles from './styles/index.less';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const keysImg = [
@@ -110,7 +111,7 @@ const SameKey: FC<PropTypes> = function(props) {
           resetBlockBg();
           answerRef.current = [];
         }, 3000);
-        elm.attributes.bgcolor = '#F1F5FF';
+        elm.attributes.bgcolor = main_color;
       }
     }
   }
@@ -118,7 +119,7 @@ const SameKey: FC<PropTypes> = function(props) {
     setVisible(true);
     answer.forEach(an => {
       blockElmRef.current[an].attr({
-        bgcolor: '#FFEEE4',
+        bgcolor: fail_color,
       });
     });
   }
