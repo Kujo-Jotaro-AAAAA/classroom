@@ -13,7 +13,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-import {main_color, fail_color} from '@/utils/theme';
+import {success_color, fail_color} from '@/utils/theme';
 import styles from './styles/index.less';
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const keysImg = [
@@ -96,8 +96,6 @@ const SameKey: FC<PropTypes> = function(props) {
    */
   function onBlockClick(elm) {
     const [p, key] = elm.name.split('-');
-    console.log('answerRef.current ==>', answerRef.current);
-
     if (answerRef.current.length < 2) {
       answerRef.current.push(Number(key));
       const correct =
@@ -106,20 +104,25 @@ const SameKey: FC<PropTypes> = function(props) {
       if (correct) {
         handleCorrect();
       } else {
-        // 播放错误语音后,重置
-        setTimeout(() => {
-          resetBlockBg();
-          answerRef.current = [];
-        }, 3000);
-        elm.attributes.bgcolor = main_color;
+        if (answerRef.current.length === 2) { // 回答错误
+          // 播放错误语音后,重置
+          setTimeout(() => {
+            resetBlockBg();
+            answerRef.current = [];
+          }, 3000);
+        }
+        elm.attributes.bgcolor = fail_color;
       }
     }
   }
+  /**
+   * @description 成功
+   */
   function handleCorrect() {
     setVisible(true);
     answer.forEach(an => {
       blockElmRef.current[an].attr({
-        bgcolor: fail_color,
+        bgcolor: success_color,
       });
     });
   }
