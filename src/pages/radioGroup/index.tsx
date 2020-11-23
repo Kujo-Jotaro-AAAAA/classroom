@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {history} from 'umi';
 import TmpPage from './components/tmp';
+import useComponents from '@/hooks/useComponents';
 const partAssertMap = {
   question: require('@/assets/part/question.png'),
   first: require('@/assets/part/first.png'),
@@ -15,14 +16,17 @@ const gloveAssertMap = {
 }
 const RadioGroup: React.FC = function (props) {
   const [tmp, setTmp] = useState<string>()
+  const { commonBlock } = useComponents();
   const assertMap = {
     part: {
       assert: partAssertMap,
-      label: '哪个是和机器人零件一模一样的呢？点点看吧'
+      label: '哪个是和机器人零件一模一样的呢？点点看吧',
+      answer: `${commonBlock}-0`
     },
     glove: {
       assert: gloveAssertMap,
-      label: '哪个是和上面的手套一模一样的呢？点点看吧'
+      label: '哪个是和上面的手套一模一样的呢？点点看吧',
+      answer: `${commonBlock}-1`
     }
   }
   useEffect(() => {
@@ -30,7 +34,7 @@ const RadioGroup: React.FC = function (props) {
     setTmp(history.location.query?.tmp)
   }, [])
   return <>
-    {tmp && <TmpPage assert={assertMap[tmp].assert} QLabel={assertMap[tmp].label} />}
+    {tmp && <TmpPage {...assertMap[tmp]} />}
   </>
 }
 export default RadioGroup

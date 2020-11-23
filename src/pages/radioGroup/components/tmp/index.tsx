@@ -19,7 +19,8 @@ interface PropTypes {
   assert: { // 静态资源
     [propsName: string] : string
   },
-  QLabel: string // 题干
+  label: string // 题干
+  answer: string
 }
 const Part: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose } = useReward();
@@ -33,7 +34,8 @@ const Part: FC<PropTypes> = function(props) {
       stage,
     },
   );
-  const answer = `${commonBlock}-0`;
+  const {answer} = props
+  // const answer = `${commonBlock}-0`;
   useEffect(() => {
     initPage();
     return () => {
@@ -46,7 +48,7 @@ const Part: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.LABEL,
         option: {
-          text: props.QLabel,
+          text: props.label,
           fontSize: 34,
           pos: [61, 93],
         },
