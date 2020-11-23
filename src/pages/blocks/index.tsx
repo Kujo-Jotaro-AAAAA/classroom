@@ -23,7 +23,8 @@ interface PropTypes {}
 const sessionKey = 'optionPos';
 const Blocks: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose } = useReward();
-  const answer = 'blue';
+  const answer = ['yellow', 'red', 'blue']; // 答案
+  const [reply, setReply] = useState<string[]>([])
   const colorBolcksRef = useRef([]);
   const initColorPos = useRef({});
   const answerBolcksRef = useRef([]);
@@ -32,7 +33,7 @@ const Blocks: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, eles, findElesByNames } = useCreateEle({
+  const { elements, setEles, eles, findElesByNames, resetElmsAttr } = useCreateEle({
     stage,
   });
   const { createHorn, createOptionsBlock } = useComponents();
@@ -182,7 +183,6 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleEnd(evt, ele) {
-    const curr = ele.name;
     // 进入到答题区域时，将另外两个色块做动画回到
     replaceColorBlock(ele);
     pullRightBlock(ele);
@@ -207,14 +207,33 @@ const Blocks: FC<PropTypes> = function(props) {
       }
     });
   }
+  useEffect(() => {
+    console.log('reply ==>', reply);
+    if (reply.length === 3) {
+      submit()
+    }
+  }, [reply])
   /**
-   * @description 纠正方块的位置
+   * @description 提交答案
+   */
+  function submit() {
+    const correct = answer.every((an, idx) => an === reply[idx])
+    if(correct) {
+      setVisible(true)
+      return
+    }
+    // 提交错误
+    moveColorBlockToInitPos()
+    setReply([])
+  }
+  /**
+   * @description 放置到答题框并纠正方块的位置
    */
   function pullRightBlock(ele) {
     let flag = false; // 为true时，说明已经有一项匹配了
     answerBolcksRef.current.forEach(async answerBlock => {
       const [x, y] = ele.attr().pos;
-      const isCover = answerBlock.isPointCollision(x, y); // 跟当前色块覆盖了
+      const isCover = answerBlock.isPointCollision(x, y); // 已放进回答框
       if (isCover) {
         flag = true
         const pos = initAnswerPos.current[answerBlock.name];
@@ -225,11 +244,14 @@ const Blocks: FC<PropTypes> = function(props) {
           iterations: 1,
           fill: 'forwards',
         });
+        setReply(reply => {
+          reply.push(ele.name)
+          return [...reply]
+        })
         return
       }
       if (flag) return
       const initPos = initColorPos.current[ele.name];
-      console.log('没覆盖到', initPos);
       await ele.animate([{ pos: initPos }], {
         duration: 400,
         easing: 'ease-in',
@@ -238,6 +260,21 @@ const Blocks: FC<PropTypes> = function(props) {
         fill: 'forwards',
       });
     });
+  }
+  function moveColorBlockToInitPos() {
+    colorBolcksRef.current.forEach(async elm => {
+      const pos = initColorPos.current[elm.name]
+      console.log(pos, elm.name, initColorPos);
+      await elm.animate([
+        {pos}
+      ],{
+         duration: 400,
+        easing: 'ease-in',
+        direction: 'alternate',
+        iterations: 1,
+        fill: 'forwards',
+      })
+    })
   }
   return (
     <>
