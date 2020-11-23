@@ -5,9 +5,7 @@ export default [
     component: './index',
     routes: [
       { path: '/balloons', component: '@/pages/balloons/index' },
-      { path: '/part', component: '@/pages/part/index' },
       { path: '/demo', component: '@/pages/demo/index' },
-      { path: '/glove', component: '@/pages/glove/index' },
       { path: '/sameKey', component: '@/pages/sameKey/index' },
       {
         path: '/radiogroup',
