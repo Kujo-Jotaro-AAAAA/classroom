@@ -1,4 +1,3 @@
-
 /**
  * @description 零件
  */
@@ -23,23 +22,23 @@ const [question, first, center, last] = [
 const assertMap = {
   first,
   center,
-  last
-}
-const { createOptionsBlock } = useComponents()
-const canvasId = 'part-container'
+  last,
+};
+const canvasId = 'part-container';
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Part: FC<PropTypes> = function(props) {
-  const {visible, setVisible, onClose} = useReward()
-  const answer = 'first'
+const { createOptionsBlock, commonBlock, } = useComponents();
+  const { visible, setVisible, onClose } = useReward();
+  const answer = 'first';
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, eles } = useCreateEle({
+  const { elements, setEles,  findElesByNames } = useCreateEle({
     stage,
   });
   useEffect(() => {
-    initPage()
+    initPage();
     return () => {
       return session.clear();
     };
@@ -59,16 +58,16 @@ const Part: FC<PropTypes> = function(props) {
         option: {
           texture: question,
           pos: [469, 246.29],
-          size: [85.57, 85.56]
+          size: [85.57, 85.56],
         },
       },
       // 选项区
       ...createOptionsParts(),
-      ...createOptionsBlock(3)
+      ...createOptionsBlock(3),
     ]);
   }
 
-/**
+  /**
    * @description 选项区
    */
   function createOptionsParts(): ElesConfig[] {
@@ -93,22 +92,24 @@ const Part: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, el) => {
               if (answer === el.name) {
-                setVisible(true)
+                setVisible(true);
               } else {
-                console.log('答错了')
+                console.log('答错了');
                 // initPage()
                 // location.reload()
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       };
     });
     return parts;
   }
-
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
+    const blocks = [0,1,2].map(n => `${commonBlock}-${n}`)
+    const ref = findElesByNames(elements, blocks)
+    console.log('ref ==>', elements, ref);
   }, [elements]);
   return (
     <>

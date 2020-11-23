@@ -31,7 +31,7 @@ const SameKey: FC<PropTypes> = function(props) {
   const answerRef = useRef<number[]>([]);
   const answer = [0, 5]; // 正确答案
   const blockElmRef = useRef<any[]>([]);
-  const { createHorn, createBlueBlock, createQuestionLabel } = useComponents();
+  const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock } = useComponents();
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -48,7 +48,7 @@ const SameKey: FC<PropTypes> = function(props) {
     setEles([
       createHorn(),
       createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
-      ...createLayout(),
+      ...createOptions(),
       ...createKeys(),
     ]);
   }
@@ -58,25 +58,12 @@ const SameKey: FC<PropTypes> = function(props) {
     console.log('getBlocks ==>', blockElmRef.current);
   }, [elements]);
   function getBlocks() {
-    const  blockNames = [0,1,2,3,4,5].map(num => `block-${num}`)
+    const  blockNames = [0,1,2,3,4,5].map(num => `${commonBlock}-${num}`)
     return findElesByNames(elements, blockNames)
-    // return elements.filter(el => {
-    //   return el.name;
-    // });
   }
-  function createLayout() {
-    const xs = [240, 433, 626],
-      ys = [243, 457];
-    const posList = ys
-      .map(y => {
-        return xs.map(x => {
-          return [x, y];
-        });
-      })
-      .flat();
-    const blueBlockConfigs = createBlueBlock(posList, 'visible');
+  function createOptions() {
+    const blueBlockConfigs = createDoubleOptionsBlock();
     return blueBlockConfigs.map((config, idx) => {
-      config.option.name = `block-${idx}`;
       return {
         ...config,
         evt: [
