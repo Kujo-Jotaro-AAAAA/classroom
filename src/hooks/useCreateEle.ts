@@ -4,14 +4,15 @@
 import { useState, useEffect, useRef } from 'react'
 import * as spritejs from 'spritejs'
 import * as Types from 'spritejs/typings/spritejs.d';
-const {  Sprite, Rect, Block, Label } = spritejs
+const {  Sprite, Rect, Block, Label, Polyline } = spritejs
 // type ElesType = Types.Label | Types.Sprite | Types.Rect | Types.Block
 type ElesType = any
 export enum EleTypeEnums {
   LABEL = 'label',
   SPRITE = 'sprite',
   RECT = 'rect',
-  BLOCK = 'block'
+  BLOCK = 'block',
+  POLYLINE = 'polyline'
 }
 export enum EvtNameEnum {
   TOUCH_START = 'touchstart',
@@ -51,7 +52,8 @@ export default function useCreateEle(props: PropTypes) {
     label: createLabel,
     sprite: createSprite,
     rect: createRect,
-    block: createBlock
+    block: createBlock,
+    polyline: createPolyline
   }
   useEffect(() => {
     const queue = createQueue();
@@ -122,6 +124,9 @@ export default function useCreateEle(props: PropTypes) {
   function createBlock(op: Types.Block) {
     return new Block(op)
   }
+  function createPolyline(op) {
+    return new Polyline(op)
+  }
   /* ********=*****************  工具函数   ******************************************************** */
   /**
    * @description 根据元素名称，查到到对应的元素
@@ -174,6 +179,7 @@ export default function useCreateEle(props: PropTypes) {
     createSprite,
     createRect,
     createBlock,
+    createPolyline,
     findEleByName,
     findElesByNames,
     eles,

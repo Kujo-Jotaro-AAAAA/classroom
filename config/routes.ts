@@ -4,16 +4,21 @@ export default [
     path: '/',
     component: './index',
     routes: [
+      // 气球
       { path: '/balloons', component: '@/pages/balloons/index' },
-      { path: '/demo', component: '@/pages/demo/index' },
+      // { path: '/demo', component: '@/pages/demo/index' },
+      // 钥匙页
       { path: '/sameKey', component: '@/pages/sameKey/index' },
+      // 方块移动页
       { path: '/blocks', component: '@/pages/blocks/index' },
       {
         path: '/radiogroup',
         component: '@/pages/radioGroup/index',
       },
+      // 送货
+      { path: '/delivery', component: '@/pages/delivery/index' },
       { exact: true, path: '/', redirect: '/balloons' },
     ],
   },
-  { exact: true, path: '/', redirect: '/' },
+  { exact: true, path: '/', redirect: '/balloons' },
 ];
