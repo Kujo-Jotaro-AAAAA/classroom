@@ -23,9 +23,9 @@ interface PropTypes {}
 const sessionKey = 'replyKeys';
 
 const Blocks: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose,setReplyNum, replyNum, getStar, resetReply } = useReward();
   const answer = ['yellow', 'red', 'blue']; // 答案
-  const [reply, setReply] = useState<string[]>([]);
+  const [layUp, setLayUp] = useState<string[]>([]);
   const colorBolcksRef = useRef([]);
   const initColorPos = useRef({});
   const answerBolcksRef = useRef([]);
@@ -151,7 +151,11 @@ const Blocks: FC<PropTypes> = function(props) {
       'yellow',
       'blue',
     ]);
-    console.log(colorBolcksRef.current[0].attr(), colorBolcksRef.current[1].attr(), colorBolcksRef.current[2].attr());
+    console.log(
+      colorBolcksRef.current[0].attr(),
+      colorBolcksRef.current[1].attr(),
+      colorBolcksRef.current[2].attr(),
+    );
 
     answerBolcksRef.current = findElesByNames(elements, [
       'answer-0',
@@ -185,7 +189,7 @@ const Blocks: FC<PropTypes> = function(props) {
     if (newReply?.includes(ele.name)) return;
     ele.attr({
       pos: [evt.x, evt.y],
-      zIndex: 99999
+      zIndex: 99999,
     });
   }
   /**
@@ -194,35 +198,36 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleEnd(evt, ele) {
-    ele.removeAttribute('zIndex', )
+    ele.removeAttribute('zIndex');
     const newReply = session.getKey(sessionKey) || [];
     if (newReply?.includes(ele.name)) return;
-    const isEdit = replaceColorBlock(ele)
+    const isEdit = replaceColorBlock(ele);
     // zIndex: 99999
-    const isDone = pullRightBlock(ele)
+    const isDone = pullRightBlock(ele);
     if (!isEdit && isDone) {
       newReply.push(ele.name);
       session.setKey(sessionKey, newReply);
-      setReply(newReply);
+      setLayUp(newReply);
     }
   }
   useEffect(() => {
-    if (reply.length === 3) {
+    if (layUp.length === 3) {
       submit();
+      setReplyNum(replyNum + 1)
     }
-  }, [reply]);
+  }, [layUp]);
   /**
    * @description 提交答案
    */
   function submit() {
-    const correct = answer.every((an, idx) => an === reply[idx]);
+    const correct = answer.every((an, idx) => an === layUp[idx]);
     if (correct) {
       setVisible(true);
       return;
     }
     // 提交错误
     moveColorBlockToInitPos();
-    setReply([]);
+    setLayUp([]);
   }
   /**
    * @description 进入到答题区域时，将同位置的色块做动画回到初始位置
@@ -248,7 +253,7 @@ const Blocks: FC<PropTypes> = function(props) {
         newReply.splice(index, 1, ele.name);
         // console.log(newReply, index, ele.name);
         session.setKey(sessionKey, newReply);
-        setReply(newReply);
+        setLayUp(newReply);
       }
     });
     return isEdit;
@@ -291,6 +296,7 @@ const Blocks: FC<PropTypes> = function(props) {
    */
   function moveColorBlockToInitPos() {
     session.clear();
+    resetReply();
     colorBolcksRef.current.forEach(async elm => {
       const pos = initColorPos.current[elm.name];
       await elm.animate([{ pos }], {
@@ -313,7 +319,7 @@ const Blocks: FC<PropTypes> = function(props) {
       />
       <RewardModal
         visible={visible}
-        star={3}
+        star={getStar}
         onClose={() => {
           onClose();
           moveColorBlockToInitPos();
