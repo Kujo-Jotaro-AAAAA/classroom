@@ -89,7 +89,6 @@ const Part: FC<PropTypes> = function(props) {
    * @param elm
    */
   function onSubmit(elm) {
-    setSessionReply(getSessionReply() + 1)
     if (props.answer == elm.name) {
       elm.attr('bgcolor', success_color)
       elm.attr({
@@ -100,6 +99,7 @@ const Part: FC<PropTypes> = function(props) {
       clearSessionReply()
       return
     }
+    setSessionReply(getSessionReply() + 1)
     elm.attr({
       bgcolor: fail_color,
       borderColor: main_color

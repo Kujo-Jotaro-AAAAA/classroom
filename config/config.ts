@@ -10,6 +10,9 @@ export default defineConfig({
   history: {
     type: 'hash'
   },
+  dynamicImport: {
+    loading: '@/components/loading'
+  },
   title: 'h5-template',
   // theme,
   mountElementId: 'app',

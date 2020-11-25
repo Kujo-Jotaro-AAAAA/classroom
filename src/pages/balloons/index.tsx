@@ -30,7 +30,7 @@ interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
   const balloonElm = useRef<any[]>([]);
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose, setSessionReply, clearSessionReply, getSessionReply, getStarFn } = useReward();
   const { createOptionsBlock, createStep } = useComponents();
   const replyRef = useRef(null);
   const answer = 'blue';
@@ -247,6 +247,7 @@ const Balloons: FC<PropTypes> = function(props) {
       if (tmpMap[currIndex].answer === el.name) {
         setVisible(true);
       } else {
+        setSessionReply(getSessionReply() + 1)
         resetBalloons();
       }
     }, 1000)
@@ -319,7 +320,10 @@ const Balloons: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={getStarFn(getSessionReply())} onClose={() => {
+        onClose()
+        clearSessionReply()
+      }} />
     </>
   );
 };
