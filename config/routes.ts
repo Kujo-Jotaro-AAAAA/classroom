@@ -9,6 +9,7 @@ export default [
       // { path: '/demo', component: '@/pages/demo/index' },
       // 钥匙页
       { path: '/sameKey', component: '@/pages/sameKey/index' },
+      { path: '/multiplechoice', component: '@/pages/multipleChoice/index' },
       // 方块移动页
       { path: '/blocks', component: '@/pages/blocks/index' },
       {

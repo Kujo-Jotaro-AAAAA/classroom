@@ -89,7 +89,6 @@ const Part: FC<PropTypes> = function(props) {
    * @param elm
    */
   function onSubmit(elm) {
-    console.log('提交答案')
     setSessionReply(getSessionReply() + 1)
     if (props.answer == elm.name) {
       elm.attr('bgcolor', success_color)

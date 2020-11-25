@@ -8,6 +8,7 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
+import {PageOptionItemTypes} from '../../index';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -22,14 +23,14 @@ const keysImg = [
   require('@/assets/keys/5.png'),
 ];
 const canvasId = 'same-key-container';
-interface PropTypes {}
+
+interface PropTypes extends PageOptionItemTypes {}
 const sessionKey = 'optionPos';
-const SameKey: FC<PropTypes> = function(props) {
+const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
   const { visible, setVisible, onClose } = useReward();
   const answerRef = useRef<number[]>([]);
-  const answer = [0, 5]; // 正确答案
   const blockElmRef = useRef<any[]>([]);
-  const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock } = useComponents();
+  const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock, createStep } = useComponents();
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -44,10 +45,12 @@ const SameKey: FC<PropTypes> = function(props) {
   }, []);
   function initPage() {
     setEles([
+      ...createStep(1),
       createHorn(),
-      createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
+      // createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
       ...createOptions(),
-      ...createKeys(),
+      ...optionElmInit,
+      // ...createKeys(),
     ]);
   }
   useEffect(() => {
@@ -162,4 +165,4 @@ const SameKey: FC<PropTypes> = function(props) {
     </>
   );
 };
-export default SameKey;
+export default MultipleTmp;
