@@ -5,18 +5,22 @@ import useComponents from '@/hooks/useComponents';
 import { ElesConfig, EleTypeEnums } from '@/hooks/useCreateEle';
 const queryTmp = history.location.query?.tmp;
 const assertMap = {
-  colorKey: [require('@/assets/keys/1.png'),
-  require('@/assets/keys/2.png'),
-  require('@/assets/keys/3.png'),
-  require('@/assets/keys/4.png'),
-  require('@/assets/keys/5.png')],
+  colorKey: [
+    require('@/assets/keys/1.png'),
+    require('@/assets/keys/2.png'),
+    require('@/assets/keys/3.png'),
+    require('@/assets/keys/4.png'),
+    require('@/assets/keys/5.png'),
+    require('@/assets/keys/1.png'),
+  ],
   robot: [
     require('@/assets/keys/机器人1@2x.png'),
     require('@/assets/keys/png0050@2x.png'),
     require('@/assets/keys/png0051@2x.png'),
+    require('@/assets/keys/png0051@2x.png'),
     require('@/assets/keys/png0052@2x.png'),
     require('@/assets/keys/png0053@2x.png'),
-  ]
+  ],
 };
 export interface PageOptionItemTypes {
   optionElmInit: ElesConfig[];
@@ -55,12 +59,13 @@ const RadioGroup: React.FC = function(props) {
     // const xs = [293, 494, 681],
     //   ys = [249, 463];
     const xsMap = {
-      colorKey: [293, 494, 681],
-      robot: [273, 466, 659]
-    }, ysMap = {
-      colorKey: [249, 463],
-      robot: [250, 464]
-    }
+        colorKey: [293, 494, 681],
+        robot: [273, 466, 659],
+      },
+      ysMap = {
+        colorKey: [249, 463],
+        robot: [250, 464],
+      };
     const posList = ysMap[queryTmp]
       .map(y => {
         return xsMap[queryTmp].map(x => {
@@ -68,22 +73,28 @@ const RadioGroup: React.FC = function(props) {
         });
       })
       .flat();
-    const concatKeys = [...assertMap[queryTmp], assertMap[queryTmp][0]];
-    return concatKeys.map((url, idx) => {
+    return assertMap[queryTmp].map((url, idx) => {
       const sizeMap = {
         colorKey: [52, 111],
-        robot: [93, 109]
-      }
+        robot: [93, 109],
+      };
       return {
         type: EleTypeEnums.SPRITE,
         option: {
           texture: url,
           pos: posList[idx],
           size: sizeMap[queryTmp],
+          pointerEvent: 'none'
         },
       };
     });
   }
-  return <>{pageOption && pageOption[queryTmp] && <TmpPage {...pageOption[queryTmp]} />}</>;
+  return (
+    <>
+      {pageOption && pageOption[queryTmp] && (
+        <TmpPage {...pageOption[queryTmp]} />
+      )}
+    </>
+  );
 };
 export default RadioGroup;

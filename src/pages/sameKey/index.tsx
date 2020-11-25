@@ -13,7 +13,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-import {success_color, fail_color} from '@/utils/theme';
+import { success_color, success_border, fail_color } from '@/utils/theme';
 const keysImg = [
   require('@/assets/keys/1.png'),
   require('@/assets/keys/2.png'),
@@ -25,11 +25,16 @@ const canvasId = 'same-key-container';
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const SameKey: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose, setSessionReply, getSessionReply, getStarFn, clearSessionReply } = useReward();
   const answerRef = useRef<number[]>([]);
   const answer = [0, 5]; // 正确答案
   const blockElmRef = useRef<any[]>([]);
-  const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock } = useComponents();
+  const {
+    createHorn,
+    commonBlock,
+    createQuestionLabel,
+    createDoubleOptionsBlock,
+  } = useComponents();
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -56,8 +61,8 @@ const SameKey: FC<PropTypes> = function(props) {
     console.log('getBlocks ==>', blockElmRef.current);
   }, [elements]);
   function getBlocks() {
-    const  blockNames = [0,1,2,3,4,5].map(num => `${commonBlock}-${num}`)
-    return findElesByNames(elements, blockNames)
+    const blockNames = [0, 1, 2, 3, 4, 5].map(num => `${commonBlock}-${num}`);
+    return findElesByNames(elements, blockNames);
   }
   function createOptions() {
     const blueBlockConfigs = createDoubleOptionsBlock();
@@ -89,12 +94,14 @@ const SameKey: FC<PropTypes> = function(props) {
       if (correct) {
         handleCorrect();
       } else {
-        if (answerRef.current.length === 2) { // 回答错误
+        if (answerRef.current.length === 2) {
+          // 回答错误
           // 播放错误语音后,重置
           setTimeout(() => {
             resetBlockBg();
             answerRef.current = [];
-          }, 3000);
+          }, 1000);
+          setSessionReply(getSessionReply() + 1)
         }
         elm.attributes.bgcolor = fail_color;
       }
@@ -108,6 +115,7 @@ const SameKey: FC<PropTypes> = function(props) {
     answer.forEach(an => {
       blockElmRef.current[an].attr({
         bgcolor: success_color,
+        borderColor: success_border,
       });
     });
   }
@@ -124,12 +132,17 @@ const SameKey: FC<PropTypes> = function(props) {
       .flat();
     const concatKeys = [...keysImg, keysImg[0]];
     return concatKeys.map((url, idx) => {
+      const wMap = {
+          1: 37,
+        },
+        w = wMap[idx] || 52;
       return {
         type: EleTypeEnums.SPRITE,
         option: {
           texture: url,
           pos: posList[idx],
-          size: [52, 111],
+          size: [w, 111],
+          pointerEvents: 'none',
         },
       };
     });
@@ -153,9 +166,10 @@ const SameKey: FC<PropTypes> = function(props) {
       />
       <RewardModal
         visible={visible}
-        star={3}
+        star={getStarFn(getSessionReply())}
         onClose={() => {
-          resetBlockBg();
+          resetBlockBg()
+          clearSessionReply()
           onClose();
         }}
       />

@@ -9,7 +9,8 @@ export default function useReward() {
   const getStar = useMemo(getStarFn, [replyNum])
   function getStarFn(num?: number) {
     const starMap = {
-      1 : 3,
+      0: 3,
+      1: 3,
       2: 2,
       3: 1
     }

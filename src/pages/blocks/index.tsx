@@ -152,12 +152,6 @@ const Blocks: FC<PropTypes> = function(props) {
       'yellow',
       'blue',
     ]);
-    console.log(
-      colorBolcksRef.current[0].attr(),
-      colorBolcksRef.current[1].attr(),
-      colorBolcksRef.current[2].attr(),
-    );
-
     answerBolcksRef.current = findElesByNames(elements, [
       'answer-0',
       'answer-1',
@@ -203,7 +197,6 @@ const Blocks: FC<PropTypes> = function(props) {
     const newReply = session.getKey(sessionKey) || [];
     if (newReply?.includes(ele.name)) return;
     const isEdit = replaceColorBlock(ele);
-    // zIndex: 99999
     const isDone = pullRightBlock(ele);
     if (!isEdit && isDone) {
       newReply.push(ele.name);
@@ -216,6 +209,7 @@ const Blocks: FC<PropTypes> = function(props) {
       submit();
       setReplyNum(replyNum + 1)
     }
+    console.log('replyNum ==>', replyNum);
   }, [layUp]);
   /**
    * @description 提交答案
