@@ -11,6 +11,10 @@ const assertMap = {
   g: require('@/assets/radioGroupSimple/png0006.png'), // 葡萄
   ba: require('@/assets/radioGroupSimple/png0007.png'), // 香蕉
   br: require('@/assets/radioGroupSimple/png0008.png'), // 面包
+  // 交通锥
+  coneR: require('@/assets/radioGroupSimple/png0035.png'), // 红
+  coneB: require('@/assets/radioGroupSimple/png0036.png'), // 蓝
+  coneG: require('@/assets/radioGroupSimple/png0037.png'), // 绿
 };
 export interface PageOptionItemTypes {
   optionElmInit: ElesConfig[];
@@ -42,6 +46,13 @@ const RadioGroup: React.FC = function(props) {
         ],
         answer: '1',
       },
+      cone: {
+        optionElmInit: [
+          createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
+          ...createCone()
+        ],
+        answer: '1',
+      }
     });
   }
   /**
@@ -120,6 +131,35 @@ const RadioGroup: React.FC = function(props) {
     });
 
     return [...list, ...breads];
+  }
+  /**
+   * @description 创建交通锥
+   */
+  function createCone(): ElesConfig[] {
+    const w = 60,
+      h = 67;
+    const list = [
+      ['coneR','coneB','coneG','coneG','coneR','coneB','coneR','coneB','coneG'],
+      ['coneR','coneB','coneG','coneR','coneB','coneG','coneR','coneB','coneG'],
+    ];
+    return list
+      .map((opList, opIdx) => {
+        return opList.map((tag, idx) => {
+          const texture = assertMap[tag],
+            x = 96 + (37 + w) * idx,
+            y = opIdx === 0 ? 276 : 485
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture,
+              size: [w, h],
+              pos: [x, y],
+              zIndex: 10,
+              pointerEvents: 'none',
+            },
+          };
+        });
+      }).flat();
   }
   useEffect(() => {
     setTmp(history.location.query?.tmp);
