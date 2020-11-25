@@ -15,6 +15,10 @@ export default [
         path: '/radiogroup',
         component: '@/pages/radioGroup/index',
       },
+      {
+        path: '/radiogroupsimple',
+        component: '@/pages/radioGroup/simple/index',
+      },
       // 送货
       { path: '/delivery', component: '@/pages/delivery/index' },
       { exact: true, path: '/', redirect: '/balloons' },
