@@ -3,7 +3,7 @@ import { history } from 'umi';
 import TmpPage from './components/tmp';
 import useComponents from '@/hooks/useComponents';
 import { ElesConfig, EleTypeEnums } from '@/hooks/useCreateEle';
-const queryTmp = history.location.query?.tmp
+const queryTmp = history.location.query?.tmp;
 const assertMap = {
   r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
   m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
@@ -34,26 +34,35 @@ const RadioGroup: React.FC = function(props) {
   function init() {
     setPageOption({
       rmc: {
+        // 只有蘑菇和胡萝卜
         optionElmInit: [
           createQuestionLabel('哪一组蔬菜是有规律排列的呢？点点看吧！'),
           ...createRMC(),
         ],
         answer: '0',
       },
+      rmc2: {
+        // 蘑菇胡萝卜玉米
+        optionElmInit: [
+          createQuestionLabel('哪一组蔬菜是有规律排列的呢？点点看吧！'),
+          ...createRMC2(),
+        ],
+        answer: '1',
+      },
       sgb: {
         optionElmInit: [
           createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
-          ...createSGB()
+          ...createSGB(),
         ],
         answer: '1',
       },
       cone: {
         optionElmInit: [
           createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
-          ...createCone()
+          ...createCone(),
         ],
         answer: '1',
-      }
+      },
     });
   }
   /**
@@ -87,6 +96,36 @@ const RadioGroup: React.FC = function(props) {
       ?.flat();
   }
   /**
+   * @description 创建水果组2
+   */
+  function createRMC2(): ElesConfig[] {
+    const w = 62,
+      h = 74;
+    const list = [
+      ['m', 'c', 'r', 'm', 'r', 'c', 'm', 'c', 'r'],
+      ['m', 'c', 'r', 'm', 'c', 'r', 'm', 'c', 'r'],
+    ];
+    return list
+      .map((opList, opIdx) => {
+        return opList.map((tag, idx) => {
+          const texture = assertMap[tag],
+            x = 80 + (41 + w) * idx,
+            y = opIdx === 0 ? 272 : 480;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture,
+              size: [w, h],
+              pos: [x, y],
+              zIndex: 10,
+              pointerEvents: 'none',
+            },
+          };
+        });
+      })
+      ?.flat();
+  }
+  /**
    * @description 创建面包组
    */
   function createSGB(): ElesConfig[] {
@@ -94,8 +133,8 @@ const RadioGroup: React.FC = function(props) {
       h = 41;
     // 水果
     const list = [
-      ['sb','g','ba','sb', 'g', 'g','sb','g','ba'],
-      ['sb','g','ba','sb','g','ba','sb','g','ba'],
+      ['sb', 'g', 'ba', 'sb', 'g', 'g', 'sb', 'g', 'ba'],
+      ['sb', 'g', 'ba', 'sb', 'g', 'ba', 'sb', 'g', 'ba'],
     ]
       .map((opList, opIdx) => {
         return opList.map((tag, idx) => {
@@ -140,15 +179,35 @@ const RadioGroup: React.FC = function(props) {
     const w = 60,
       h = 67;
     const list = [
-      ['coneR','coneB','coneG','coneG','coneR','coneB','coneR','coneB','coneG'],
-      ['coneR','coneB','coneG','coneR','coneB','coneG','coneR','coneB','coneG'],
+      [
+        'coneR',
+        'coneB',
+        'coneG',
+        'coneG',
+        'coneR',
+        'coneB',
+        'coneR',
+        'coneB',
+        'coneG',
+      ],
+      [
+        'coneR',
+        'coneB',
+        'coneG',
+        'coneR',
+        'coneB',
+        'coneG',
+        'coneR',
+        'coneB',
+        'coneG',
+      ],
     ];
     return list
       .map((opList, opIdx) => {
         return opList.map((tag, idx) => {
           const texture = assertMap[tag],
             x = 96 + (37 + w) * idx,
-            y = opIdx === 0 ? 276 : 485
+            y = opIdx === 0 ? 276 : 485;
           return {
             type: EleTypeEnums.SPRITE,
             option: {
@@ -160,7 +219,8 @@ const RadioGroup: React.FC = function(props) {
             },
           };
         });
-      }).flat();
+      })
+      .flat();
   }
   useEffect(() => {
     setTmp(queryTmp);

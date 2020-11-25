@@ -24,12 +24,12 @@ interface PropTypes extends PageOptionItemTypes{
   // answer: string
 }
 const Part: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, getStar, addReply, replyNum, setReplyNum } = useReward();
+  const { visible, setVisible, onClose,setSessionReply, getSessionReply, clearSessionReply, getStarFn } = useReward();
   const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { createOptionsBlock, createHorn, commonBlock } = useComponents();
+  const { createOptionsBlock, createHorn, createStep } = useComponents();
   const { elements, setEles, findElesByNames } = useCreateEle(
     {
       stage,
@@ -37,13 +37,15 @@ const Part: FC<PropTypes> = function(props) {
   );
   useEffect(() => {
     initPage();
+    return () => {
+      console.log('清空');
+      clearSessionReply()
+    }
   }, []);
-  useEffect(() => {
-    console.log('replyNum', replyNum);
-  }, [replyNum])
   function initPage() {
     setEles([
       createHorn(),
+      ...createStep(0),
       ...props.optionElmInit,
       // 选项区
       ...createOptionsBox(),
@@ -82,8 +84,13 @@ const Part: FC<PropTypes> = function(props) {
     if (!Array.isArray(elements) || elements.length === 0) return;
     optionElms.current = findElesByNames(elements, ['0', '1'])
   }, [elements]);
+  /**
+   * @description 提交信息
+   * @param elm
+   */
   function onSubmit(elm) {
-    setReplyNum(replyNum + 1)
+    console.log('提交答案')
+    setSessionReply(getSessionReply() + 1)
     if (props.answer == elm.name) {
       elm.attr('bgcolor', success_color)
       elm.attr({
@@ -91,6 +98,7 @@ const Part: FC<PropTypes> = function(props) {
         borderColor: success_border
       })
       setVisible(true)
+      clearSessionReply()
       return
     }
     elm.attr({
@@ -115,7 +123,7 @@ const Part: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getStar} onClose={onClose} />
+      <RewardModal visible={visible} star={getStarFn(getSessionReply())} onClose={onClose} />
     </>
   );
 };

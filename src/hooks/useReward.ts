@@ -1,18 +1,20 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { session } from '@/utils/store';
+export const replySessionKey = 'reply'
 interface PropTypes {
 }
 export default function useReward() {
   const [visible, setVisible] = useState<boolean>(false)
   const [replyNum, setReplyNum] = useState<number>(0) // 答题次数
-  const getStar = useMemo(() => {
-    // 1次 3星， 3次以上1星
+  const getStar = useMemo(getStarFn, [replyNum])
+  function getStarFn(num?: number) {
     const starMap = {
       1 : 3,
       2: 2,
       3: 1
     }
-    return starMap[replyNum] || 1
-  }, [replyNum])
+    return starMap[num || replyNum] || 1
+  }
   function onClose() {
     setVisible(false)
   }
@@ -25,6 +27,19 @@ export default function useReward() {
   function resetReply() {
     setReplyNum(0)
   }
+  /**
+   * @description 如果是遍历的组件，无法更新hook里的值，只能放到session
+   * @param num
+   */
+  function setSessionReply (num: number) {
+    session.setKey(replySessionKey, String(num))
+  }
+  function getSessionReply() {
+    return  Number(session.getKey(replySessionKey))
+  }
+  function clearSessionReply() {
+    return  session.removeKey(replySessionKey)
+  }
   return {
     replyNum,
     getStar,
@@ -33,6 +48,11 @@ export default function useReward() {
     resetReply,
     visible,
     setVisible,
-    onClose
+    getStarFn,
+    onClose,
+    // sessionReply
+    setSessionReply,
+    getSessionReply,
+    clearSessionReply
   }
 }

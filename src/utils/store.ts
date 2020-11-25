@@ -1,6 +1,8 @@
 export const session = {
   setKey(key: string, value: any) {
     const str = JSON.stringify(value);
+    console.log('set', key, str);
+
     window.sessionStorage.setItem(key, str);
   },
   getKey(key: string) {
@@ -10,6 +12,9 @@ export const session = {
   clear() {
     window.sessionStorage.clear();
   },
+  removeKey(key: string) {
+    window.sessionStorage.removeItem(key)
+  }
 };
 export const local = {
   setKey(key: string, value: any) {
@@ -23,4 +28,7 @@ export const local = {
   clear() {
     window.localStorage.clear();
   },
+  removeKey(key: string) {
+    window.localStorage.removeItem(key)
+  }
 };
