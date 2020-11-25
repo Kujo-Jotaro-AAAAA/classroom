@@ -10,9 +10,8 @@ export default function useReward() {
   function getStarFn(num?: number) {
     const starMap = {
       0: 3,
-      1: 3,
-      2: 2,
-      3: 1
+      1: 2,
+      2: 1,
     }
     return starMap[num || replyNum] || 1
   }

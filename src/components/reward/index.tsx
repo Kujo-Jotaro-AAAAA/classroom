@@ -48,12 +48,15 @@ const Reward: FC<PropTypes> = function(props) {
         fill: 'forwards',
       },
     );
-    await assets.animate.coin.animate([{ text: 18 + props.star }], {
-      duration: 2500,
-      iterations: 1,
-      easing: 'ease-out',
-      fill: 'forwards',
-    });
+    setTimeout(() => {
+      assets.animate.coin.attr('text', 18 + props.star)
+    }, 1000)
+    // await assets.animate.coin.animate([{ text: 18 + props.star }], {
+    //   duration: 2500,
+    //   iterations: 1,
+    //   easing: 'ease-out',
+    //   fill: 'forwards',
+    // });
   }
   /**
    * @description 加载页面
@@ -145,9 +148,10 @@ const Reward: FC<PropTypes> = function(props) {
     const groupX = 887;
     const groupY = 38;
     const bg = new Block({
-      size: [76.68, groupY],
-      pos: [groupX, 38],
+      size: [76.68, 31],
+      pos: [groupX, groupY],
       bgcolor: '#3B3B3B',
+      opacity: .3,
       borderRadius: 16,
     });
     const star = new Sprite({
@@ -157,12 +161,18 @@ const Reward: FC<PropTypes> = function(props) {
       // anchor: [0.5, 0.5],
     });
     const count = new Label({
-      pos: [920, 41],
+      pos: [920, 43],
       fontSize: 18,
       text: 18,
       fillColor: '#fff',
     });
-    return [bg, star, count];
+    const addNum = new Label({
+      text: `+${props.star}`,
+      pos: [490, 270],
+      fillColor: '#fff',
+      fontSize: 34,
+    })
+    return [bg, star, count, addNum];
   }
   return (
     <>

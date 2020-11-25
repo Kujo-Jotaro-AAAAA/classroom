@@ -218,22 +218,38 @@ const Balloons: FC<PropTypes> = function(props) {
           pos: [initPosX + (145 + balloonW) * idx, initPosY + 100 / 2],
         },
         evt: [
+          // {
+          //   type: EvtNameEnum.CLICK,
+          //   callback: (evt, el) => {
+          //     el.attr({
+          //       pos: [evt.x, evt.y],
+          //     });
+          //   },
+          // },
           {
-            type: EvtNameEnum.TOUCH_MOVE,
-            callback: (evt, el) => {
-              el.attr({
-                pos: [evt.x, evt.y],
-              });
-            },
-          },
-          {
-            type: EvtNameEnum.TOUCH_END,
-            callback: (evt, el) => onOptionDragEnd(evt, el, idx),
+            type: EvtNameEnum.CLICK,
+            callback: (evt, el) => onOptionClick(el),
           },
         ],
       };
     });
     return balloons;
+  }
+  async function onOptionClick(el) {
+    await el.animate([{ pos: replyRef.current.attr().pos }], {
+      duration: 400,
+      easing: 'ease-in',
+      direction: 'alternate',
+      iterations: 1,
+      fill: 'forwards',
+    });
+    setTimeout(() => {
+      if (tmpMap[currIndex].answer === el.name) {
+        setVisible(true);
+      } else {
+        resetBalloons();
+      }
+    }, 1000)
   }
   /**
    * @description 选项拖拽结束
@@ -242,7 +258,7 @@ const Balloons: FC<PropTypes> = function(props) {
    * @param idx
    */
   async function onOptionDragEnd(evt, el, idx) {
-    // replyRef.current
+    el.attr('pos', replyRef.current.attr().pos)
     const isCover = replyRef.current.isPointCollision(evt.x, evt.y);
     if (isCover) {
       const originPos = replyRef.current.attr().pos;
