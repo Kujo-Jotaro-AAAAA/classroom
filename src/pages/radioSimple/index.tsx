@@ -38,6 +38,7 @@ const RadioGroup: React.FC = function(props) {
       sgb: {
         optionElmInit: [
           createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
+          ...createSGB()
         ],
         answer: '1',
       },
@@ -65,12 +66,60 @@ const RadioGroup: React.FC = function(props) {
               texture,
               size: [w, h],
               pos: [x, y],
-              zIndex: 10
+              zIndex: 10,
+              pointerEvents: 'none',
             },
           };
         });
       })
       ?.flat();
+  }
+  /**
+   * @description 创建面包组
+   */
+  function createSGB(): ElesConfig[] {
+    const w = 55,
+      h = 41;
+    // 水果
+    const list = [
+      ['sb','g','ba','sb', 'g', 'g','sb','g','ba'],
+      ['sb','g','ba','sb','g','ba','sb','g','ba'],
+    ]
+      .map((opList, opIdx) => {
+        return opList.map((tag, idx) => {
+          const texture = assertMap[tag],
+            x = 270 + (2 + w) * idx,
+            y = opIdx === 0 ? 262 : 471;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture,
+              size: [w, h],
+              pos: [x, y],
+              zIndex: 10,
+              pointerEvents: 'none',
+            },
+          };
+        });
+      })
+      ?.flat();
+    // 面包
+    const brx = 239,
+      bry = [285, 494];
+    const breads = bry.map(bry => {
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assertMap.br,
+          size: [546.68, 70.8],
+          pos: [brx, bry],
+          zIndex: 1,
+          pointerEvents: 'none',
+        },
+      };
+    });
+
+    return [...list, ...breads];
   }
   useEffect(() => {
     setTmp(history.location.query?.tmp);

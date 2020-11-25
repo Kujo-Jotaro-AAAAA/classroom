@@ -24,7 +24,7 @@ interface PropTypes extends PageOptionItemTypes{
   // answer: string
 }
 const Part: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, getStar, addReply } = useReward();
+  const { visible, setVisible, onClose, getStar, addReply, replyNum, setReplyNum } = useReward();
   const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
@@ -38,6 +38,9 @@ const Part: FC<PropTypes> = function(props) {
   useEffect(() => {
     initPage();
   }, []);
+  useEffect(() => {
+    console.log('replyNum', replyNum);
+  }, [replyNum])
   function initPage() {
     setEles([
       createHorn(),
@@ -69,7 +72,6 @@ const Part: FC<PropTypes> = function(props) {
           type: EvtNameEnum.CLICK,
           callback: (evt, elm) => {
             onSubmit(elm)
-
           }
         }]
       };
@@ -81,7 +83,7 @@ const Part: FC<PropTypes> = function(props) {
     optionElms.current = findElesByNames(elements, ['0', '1'])
   }, [elements]);
   function onSubmit(elm) {
-    addReply()
+    setReplyNum(replyNum + 1)
     if (props.answer == elm.name) {
       elm.attr('bgcolor', success_color)
       elm.attr({
