@@ -13,6 +13,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+import { fail_color, success_border, success_color } from '@/utils/theme';
 const balloonTmp = history.location.query.tmp;
 const currIndex = balloonTmp || 0
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
@@ -30,6 +31,7 @@ interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
   const balloonElm = useRef<any[]>([]);
+  const balloonBlockElm = useRef<any[]>([]);
   const { visible, setVisible, onClose, setSessionReply, clearSessionReply, getSessionReply, getStarFn } = useReward();
   const { createOptionsBlock, createStep } = useComponents();
   const replyRef = useRef(null);
@@ -37,7 +39,7 @@ const Balloons: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: 'balloons-container',
   });
-  const { elements, setEles, eles, findEleByName } = useCreateEle({
+  const { elements, setEles, eles, findEleByName, findElesByNames } = useCreateEle({
     stage,
   });
   const tmpMap = [
@@ -97,13 +99,55 @@ const Balloons: FC<PropTypes> = function(props) {
       ...createPlaceholderBalloons(),
       // 选项区
       ...createOptionsBalloons(),
-      ...createOptionsBlock(3),
+      // ...createOptionsBlock(3),
+      ...payloadBlockEvt()
     ]);
   }
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
     init();
   }, [elements]);
+  /**
+   * @description 盒子状态
+   */
+  function payloadBlockEvt() {
+    return createOptionsBlock(3).map((block, i) => {
+      const colorMap = {
+        0: 'red',
+        1: 'yellow',
+        2: 'blue'
+      }
+      block.option.pointerEvent = 'visibled'
+      block.option.name = colorMap[i]
+      // block.option.zIndex = colorMap[i]
+      return {
+        ...block,
+        evt: [{
+        type: EvtNameEnum.CLICK,
+          callback: (evt, el) => {
+            blockClick(el)
+          }
+        }]
+      }
+    })
+  }
+  function blockClick(el) {
+    if (tmpMap[currIndex].answer === el.name) {
+      setVisible(true);
+      el.attr({
+        bgcolor: success_color,
+        borderColor: success_border
+      })
+    } else {
+      el.attr({
+        bgcolor: fail_color
+      })
+      setSessionReply(getSessionReply() + 1)
+      setTimeout(() => {
+        resetBalloons();
+      }, 1000)
+    }
+  }
   /**
    * @description 初始化页面
    */
@@ -113,6 +157,7 @@ const Balloons: FC<PropTypes> = function(props) {
     replyRef.current = findEleByName(elements, 'reply');
 
     balloonElm.current = getOptionBalloons();
+    balloonBlockElm.current = findElesByNames(elements, ['red', 'yellow', 'blue'])
   }
   /**
    * @description 获取选项的气球
@@ -175,15 +220,7 @@ const Balloons: FC<PropTypes> = function(props) {
               border: [1, '#8CABFF'],
               borderDash: 2,
               boxSizing: 'border-box',
-            },
-            evt: [
-              {
-                type: EvtNameEnum.TOUCH_MOVE,
-                callback: (evt, ele) => {
-                  console.log('手指进来了');
-                },
-              },
-            ],
+            }
           };
     });
   }
@@ -210,47 +247,57 @@ const Balloons: FC<PropTypes> = function(props) {
       return {
         type: EleTypeEnums.SPRITE,
         option: {
-          name: imgKey,
+          name: `balloon-${imgKey}`,
           texture: colorMap[imgKey],
           size: [balloonW, 100],
           anchor: [0.5, 0.5],
-          zIndex: 200,
+          pointerEvent: 'none',
+          zIndex: 1,
           pos: [initPosX + (145 + balloonW) * idx, initPosY + 100 / 2],
         },
         evt: [
-          // {
-          //   type: EvtNameEnum.CLICK,
-          //   callback: (evt, el) => {
-          //     el.attr({
-          //       pos: [evt.x, evt.y],
-          //     });
-          //   },
-          // },
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, el) => onOptionClick(el),
+            callback: (evt, el) => {
+              const currBlock = balloonBlockElm.current.find(blockElm => {
+                const elName = el.name.split('-')
+                return blockElm.name === elName[1]
+              })
+              blockClick(currBlock)
+            },
           },
+          // {
+          //   type: EvtNameEnum.CLICK,
+          //   callback: (evt, el) => onOptionClick(el),
+          // },
         ],
       };
     });
     return balloons;
   }
   async function onOptionClick(el) {
-    await el.animate([{ pos: replyRef.current.attr().pos }], {
-      duration: 400,
-      easing: 'ease-in',
-      direction: 'alternate',
-      iterations: 1,
-      fill: 'forwards',
-    });
-    setTimeout(() => {
-      if (tmpMap[currIndex].answer === el.name) {
-        setVisible(true);
-      } else {
-        setSessionReply(getSessionReply() + 1)
-        resetBalloons();
-      }
-    }, 1000)
+    // await el.animate([{ pos: replyRef.current.attr().pos }], {
+    //   duration: 400,
+    //   easing: 'ease-in',
+    //   direction: 'alternate',
+    //   iterations: 1,
+    //   fill: 'forwards',
+    // });
+    if (tmpMap[currIndex].answer === el.name) {
+      setVisible(true);
+      el.attr({
+        bgcolor: success_color,
+        borderColor: success_border
+      })
+    } else {
+      el.attr({
+        bgcolor: fail_color
+      })
+      setSessionReply(getSessionReply() + 1)
+      // resetBalloons();
+    }
+    // setTimeout(() => {
+    // }, 1000)
   }
   /**
    * @description 选项拖拽结束
@@ -292,23 +339,26 @@ const Balloons: FC<PropTypes> = function(props) {
    * @description 重置气球的位置
    */
   function resetBalloons() {
-    const balloons = balloonElm.current;
-    const ballPos = session.getKey(sessionKey);
+    const balloons = balloonBlockElm.current
+    // const ballPos = session.getKey(sessionKey);
     balloons.forEach(async (ball, idx) => {
-      await ball.animate(
-        [
-          {
-            pos: ballPos[idx],
-          },
-        ],
-        {
-          duration: 400,
-          easing: 'ease-in',
-          direction: 'alternate',
-          iterations: 1,
-          fill: 'forwards',
-        },
-      );
+      ball.attr({
+        bgcolor: '#fff'
+      })
+      // await ball.animate(
+      //   [
+      //     {
+      //       pos: ballPos[idx],
+      //     },
+      //   ],
+      //   {
+      //     duration: 400,
+      //     easing: 'ease-in',
+      //     direction: 'alternate',
+      //     iterations: 1,
+      //     fill: 'forwards',
+      //   },
+      // );
     });
   }
   return (
