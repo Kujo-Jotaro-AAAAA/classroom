@@ -4,7 +4,7 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
-import * as spritejs from 'spritejs';
+import { history } from 'umi';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
@@ -13,6 +13,8 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+const balloonTmp = history.location.query.tmp;
+const currIndex = balloonTmp || 0
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const [blue, red, yellow] = [
   require('@/assets/png0015.png'),
@@ -22,33 +24,67 @@ const [blue, red, yellow] = [
 const colorMap = {
   blue,
   red,
-  yellow
-}
+  yellow,
+};
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
-  const balloonElm = useRef<any[]>([])
-  const {visible, setVisible, onClose} = useReward()
-  const { createOptionsBlock } = useComponents()
-  const answer = 'blue'
+  const balloonElm = useRef<any[]>([]);
+  const { visible, setVisible, onClose } = useReward();
+  const { createOptionsBlock, createStep } = useComponents();
+  const replyRef = useRef(null);
+  const answer = 'blue';
   const { stage } = useStage({
     elId: 'balloons-container',
   });
-  const { elements, setEles, eles } = useCreateEle({
+  const { elements, setEles, eles, findEleByName } = useCreateEle({
     stage,
   });
-  // useEffect(() => {
-  //   console.log('stage', stage);
-
-  // }, [stage])
+  const tmpMap = [
+    {
+      replyBlock: {
+        pos: [884, 210],
+      },
+      balloons: [
+        'red',
+        'yellow',
+        'blue',
+        'red',
+        'yellow',
+        'blue',
+        'red',
+        'yellow',
+        '',
+      ],
+      answer: 'blue'
+    },
+    {
+      replyBlock: {
+        pos: [777, 210],
+      },
+      balloons: [
+        'blue',
+        'yellow',
+        'red',
+        'blue',
+        'yellow',
+        'red',
+        'blue',
+        '',
+        'red',
+      ],
+      answer: 'yellow'
+    },
+  ];
   useEffect(() => {
-    initPage()
+    initPage();
     return () => {
       return session.clear();
     };
   }, []);
   function initPage() {
     setEles([
+      ...createStep(0),
       {
         type: EleTypeEnums.LABEL,
         option: {
@@ -59,29 +95,9 @@ const Balloons: FC<PropTypes> = function(props) {
         },
       },
       ...createPlaceholderBalloons(),
-      // 答题框
-      {
-        type: EleTypeEnums.BLOCK,
-        option: {
-          size: [110, 132],
-          pos: [884, 210],
-          borderRadius: 10,
-          border: [1, '#8CABFF'],
-          borderDash: 2,
-          boxSizing: 'border-box'
-        },
-        evt: [
-          {
-            type: EvtNameEnum.TOUCH_MOVE,
-            callback: (evt, ele) => {
-              console.log('手指进来了');
-            },
-          },
-        ],
-      },
       // 选项区
       ...createOptionsBalloons(),
-      ...createOptionsBlock(3)
+      ...createOptionsBlock(3),
     ]);
   }
   useEffect(() => {
@@ -93,14 +109,17 @@ const Balloons: FC<PropTypes> = function(props) {
    */
   async function init() {
     getOptionInitPos();
-    balloonElm.current = getOptionBalloons()
+    // 获取答题框
+    replyRef.current = findEleByName(elements, 'reply');
+
+    balloonElm.current = getOptionBalloons();
   }
   /**
    * @description 获取选项的气球
    */
   function getOptionBalloons() {
     return elements.filter(el => {
-      return el.name
+      return el.name;
     });
   }
   /**
@@ -108,7 +127,7 @@ const Balloons: FC<PropTypes> = function(props) {
    */
   function getOptionInitPos() {
     const balloons = eles.filter(el => {
-      return el.option.name
+      return el.option.name;
     });
     const defaultPos = balloons.map(b => {
       return b.option.pos;
@@ -121,31 +140,62 @@ const Balloons: FC<PropTypes> = function(props) {
   function createPlaceholderBalloons(): ElesConfig[] {
     const initPosX = 61;
     const initPosY = 226;
-    return [red, yellow, blue, red, yellow, blue, red, yellow].map(
-      (img, idx) => {
-        const currPosX = initPosX + 107 * idx;
-        return {
-          type: EleTypeEnums.SPRITE,
-          option: {
-            texture: img,
-            size: [48.35, 100],
-            // anchor: [0.5, 0.5],
-            pos: [currPosX, initPosY],
-          },
-          animates: [
-            {
-              animate: [{ pos: [currPosX, initPosY + 20] }],
-              config: {
-                duration: 1200,
-                easing: 'ease-in',
-                direction: 'alternate',
-                iterations: Infinity,
-              },
+    return tmpMap[currIndex].balloons.map((color, idx) => {
+      const currPosX = initPosX + 107 * idx;
+      const isPlaceholder = colorMap[color];
+      return isPlaceholder
+        ? {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture: colorMap[color],
+              size: [48.35, 100],
+              // anchor: [0.5, 0.5],
+              pos: [currPosX, initPosY],
             },
-          ],
-        };
-      },
-    );
+            animates: [
+              {
+                animate: [{ pos: [currPosX, initPosY + 20] }],
+                config: {
+                  duration: 1200,
+                  easing: 'ease-in',
+                  direction: 'alternate',
+                  iterations: Infinity,
+                },
+              },
+            ],
+          }
+        : {
+            type: EleTypeEnums.BLOCK,
+            option: {
+              name: 'reply',
+              size: [110, 132],
+              pos: getHalfPos(tmpMap[currIndex].replyBlock.pos, [110, 132]),
+              anchor: [.5, .5],
+              borderRadius: 10,
+              border: [1, '#8CABFF'],
+              borderDash: 2,
+              boxSizing: 'border-box',
+            },
+            evt: [
+              {
+                type: EvtNameEnum.TOUCH_MOVE,
+                callback: (evt, ele) => {
+                  console.log('手指进来了');
+                },
+              },
+            ],
+          };
+    });
+  }
+  /**
+   * @description 获取锚点居中元素的定位信息
+   * @param originPos
+   * @param w
+   * @param h
+   */
+  function getHalfPos(oPos: number[], [w, h]) {
+    const [ox, oy] = oPos
+    return [ox + w / 2, oy + h / 2]
   }
   /**
    * @description 选项区
@@ -192,22 +242,22 @@ const Balloons: FC<PropTypes> = function(props) {
    * @param idx
    */
   async function onOptionDragEnd(evt, el, idx) {
-    const [w, h, x, y] = [110, 132, 884, 210]
-    if (x < evt.x && evt.x < x + w && y - h < evt.y && evt.y < y + h) {
+    // replyRef.current
+    const isCover = replyRef.current.isPointCollision(evt.x, evt.y);
+    if (isCover) {
+      const originPos = replyRef.current.attr().pos;
       // 贴合到答案框中间
-      await el.animate([{ pos: [x + w / 2, y + h / 2] }], {
+      await el.animate([{ pos: originPos }], {
         duration: 400,
         easing: 'ease-in',
         direction: 'alternate',
         iterations: 1,
         fill: 'forwards',
       });
-      if (answer === el.name) {
-        setVisible(true)
+      if (tmpMap[currIndex].answer === el.name) {
+        setVisible(true);
       } else {
-        resetBalloons()
-        // initPage()
-        // location.reload()
+        resetBalloons();
       }
       return;
     }
@@ -225,19 +275,24 @@ const Balloons: FC<PropTypes> = function(props) {
    * @description 重置气球的位置
    */
   function resetBalloons() {
-    const balloons = balloonElm.current
-    const ballPos = session.getKey(sessionKey)
+    const balloons = balloonElm.current;
+    const ballPos = session.getKey(sessionKey);
     balloons.forEach(async (ball, idx) => {
-      await ball.animate([{
-        pos: ballPos[idx]
-      }], {
-        duration: 400,
-        easing: 'ease-in',
-        direction: 'alternate',
-        iterations: 1,
-        fill: 'forwards',
-      })
-    })
+      await ball.animate(
+        [
+          {
+            pos: ballPos[idx],
+          },
+        ],
+        {
+          duration: 400,
+          easing: 'ease-in',
+          direction: 'alternate',
+          iterations: 1,
+          fill: 'forwards',
+        },
+      );
+    });
   }
   return (
     <>

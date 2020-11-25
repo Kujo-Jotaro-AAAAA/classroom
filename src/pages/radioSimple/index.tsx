@@ -3,6 +3,7 @@ import { history } from 'umi';
 import TmpPage from './components/tmp';
 import useComponents from '@/hooks/useComponents';
 import { ElesConfig, EleTypeEnums } from '@/hooks/useCreateEle';
+const queryTmp = history.location.query?.tmp
 const assertMap = {
   r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
   m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
@@ -162,7 +163,7 @@ const RadioGroup: React.FC = function(props) {
       }).flat();
   }
   useEffect(() => {
-    setTmp(history.location.query?.tmp);
+    setTmp(queryTmp);
   }, []);
   return <>{tmp && <TmpPage {...pageOption[tmp]} />}</>;
 };

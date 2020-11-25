@@ -90,7 +90,24 @@ export default function useComponents() {
       .flat();
     return createBlueBlock(posList, pointerEvents);
   }
+  /**
+   * @description 创建步骤
+   * @param step
+   */
+  function createStep(step: number, len: number = 6):ElesConfig[] {
+    return new Array(len).fill(0).map( (_, idx) => {
+      const w = 24 , h = 24, x = 392 + ((19 + w) * idx) , y = 34
+      return {
+        type: EleTypeEnums.BLOCK,
+        option: {
+          size: [w, h],
+          pos: [x, y],
+          bgcolor: step === idx ? '#62CA5D' : '#D8F1D6'
+        }
+      }
+    })
 
+  }
   return {
     createHorn,
     createQuestionLabel,
@@ -98,5 +115,6 @@ export default function useComponents() {
     createDoubleOptionsBlock,
     commonBlock,
     createBlueBlock,
+    createStep
   };
 }
