@@ -6,6 +6,13 @@
 <title><%= context.title %></title>
 <div id="<%= context.config.mountElementId %>" class="_content" style="overflow-y:auto;"></div>
 <script type="text/javascript"></script>
+<script>
+((function () {
+  var mo=function(e){e.preventDefault();};
+  document.body.style.overflow='hidden';
+  document.addEventListener("touchmove",mo,{passive:false});//禁止页面滑动
+})())
+</script>
 </head>
 <body>
 </body>

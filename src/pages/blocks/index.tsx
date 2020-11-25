@@ -118,7 +118,7 @@ const Blocks: FC<PropTypes> = function(props) {
     return ['red', 'yellow', 'blue'].map((color, index) => {
       const w = 79,
         h = 37,
-        x = 280 + w / 2 + (w + 114) * index;
+        x = 280 + w / 2 + (w + 114) * index - 6.5;
       return {
         type: EleTypeEnums.SPRITE,
         option: {
@@ -151,6 +151,8 @@ const Blocks: FC<PropTypes> = function(props) {
       'yellow',
       'blue',
     ]);
+    console.log(colorBolcksRef.current[0].attr(), colorBolcksRef.current[1].attr(), colorBolcksRef.current[2].attr());
+
     answerBolcksRef.current = findElesByNames(elements, [
       'answer-0',
       'answer-1',
@@ -183,6 +185,7 @@ const Blocks: FC<PropTypes> = function(props) {
     if (newReply?.includes(ele.name)) return;
     ele.attr({
       pos: [evt.x, evt.y],
+      zIndex: 99999
     });
   }
   /**
@@ -191,11 +194,12 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleEnd(evt, ele) {
+    ele.removeAttribute('zIndex', )
     const newReply = session.getKey(sessionKey) || [];
     if (newReply?.includes(ele.name)) return;
-    const isEdit = replaceColorBlock(ele);
-    const isDone = pullRightBlock(ele);
-    console.log('xxx =>', reply);
+    const isEdit = replaceColorBlock(ele)
+    // zIndex: 99999
+    const isDone = pullRightBlock(ele)
     if (!isEdit && isDone) {
       newReply.push(ele.name);
       session.setKey(sessionKey, newReply);
@@ -203,7 +207,6 @@ const Blocks: FC<PropTypes> = function(props) {
     }
   }
   useEffect(() => {
-    console.log('useEff reply ==>', session.getKey(sessionKey));
     if (reply.length === 3) {
       submit();
     }
