@@ -16,6 +16,9 @@ export default function useReward() {
   function onClose() {
     setVisible(false)
   }
+  function addReply() {
+    setReplyNum(replyNum + 1)
+  }
   /**
    * @description 重置提交次数
    */
@@ -26,6 +29,7 @@ export default function useReward() {
     replyNum,
     getStar,
     setReplyNum,
+    addReply,
     resetReply,
     visible,
     setVisible,

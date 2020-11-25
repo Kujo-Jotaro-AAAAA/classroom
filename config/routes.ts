@@ -16,8 +16,8 @@ export default [
         component: '@/pages/radioGroup/index',
       },
       {
-        path: '/radiogroupsimple',
-        component: '@/pages/radioGroup/simple/index',
+        path: '/radiosimple',
+        component: '@/pages/radioSimple/index',
       },
       // 送货
       { path: '/delivery', component: '@/pages/delivery/index' },

@@ -6,7 +6,7 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
-import { success_color, fail_color } from '@/utils/theme';
+import { success_color,success_border, fail_color, main_color } from '@/utils/theme';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -24,24 +24,19 @@ interface PropTypes extends PageOptionItemTypes{
   // answer: string
 }
 const Part: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose, getStar, addReply } = useReward();
   const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
   });
   const { createOptionsBlock, createHorn, commonBlock } = useComponents();
-  const { elements, setEles, resetElmsAttr, payloadEvtsByNames } = useCreateEle(
+  const { elements, setEles, findElesByNames } = useCreateEle(
     {
       stage,
     },
   );
-  const {answer} = props
-  // const answer = `${commonBlock}-0`;
   useEffect(() => {
     initPage();
-    return () => {
-      // return session.clear();
-    };
   }, []);
   function initPage() {
     setEles([
@@ -59,24 +54,55 @@ const Part: FC<PropTypes> = function(props) {
     const arr = [0, 1];
     const box = arr.map((key, idx) => {
       const w = 930, h = 130;
-      const y = 244 + (79 + h * idx);
+      const y = 244 + ((79 + h) * idx);
       return {
         type: EleTypeEnums.BLOCK,
         option: {
-          name: key,
+          name: `${key}`,
           size: [w, h],
           pos: [61, y],
+          border: [2, main_color],
+          borderRadius: 10,
+          boxSizing: 'border-box'
         },
+        evt: [{
+          type: EvtNameEnum.CLICK,
+          callback: (evt, elm) => {
+            onSubmit(elm)
+
+          }
+        }]
       };
     });
     return box;
   }
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
-
+    optionElms.current = findElesByNames(elements, ['0', '1'])
   }, [elements]);
-  function onSubmit(el) {
-
+  function onSubmit(elm) {
+    addReply()
+    if (props.answer == elm.name) {
+      elm.attr('bgcolor', success_color)
+      elm.attr({
+        bgcolor: success_color,
+        borderColor: success_border
+      })
+      setVisible(true)
+      return
+    }
+    elm.attr({
+      bgcolor: fail_color,
+      borderColor: main_color
+    })
+    resetStatus()
+  }
+  function resetStatus() {
+    setTimeout(() => {
+      optionElms.current.forEach(opElm => {
+        opElm.removeAttribute('bgcolor')
+      })
+    }, 1000)
   }
   return (
     <>
@@ -87,7 +113,7 @@ const Part: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={getStar} onClose={onClose} />
     </>
   );
 };

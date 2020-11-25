@@ -55,6 +55,7 @@ export default function useComponents() {
           border: [2, main_color],
           pointerEvents, // 此属性要指给不捕获事件的元素
           borderRadius: 10,
+          boxSizing: 'border-box'
         },
       };
     });

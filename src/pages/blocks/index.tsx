@@ -107,6 +107,7 @@ const Blocks: FC<PropTypes> = function(props) {
           border: [2, main_color],
           borderDash: 2,
           borderRadius: 10,
+          boxSizing: 'border-box'
         },
       };
     });

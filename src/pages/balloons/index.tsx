@@ -68,6 +68,7 @@ const Balloons: FC<PropTypes> = function(props) {
           borderRadius: 10,
           border: [1, '#8CABFF'],
           borderDash: 2,
+          boxSizing: 'border-box'
         },
         evt: [
           {
