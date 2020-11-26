@@ -6,9 +6,9 @@ import { ElesConfig, EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
 const queryTmp = history.location.query?.tmp;
 const assertMap = {
   // * 每个切图大小都不一致，弃用
-  // r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
-  // m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
-  // c: require('@/assets/radioGroupSimple/png0014.png'), // 玉米
+  r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
+  m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
+  c: require('@/assets/radioGroupSimple/png0014.png'), // 玉米
   // sb: require('@/assets/radioGroupSimple/png0005.png'), // 草莓
   // g: require('@/assets/radioGroupSimple/png0006.png'), // 葡萄
   // ba: require('@/assets/radioGroupSimple/png0007.png'), // 香蕉
