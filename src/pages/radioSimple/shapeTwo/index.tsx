@@ -31,7 +31,7 @@ const assetsMap = {
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const ShapeTwo: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, setSessionReply, getStarFn, getSessionReply } = useReward();
+  const { visible, setVisible, onClose, setSessionReply, getStarFn, getSessionReply, getSessionStar } = useReward();
   const fgW = 60.44,
     fgH = 64.95,
     answerMap = {
@@ -180,7 +180,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getStarFn(getSessionReply())} onClose={onClose} />
+      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
     </>
   );
 };

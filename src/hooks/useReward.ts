@@ -40,6 +40,9 @@ export default function useReward() {
   function clearSessionReply() {
     return  session.removeKey(replySessionKey)
   }
+  function getSessionStar() {
+    return getStarFn(getSessionReply())
+  }
   return {
     replyNum,
     getStar,
@@ -53,6 +56,7 @@ export default function useReward() {
     // sessionReply
     setSessionReply,
     getSessionReply,
+    getSessionStar,
     clearSessionReply
   }
 }
