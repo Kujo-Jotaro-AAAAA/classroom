@@ -25,6 +25,8 @@ export default [
         path: '/radiosimple/shapeTwo',
         component: '@/pages/radioSimple/shapeTwo/index',
       },
+      // --== 游戏 ==--
+      { path: '/game/findpark', component: '@/pages/game/findPark/index' },
       // 送货
       { path: '/delivery', component: '@/pages/delivery/index' },
       { exact: true, path: '/', redirect: '/balloons' },

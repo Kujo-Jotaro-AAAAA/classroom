@@ -33,6 +33,7 @@ export default function useComponents() {
         text,
         fontSize: 34,
         pos: [61, 93],
+        width: 816
       },
     };
   }

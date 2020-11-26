@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import * as spritejs from 'spritejs'
 import * as Types from 'spritejs/typings/spritejs.d';
-const {  Sprite, Rect, Block, Label, Polyline, Path } = spritejs
+const {  Sprite, Rect, Block, Label, Polyline, Path, Group } = spritejs
 // type ElesType = Types.Label | Types.Sprite | Types.Rect | Types.Block
 type ElesType = any
 export enum EleTypeEnums {
@@ -13,7 +13,8 @@ export enum EleTypeEnums {
   RECT = 'rect',
   BLOCK = 'block',
   POLYLINE = 'polyline',
-  PATH = 'path'
+  PATH = 'path',
+  GROUP = 'group'
 }
 export enum EvtNameEnum {
   TOUCH_START = 'touchstart',
@@ -55,21 +56,22 @@ export default function useCreateEle(props: PropTypes) {
     rect: createRect,
     block: createBlock,
     polyline: createPolyline,
-    path: createPath
+    path: createPath,
+    group: createGroup
   }
   useEffect(() => {
-    const queue = createQueue();
+    const queue = createQueue(eles);
     setElements(queue)
   }, [eles])
   useEffect(() => {
     if (!props.stage) return
     if (!elements || elements.length === 0) return
-    payloadElement()
+    payloadElement(elements)
   }, [elements])
   /**
    * @description 挂载dom及事件、动画
    */
-  function payloadElement() {
+  function payloadElement(elements) {
     elements.forEach((el, idx) => {
       props.stage.layer.append(el)
       const events = eles[idx].evt
@@ -107,13 +109,14 @@ export default function useCreateEle(props: PropTypes) {
   /**
    * @description 生成配置的挂载的dom队列
    */
-  function createQueue() {
+  function createQueue(eles) {
     if (!Array.isArray(eles)) return []
     return eles.map(eleConfig => {
       const fn = createFnMap[eleConfig.type]
       return fn && fn(eleConfig.option)
     })
   }
+
   function createLabel(op: Types.Label) {
     return new Label(op)
   }
@@ -131,6 +134,9 @@ export default function useCreateEle(props: PropTypes) {
   }
   function createPath(op) {
     return new Path(op)
+  }
+  function createGroup(op) {
+    return new Group(op)
   }
   /* ********=*****************  工具函数   ******************************************************** */
   /**
