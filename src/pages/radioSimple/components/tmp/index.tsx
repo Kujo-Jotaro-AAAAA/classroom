@@ -29,7 +29,7 @@ const Part: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { createOptionsBlock, createHorn, createStep } = useComponents();
+  const { createHorn, createStep } = useComponents();
   const { elements, setEles, findElesByNames } = useCreateEle(
     {
       stage,
@@ -90,10 +90,10 @@ const Part: FC<PropTypes> = function(props) {
    */
   function onSubmit(elm) {
     if (props.answer == elm.name) {
-      elm.attr('bgcolor', success_color)
       elm.attr({
         bgcolor: success_color,
-        borderColor: success_border
+        borderColor: success_border,
+        zIndex: -1
       })
       setVisible(true)
       clearSessionReply()
@@ -102,7 +102,8 @@ const Part: FC<PropTypes> = function(props) {
     setSessionReply(getSessionReply() + 1)
     elm.attr({
       bgcolor: fail_color,
-      borderColor: main_color
+      borderColor: main_color,
+      zIndex: -1
     })
     resetStatus()
   }
@@ -110,6 +111,7 @@ const Part: FC<PropTypes> = function(props) {
     setTimeout(() => {
       optionElms.current.forEach(opElm => {
         opElm.removeAttribute('bgcolor')
+        opElm.removeAttribute('zIndex')
       })
     }, 1000)
   }

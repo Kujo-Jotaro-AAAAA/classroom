@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import TmpPage from './components/tmp';
 import useComponents from '@/hooks/useComponents';
-import { ElesConfig, EleTypeEnums } from '@/hooks/useCreateEle';
+import { ElesConfig, EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
 const queryTmp = history.location.query?.tmp;
 const assertMap = {
   r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
@@ -12,6 +12,8 @@ const assertMap = {
   g: require('@/assets/radioGroupSimple/png0006.png'), // 葡萄
   ba: require('@/assets/radioGroupSimple/png0007.png'), // 香蕉
   br: require('@/assets/radioGroupSimple/png0008.png'), // 面包
+  br1: require('@/assets/radioGroupSimple/cake1@2x.png'),
+  br2: require('@/assets/radioGroupSimple/cake2@2x.png'),
   // 交通锥
   coneR: require('@/assets/radioGroupSimple/png0035.png'), // 红
   coneB: require('@/assets/radioGroupSimple/png0036.png'), // 蓝
@@ -129,62 +131,19 @@ const RadioGroup: React.FC = function(props) {
    * @description 创建面包组
    */
   function createSGB(): ElesConfig[] {
-    const w = 55,
-      h = 41, wMap = {
-        sb: 33.2,
-        g: 35.27,
-        ba: 34.36
-      }, hMap = {
-        sb: 37.24,
-        g: 36.47,
-        ba: 37.25
-      }
-
-    /**
-    草莓：33.2    37.24
-    葡萄：35.27   36.47
-    香蕉：34.36     37.25
-     */
-    const list = [
-      ['sb', 'g', 'ba', 'sb', 'g', 'g', 'sb', 'g', 'ba'],
-      ['sb', 'g', 'ba', 'sb', 'g', 'ba', 'sb', 'g', 'ba'],
-    ]
-      .map((opList, opIdx) => {
-        return opList.map((tag, idx) => {
-          const currW = wMap[tag], currh = hMap[tag]
-          const texture = assertMap[tag],
-            x = 270 + (22 + currW) * idx,
-            y = opIdx === 0 ? 262 : 471;
-          return {
-            type: EleTypeEnums.SPRITE,
-            option: {
-              texture,
-              size: [currW, currh],
-              pos: [x, y],
-              zIndex: 10,
-              pointerEvents: 'none',
-            },
-          };
-        });
-      })
-      ?.flat();
-    // 面包
-    const brx = 239,
-      bry = [285, 494];
-    const breads = bry.map(bry => {
+    const w = 546.68, h = 93, posX = 239, posY = 263
+    return ['br1', 'br2'].map((key, idx) => {
       return {
         type: EleTypeEnums.SPRITE,
         option: {
-          texture: assertMap.br,
-          size: [546.68, 70.8],
-          pos: [brx, bry],
-          zIndex: 1,
-          pointerEvents: 'none',
+          texture: assertMap[key],
+          size: [w, h],
+          zIndex: 0,
+          pointerEvent: 'none',
+          pos: [posX, posY + (115 + h) * idx]
         },
-      };
-    });
-
-    return [...list, ...breads];
+      }
+    })
   }
   /**
    * @description 创建交通锥
