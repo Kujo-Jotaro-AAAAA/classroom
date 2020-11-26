@@ -6,6 +6,7 @@ export default [
     routes: [
       // 气球
       { path: '/balloons', component: '@/pages/balloons/index' },
+      { path: '/balls', component: '@/pages/balls/index' },
       // { path: '/demo', component: '@/pages/demo/index' },
       // 钥匙页
       { path: '/sameKey', component: '@/pages/sameKey/index' },
@@ -19,6 +20,10 @@ export default [
       {
         path: '/radiosimple',
         component: '@/pages/radioSimple/index',
+      },
+      {
+        path: '/radiosimple/shapeTwo',
+        component: '@/pages/radioSimple/shapeTwo/index',
       },
       // 送货
       { path: '/delivery', component: '@/pages/delivery/index' },
