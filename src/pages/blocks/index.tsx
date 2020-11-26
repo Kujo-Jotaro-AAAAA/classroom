@@ -198,8 +198,6 @@ const Blocks: FC<PropTypes> = function(props) {
     const isEdit = replaceColorBlock(ele);
     const isDone = pullRightBlock(ele);
     if (!isEdit && isDone) {
-    //   debugger
-    // console.log({isDone, isEdit});
       newReply.push(ele.name);
       session.setKey(sessionKey, newReply);
       setLayUp(newReply);
