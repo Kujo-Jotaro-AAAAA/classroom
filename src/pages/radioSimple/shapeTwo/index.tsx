@@ -24,7 +24,7 @@ const assetsMap = {
   },
   doughnut: {
     0: require('@/assets/shapeTwo/png0032.png'),
-    1: require('@/assets/shapeTwo/png0033.png'),
+    1: require('@/assets/shapeTwo/png0033.png'), // 💕
   },
 };
 
@@ -34,9 +34,11 @@ const ShapeTwo: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose, setSessionReply, getStarFn, getSessionReply, getSessionStar } = useReward();
   const fgW = 60.44,
     fgH = 64.95,
-    answerMap = {
+    bgW = 60,
+    bgH = 56,
+    answerMap = { // 答案
       finger: 1,
-      doughnut: 0,
+      doughnut: 1,
     },blockRef = useRef<any[]>()
 
   const { stage } = useStage({
@@ -66,7 +68,11 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     ]);
   }
   function mapTmpOption(): ElesConfig[] {
-    return createFinger();
+    const createMap = {
+      finger: createFinger,
+      doughnut:createDoughnut
+    }
+    return createMap[queryTmp]();
   }
   function createFinger(): ElesConfig[] {
     const posX = 61,
@@ -128,6 +134,57 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     });
     return [...fgList, ...fgReplys];
   }
+  function createDoughnut(): ElesConfig[] {
+    const posX = 61,
+      posY = 260,
+      list = [ 0, 1, 0,  0, 1, 0,  0, 1, 0],
+      replyList = [
+        [0, 1],
+        [ 0, 1, 0]
+      ];
+    const fgReplys = replyList
+      .map((replys, reIdx) => {
+        const replyPosX = {
+          0: 295,
+          1: 568,
+        };
+        return replys.map((key, idx) => {
+          // console.log('key', assetsMap.finger[key]);
+          const currPosx = replyPosX[reIdx] + (8 + bgW) * idx;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture: assetsMap.doughnut[key],
+              size: [bgW, bgH],
+              pos: [currPosx, 491],
+              zIndex: 1,
+              pointerEvent: 'none'
+            },
+            evt: [{
+              type: EvtNameEnum.CLICK,
+              callback: (evt, elm) => {
+                const currBlock = blockRef.current.find(b => b.name === `${reIdx}`)
+                handleBlockClick(currBlock)
+              }
+            }]
+          };
+        });
+      })
+      .flat();
+    const fgList = list.map((key, idx) => {
+      const currPosx = posX + (46 + bgW) * idx;
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assetsMap.doughnut[key],
+          size: [bgW, bgH],
+          pos: [currPosx, posY],
+        },
+      };
+    });
+    return [...fgList, ...fgReplys];
+  }
+
   function createBlock(): ElesConfig[] {
     const posX = [241, 548],
       posY = 457;
