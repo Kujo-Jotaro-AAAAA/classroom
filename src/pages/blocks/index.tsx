@@ -90,13 +90,13 @@ const Blocks: FC<PropTypes> = function(props) {
     );
   }
   /**
-   * @description 答案区域
+   * @description 回答区域
    */
   function createAnswerBlocks() {
     return new Array(3).fill(0).map((_, index) => {
       const w = 96,
         h = 58,
-        x = 674 + w / 2 + (w + 23) * index;
+        x = 674 + w / 2 + (w + 7) * index;
       return {
         type: EleTypeEnums.BLOCK,
         option: {
@@ -209,9 +209,8 @@ const Blocks: FC<PropTypes> = function(props) {
   useEffect(() => {
     if (layUp.length === 3) {
       submit();
-      setReplyNum(replyNum + 1)
+
     }
-    console.log('replyNum ==>', replyNum);
   }, [layUp]);
   /**
    * @description 提交答案
@@ -220,8 +219,19 @@ const Blocks: FC<PropTypes> = function(props) {
     const correct = answer.every((an, idx) => an === layUp[idx]);
     if (correct) {
       setVisible(true);
+      // 将选择区的框颜色变为红色
+      console.log('answerBolcksRef.current', answerBolcksRef.current);
+
+      answerBolcksRef.current.forEach(el => {
+        el.attr({
+          borderColor: '#F57F57',
+          borderDash: 1
+        })
+        // el.removeAttribute('borderDash')
+      })
       return;
     }
+    setReplyNum(replyNum + 1)
     // 提交错误
     moveColorBlockToInitPos();
     setLayUp([]);

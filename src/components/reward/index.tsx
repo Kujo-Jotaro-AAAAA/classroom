@@ -29,28 +29,81 @@ const Reward: FC<PropTypes> = function(props) {
    */
   async function init() {
     const assets = createDefaultAssets();
+    const initTime = 300
     assets.doms.forEach(sp => {
       stage.layer.append(sp);
     });
-    await assets.animate.flyStar.animate(
-      [
-        { pos: [733, 362] },
-        { pos: [842, 231] },
-        { pos: [887, 109] },
-        { pos: [894, 105] },
-        { opacity: 0 },
-      ],
-      {
-        duration: 1000,
-        easing: 'ease-in',
+    await setTimeout(() => {
+      assets.animate.tiger.animate([
+        // {
+        //   y: vpHeight
+        // },
+        {
+          y: vpHeight - 269 / 2 + 50
+        },
+        {
+          y: vpHeight - 269 / 2 - 50
+        },
+        {
+          y: vpHeight - 269 / 2
+        },
+      ], {
+        duration: 500,
+        easing: 'linear',
         direction: 'alternate',
         iterations: 1,
         fill: 'forwards',
-      },
-    );
-    setTimeout(() => {
+      })
+    }, initTime)
+    await setTimeout(() => {
+      assets.animate.stars.forEach(star => {
+        star.animate([
+          {opacity: .3},
+          {opacity: .6},
+          {opacity: 1},
+        ], {
+          duration: 500,
+          easing: 'linear',
+          direction: 'alternate',
+          iterations: 1,
+          fill: 'forwards',
+        })
+      })
+    }, initTime + 300)
+    await setTimeout(() => {
+      assets.animate.addNum.animate([
+          {opacity: .3},
+          {opacity: .6},
+          {opacity: 1},
+        ], {
+          duration: 500,
+          easing: 'linear',
+          direction: 'alternate',
+          iterations: 1,
+          fill: 'forwards',
+        })
+    }, initTime + 600)
+    await setTimeout(() => {
+      assets.animate.flyStar.animate(
+        [
+          { pos: [733, 362] },
+          { pos: [842, 231] },
+          { pos: [887, 109] },
+          { pos: [894, 105] },
+          { opacity: 0 },
+        ],
+        {
+          duration: 1000,
+          easing: 'linear',
+          direction: 'alternate',
+          iterations: 1,
+          fill: 'forwards',
+        },
+      );
+    }, initTime + 900)
+    await setTimeout(() => {
       assets.animate.coin.attr('text', 18 + props.star)
-    }, 1000)
+    }, initTime + 1100)
     // await assets.animate.coin.animate([{ text: 18 + props.star }], {
     //   duration: 2500,
     //   iterations: 1,
@@ -70,12 +123,15 @@ const Reward: FC<PropTypes> = function(props) {
       createFlyStar(),
     ];
     const coin = countGroup[2];
-
+    const addNum = countGroup[3];
     return {
       doms: [mask, tiger, ...stars, ...countGroup, flyStar],
       animate: {
         flyStar,
         coin,
+        tiger,
+        stars,
+        addNum
       },
     };
   }
@@ -92,7 +148,8 @@ const Reward: FC<PropTypes> = function(props) {
       texture: tigerIcon,
       size: [373, 269],
       anchor: [0.5, 0.5],
-      pos: [vpWidth / 2, vpHeight - 269 / 2],
+      // pos: [vpWidth / 2, vpHeight - 269 / 2],
+      pos: [vpWidth / 2, vpHeight + 269]
     });
   }
   /**
@@ -128,6 +185,7 @@ const Reward: FC<PropTypes> = function(props) {
           texture: icon,
           size: [w, h],
           anchor: [0.5, 0.5],
+          opacity: 0,
           pos: [xMap[props.star], yMap[props.star]],
         }),
       );
@@ -138,7 +196,7 @@ const Reward: FC<PropTypes> = function(props) {
     return new Sprite({
       texture: flyIcon,
       size: [30, 30],
-      // pos: [-100, -100],
+      pos: [-100, -100],
       anchor: [0.5, 0.5],
       zIndex: 200,
     });
@@ -170,6 +228,7 @@ const Reward: FC<PropTypes> = function(props) {
       text: `+${props.star}`,
       pos: [490, 270],
       fillColor: '#fff',
+      opacity: 0,
       fontSize: 34,
     })
     return [bg, star, count, addNum];
