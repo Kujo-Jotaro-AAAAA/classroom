@@ -5,15 +5,18 @@ import useComponents from '@/hooks/useComponents';
 import { ElesConfig, EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
 const queryTmp = history.location.query?.tmp;
 const assertMap = {
-  r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
-  m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
-  c: require('@/assets/radioGroupSimple/png0014.png'), // 玉米
-  sb: require('@/assets/radioGroupSimple/png0005.png'), // 草莓
-  g: require('@/assets/radioGroupSimple/png0006.png'), // 葡萄
-  ba: require('@/assets/radioGroupSimple/png0007.png'), // 香蕉
-  br: require('@/assets/radioGroupSimple/png0008.png'), // 面包
-  br1: require('@/assets/radioGroupSimple/cake1@2x.png'),
+  // * 每个切图大小都不一致，弃用
+  // r: require('@/assets/radioGroupSimple/png0012.png'), // 胡萝卜
+  // m: require('@/assets/radioGroupSimple/png0013.png'), // 香菇
+  // c: require('@/assets/radioGroupSimple/png0014.png'), // 玉米
+  // sb: require('@/assets/radioGroupSimple/png0005.png'), // 草莓
+  // g: require('@/assets/radioGroupSimple/png0006.png'), // 葡萄
+  // ba: require('@/assets/radioGroupSimple/png0007.png'), // 香蕉
+  // br: require('@/assets/radioGroupSimple/png0008.png'), // 面包
+  br1: require('@/assets/radioGroupSimple/cake1@2x.png'), // 有香蕉版本
   br2: require('@/assets/radioGroupSimple/cake2@2x.png'),
+  br3: require('@/assets/radioGroupSimple/cake3@2x.png'), // 无香蕉版本
+  br4: require('@/assets/radioGroupSimple/cake4@2x.png'),
   // 交通锥
   coneR: require('@/assets/radioGroupSimple/png0035.png'), // 红
   coneB: require('@/assets/radioGroupSimple/png0036.png'), // 蓝
@@ -55,6 +58,13 @@ const RadioGroup: React.FC = function(props) {
         optionElmInit: [
           createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
           ...createSGB(),
+        ],
+        answer: '1',
+      },
+      sgb2: {
+        optionElmInit: [
+          createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
+          ...createSGB2(),
         ],
         answer: '1',
       },
@@ -133,6 +143,24 @@ const RadioGroup: React.FC = function(props) {
   function createSGB(): ElesConfig[] {
     const w = 546.68, h = 93, posX = 239, posY = 263
     return ['br1', 'br2'].map((key, idx) => {
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assertMap[key],
+          size: [w, h],
+          zIndex: 0,
+          pointerEvent: 'none',
+          pos: [posX, posY + (115 + h) * idx]
+        },
+      }
+    })
+  }
+  /**
+   * @description 创建面包组2
+   */
+  function createSGB2(): ElesConfig[] {
+    const w = 546.68, h = 93, posX = 239, posY = 263
+    return ['br3', 'br4'].map((key, idx) => {
       return {
         type: EleTypeEnums.SPRITE,
         option: {
