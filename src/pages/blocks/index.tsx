@@ -193,16 +193,20 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function handleColorEleEnd(evt, ele) {
-    ele.removeAttribute('zIndex');
     const newReply = session.getKey(sessionKey) || [];
     if (newReply?.includes(ele.name)) return;
     const isEdit = replaceColorBlock(ele);
     const isDone = pullRightBlock(ele);
     if (!isEdit && isDone) {
+    //   debugger
+    // console.log({isDone, isEdit});
       newReply.push(ele.name);
       session.setKey(sessionKey, newReply);
       setLayUp(newReply);
     }
+    setTimeout(() => {
+      ele.removeAttribute('zIndex');
+    }, 500)
   }
   useEffect(() => {
     if (layUp.length === 3) {
@@ -234,6 +238,7 @@ const Blocks: FC<PropTypes> = function(props) {
       const [x, y] = ele.attr().pos;
       const isCover = elm.isPointCollision(x, y); // 跟当前色块覆盖了
       if (elm.name !== ele.name && isCover) {
+        if (colorBlockUnMove(elm)) return //  没移动过，不继续操作
         const newReply = session.getKey(sessionKey) || [];
         isEdit = true;
         const pos = initColorPos.current[elm.name];
@@ -253,7 +258,14 @@ const Blocks: FC<PropTypes> = function(props) {
     });
     return isEdit;
   }
-
+  /**
+   * @description 判断当前色块是否移动过,
+   */
+  function colorBlockUnMove(elm) {
+    const elmPos = elm.attr().pos
+    const initPos = initColorPos.current[elm.name];
+    return initPos.every((initVal, idx) => initVal === elmPos[idx])
+  }
   /**
    * @description 放置到答题框并纠正方块的位置
    */
@@ -272,11 +284,11 @@ const Blocks: FC<PropTypes> = function(props) {
           iterations: 1,
           fill: 'forwards',
         });
-        return;
+        return
       }
       if (flag) return;
       const initPos = initColorPos.current[ele.name];
-      await ele.animate([{ pos: initPos }], {
+      await ele.animate([{ pos: initPos }], { // 滚动回初始节点
         duration: 400,
         easing: 'ease-in',
         direction: 'alternate',
