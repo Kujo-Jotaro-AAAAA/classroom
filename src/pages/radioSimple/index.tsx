@@ -130,22 +130,36 @@ const RadioGroup: React.FC = function(props) {
    */
   function createSGB(): ElesConfig[] {
     const w = 55,
-      h = 41;
-    // 水果
+      h = 41, wMap = {
+        sb: 33.2,
+        g: 35.27,
+        ba: 34.36
+      }, hMap = {
+        sb: 37.24,
+        g: 36.47,
+        ba: 37.25
+      }
+
+    /**
+    草莓：33.2    37.24
+    葡萄：35.27   36.47
+    香蕉：34.36     37.25
+     */
     const list = [
       ['sb', 'g', 'ba', 'sb', 'g', 'g', 'sb', 'g', 'ba'],
       ['sb', 'g', 'ba', 'sb', 'g', 'ba', 'sb', 'g', 'ba'],
     ]
       .map((opList, opIdx) => {
         return opList.map((tag, idx) => {
+          const currW = wMap[tag], currh = hMap[tag]
           const texture = assertMap[tag],
-            x = 270 + (2 + w) * idx,
+            x = 270 + (22 + currW) * idx,
             y = opIdx === 0 ? 262 : 471;
           return {
             type: EleTypeEnums.SPRITE,
             option: {
               texture,
-              size: [w, h],
+              size: [currW, currh],
               pos: [x, y],
               zIndex: 10,
               pointerEvents: 'none',

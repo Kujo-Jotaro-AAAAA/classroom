@@ -131,16 +131,43 @@ const Balloons: FC<PropTypes> = function(props) {
       }
     })
   }
+  /**
+   * @description 点击方块事件
+   * @param el
+   */
   function blockClick(el) {
-    if (tmpMap[currIndex].answer === el.name) {
+    const currBall = balloonElm.current.find(balloon => {
+      const tag = balloon.name.split('-')
+      return tag[1] === el.name
+    })
+    if (tmpMap[currIndex].answer === el.name) { // 正确，气球飞到答题区
       setVisible(true);
       el.attr({
         bgcolor: success_color,
         borderColor: success_border
       })
-    } else {
+    } else { // 错误，抖动
       el.attr({
         bgcolor: fail_color
+      })
+      console.log('currBall', currBall);
+      const currBallX = currBall.attr().x
+      currBall.animate([{
+        x: currBallX + 10
+      },{
+        x: currBallX - 10
+      },{
+        x: currBallX + 10
+      },{
+        x: currBallX - 10
+      },{
+        x: currBallX
+      }], {
+        duration: 300,
+        easing: 'ease-in',
+        direction: 'alternate',
+        iterations: 1,
+        fill: 'forwards',
       })
       setSessionReply(getSessionReply() + 1)
       setTimeout(() => {
@@ -156,16 +183,8 @@ const Balloons: FC<PropTypes> = function(props) {
     // 获取答题框
     replyRef.current = findEleByName(elements, 'reply');
 
-    balloonElm.current = getOptionBalloons();
+    balloonElm.current = findElesByNames(elements, ['balloon-red', 'balloon-yellow', 'balloon-blue']);
     balloonBlockElm.current = findElesByNames(elements, ['red', 'yellow', 'blue'])
-  }
-  /**
-   * @description 获取选项的气球
-   */
-  function getOptionBalloons() {
-    return elements.filter(el => {
-      return el.name;
-    });
   }
   /**
    * @description 获取气球的默认位置

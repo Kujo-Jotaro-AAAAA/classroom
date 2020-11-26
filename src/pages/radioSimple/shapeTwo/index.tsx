@@ -47,7 +47,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
   const { elements, setEles, eles, findElesByNames, resetElmsAttr } = useCreateEle({
     stage,
   });
-  const { createQuestionLabel, createHorn } = useComponents();
+  const { createQuestionLabel, createHorn, createStep } = useComponents();
   useEffect(() => {
     initPage();
     return () => {
@@ -63,6 +63,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     setEles([
       createQuestionLabel('是哪一种规律呢？点点看吧'),
       createHorn(),
+      ...createStep(1),
       ...mapTmpOption(),
       ...createBlock(),
     ]);
