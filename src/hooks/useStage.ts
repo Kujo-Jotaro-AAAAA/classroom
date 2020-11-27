@@ -4,8 +4,10 @@ const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs
 interface PropTypes {
   elId: string
 }
-const vpWidth = window.innerWidth;
-const vpHeight = window.innerHeight;
+// const vpWidth = window.innerWidth;
+// const vpHeight = window.innerHeight;
+const vpWidth = 1024;
+const vpHeight = 768;
 export default function useStage(props: PropTypes) {
   const reward = useRef(null)
   const [stage, setStage] = useState(null)
