@@ -7,7 +7,7 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
-import { create12Checkerboard } from './utils';
+import { create12Checkerboard, getDirection } from './utils';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -18,7 +18,8 @@ const canvasId = 'delivery-container'
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Delivery: FC<PropTypes> = function(props) {
-  const {visible, setVisible, onClose} = useReward()
+  const {visible, setVisible, onClose} = useReward(),
+  [fixAnchors, setFixAnchors] = useState([])
   const answer = 'blue',
   originPos = [50, 50] // 起始点
   const lineRef = useRef<any>(null)
@@ -30,8 +31,6 @@ const Delivery: FC<PropTypes> = function(props) {
   });
   // const {} = useComponents()
   useEffect(() => {
-    const board = create12Checkerboard()
-    console.log('board ==>', board);
     initPage()
     return () => {
       return session.clear();
@@ -65,18 +64,32 @@ const Delivery: FC<PropTypes> = function(props) {
           type: EvtNameEnum.TOUCH_MOVE,
           callback: handleMoveEvent
         }]
-      }
+      },
+      ...createMarks()
     ]);
   }
   /**
    * @description 生成标记好的点
    */
-  function createMarks() {
-    [
-      [originPos], []
-    ]
+  function createMarks(): ElesConfig[] {
+    const board = create12Checkerboard()
+    setFixAnchors(board.anchors)
+    return board.anchors.map(pos => {
+      return {
+        type: EleTypeEnums.BLOCK,
+        option: {
+          anchor: [.5, .5],
+          size: [50, 50],
+          border: [2, '#f40'],
+          borderRadius: 25,
+          pos
+        }
+      }
+    })
   }
   function handleMoveEvent(evt, elm) {
+    const move = getDirection([139, 229], [evt.x, evt.y])
+    console.log('move', move);
     elm.attr({
       pos: [evt.x, originPos[1]]
     })

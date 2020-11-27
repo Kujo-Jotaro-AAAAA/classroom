@@ -1,13 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import * as spritejs from 'spritejs'
+import {BASE_WIDTH, BASE_HEIGHT} from '@/utils/detectOrient';
 const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs
 interface PropTypes {
   elId: string
 }
-// const vpWidth = window.innerWidth;
-// const vpHeight = window.innerHeight;
-const vpWidth = 1024;
-const vpHeight = 768;
 export default function useStage(props: PropTypes) {
   const reward = useRef(null)
   const [stage, setStage] = useState(null)
@@ -15,8 +12,8 @@ export default function useStage(props: PropTypes) {
     reward.current = document.getElementById(props.elId)
     const scene = new Scene({
       container: reward.current,
-      width: vpWidth,
-      height: vpHeight,
+      width: BASE_WIDTH,
+      height: BASE_HEIGHT,
     })
     const layer = scene.layer()
     setStage({
@@ -26,11 +23,11 @@ export default function useStage(props: PropTypes) {
   }, [])
   return {
     stage,
-    vpWidth,
-    vpHeight,
+    vpWidth: BASE_WIDTH,
+    vpHeight: BASE_HEIGHT,
     halfVp: { // 居中
-      w: vpWidth/2,
-      h: vpHeight/2
+      w: BASE_WIDTH/2,
+      h: BASE_HEIGHT/2
     }
   }
 }
