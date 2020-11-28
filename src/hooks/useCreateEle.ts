@@ -40,7 +40,8 @@ export interface ElesConfig {
   type: EleTypeEnums,
   option: ElesType,
   evt?: EleEventTypes[],
-  animates?: EleAnimateTypes[]
+  animates?: EleAnimateTypes[],
+  children?: ElesConfig[] // group专属
 }
 interface PropTypes {
   eles?: ElesConfig[],
@@ -152,10 +153,9 @@ export default function useCreateEle(props: PropTypes) {
     if (!Array.isArray(eles)) return []
     return eles.map(eleConfig => {
       const fn = createFnMap[eleConfig.type]
-      return fn && fn(eleConfig.option)
+      return fn && fn(eleConfig.option, eleConfig.children)
     })
   }
-
   function createLabel(op: Types.Label) {
     return new Label(op)
   }
@@ -174,8 +174,20 @@ export default function useCreateEle(props: PropTypes) {
   function createPath(op) {
     return new Path(op)
   }
-  function createGroup(op) {
-    return new Group(op)
+  function createGroup(op, children) {
+    const queue = createQueue(children)
+    const group = new Group(op)
+    payloadGroupElement(group, queue, children)
+    return group
+  }
+  function payloadGroupElement(group, elements, children) {
+    elements.forEach((el, idx) => {
+      group.append(el)
+      const events = children[idx].evt
+      const animates = children[idx].animates
+      handleEvent(el, events)
+      handleAnimates(el, animates)
+    })
   }
   /* ********=*****************  工具函数   ******************************************************** */
   /**

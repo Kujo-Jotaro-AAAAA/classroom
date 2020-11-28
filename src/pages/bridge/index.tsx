@@ -27,12 +27,13 @@ const Bridge: FC<PropTypes> = function(props) {
   const { elements, setEles, eles } = useCreateEle({
     stage,
   });
+  // appobject.onBackPress
   const bridgeMap = {
-    onBackPress: () =>  onBackPress(),
-    voiceRecordStart: () => voiceRecordStart(),
-    voiceRecordEnd: () => voiceRecordEnd(),
-    voiceRecordPlay: () => voiceRecordPlay(),
-    nextStep: () => nextStep(),
+    onBackPress: () =>  onBackPress.postMessage(),
+    voiceRecordStart: () => voiceRecordStart.postMessage(),
+    voiceRecordEnd: () => voiceRecordEnd.postMessage(),
+    voiceRecordPlay: () => voiceRecordPlay.postMessage(),
+    nextStep: () => nextStep.postMessage(),
   }
   const {} = useComponents()
   useEffect(() => {
@@ -63,9 +64,9 @@ const Bridge: FC<PropTypes> = function(props) {
             callback: () => {
               try {
                 bridgeMap[fnName]()
-                alert(`调用${fnName}`)
+                console.log(`调用${fnName}成功`)
               } catch (error) {
-                alert(error);
+                console.log(error, `调用${fnName}失败`);
               }
             }
           }]

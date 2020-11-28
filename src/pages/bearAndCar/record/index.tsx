@@ -25,11 +25,11 @@ const assetsMap = {
 }
 interface PropTypes {}
 // const sessionKey = 'optionPos';
-import { bAndCResultSession } from '../index';
+// import { bAndCResultSession } from '../index';
 const Record: FC<PropTypes> = function(props) {
   const {visible, setVisible, onClose} = useReward()
-  const answer = 'blue',
-  imgUrl = session.getKey(bAndCResultSession)
+  const answer = 'blue'
+  // imgUrl = session.getKey(bAndCResultSession)
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -44,18 +44,16 @@ const Record: FC<PropTypes> = function(props) {
     };
   }, []);
   function initPage() {
-    console.log(imgUrl);
-    location.href = imgUrl
     setEles([
       createQuestionLabel('你是按照什么规律来排列的呢？按下录音键说一说吧'),
-      { // 上一步操作的截图
-        type: EleTypeEnums.SPRITE,
-        option: {
-          texture: imgUrl,
-          size: [548, 421],
-          pos: [61, 236]
-        }
-      },
+      // { // 上一步操作的截图
+      //   type: EleTypeEnums.SPRITE,
+      //   option: {
+      //     texture: imgUrl,
+      //     size: [548, 421],
+      //     pos: [61, 236]
+      //   }
+      // },
       {
         type: EleTypeEnums.SPRITE,
         option: {
@@ -104,6 +102,23 @@ const Record: FC<PropTypes> = function(props) {
           callback: (evt, elm) => {
             // 开始录音
           }
+        }]
+      },
+      {
+        type: EleTypeEnums.GROUP,
+        option: {
+          texture: assetsMap.play,
+          size: [80, 80],
+          pos: [746, 577],
+        },
+        children: [{
+           type: EleTypeEnums.BLOCK,
+          option: {
+            size: [10, 10],
+            pos: [752, 266],
+            bgcolor: '#333333',
+            borderRadius: 5
+          },
         }]
       },
     ]);

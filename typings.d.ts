@@ -12,3 +12,18 @@ declare function voiceRecordStart (): void
 declare function voiceRecordEnd (): void
 declare function voiceRecordPlay (): void
 declare function nextStep (): void
+declare namespace onBackPress {
+  export function postMessage (): void
+}
+declare namespace voiceRecordStart {
+  export function postMessage (): void
+}
+declare namespace voiceRecordEnd {
+  export function postMessage (): void
+}
+declare namespace voiceRecordPlay {
+  export function postMessage (): void
+}
+declare namespace nextStep {
+  export function postMessage (): void
+}
