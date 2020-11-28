@@ -12,6 +12,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+export const bAndCResultSession = 'bAndCResultSession' // 小朋友操作完的结果图像
 const assetsMap = {
   desk: require('./assets/桌子.png'),
   bear: require('./assets/png0018.png'),
@@ -19,12 +20,12 @@ const assetsMap = {
   ellipse: require('./assets/椭圆形@2x.png'),
 };
 const canvasId = 'bearAndCar-container';
-interface PropTypes {}
 const replyPosSessionKey = 'replyPos'; // 回复椭圆框的点位
 const replySessionKey = 'replyKeys'; // 回复信息 ['A', 'A']
 const bearSessionKey = 'bear'; // 熊原始定位
 const carSessionKey = 'car'; // 车原始定位
-const BearAndCar: FC<PropTypes> = function(props) {
+
+const BearAndCar: FC = function() {
   const { visible, setVisible, onClose, getSessionStar, addSessionReply } = useReward(),
     ellipseRef = useRef<any[]>([]),
     optionRef = useRef<any>({
@@ -47,7 +48,7 @@ const BearAndCar: FC<PropTypes> = function(props) {
     'ABAABA',
     'BABBAB'
   ];
-  const { stage } = useStage({
+  const { stage, toImage } = useStage({
     elId: canvasId,
   });
   const { elements, setEles, findElesByNames, commonAnimate } = useCreateEle({
@@ -63,12 +64,19 @@ const BearAndCar: FC<PropTypes> = function(props) {
       stage.layer.attr({
         bgcolor: '#FFF5EE',
       });
+      const img = toImage()
+      console.log(img);
+
+      session.setKey(bAndCResultSession, img)
     }
   }, [stage]);
   useEffect(() => {
     initPage();
     return () => {
-      return session.clear();
+      session.removeKey(replyPosSessionKey)
+      session.removeKey(replySessionKey)
+      session.removeKey(bearSessionKey)
+      session.removeKey(carSessionKey)
     };
   }, []);
   useEffect(() => {
@@ -278,6 +286,8 @@ const BearAndCar: FC<PropTypes> = function(props) {
   function submit(curr) {
     const isCorrect = answer.some(ans => ans === curr.join(''))
     if (isCorrect) {
+      const img = toImage()
+      session.setKey(bAndCResultSession, img)
       setVisible(true)
       return
     }

@@ -21,6 +21,9 @@ export default function useStage(props: PropTypes) {
       layer,
     })
   }, [])
+  function toImage() {
+    return reward.current.childNodes[0].toDataURL("image/png")
+  }
   return {
     stage,
     vpWidth: BASE_WIDTH,
@@ -28,6 +31,7 @@ export default function useStage(props: PropTypes) {
     halfVp: { // 居中
       w: BASE_WIDTH/2,
       h: BASE_HEIGHT/2
-    }
+    },
+    toImage
   }
 }

@@ -1,11 +1,18 @@
+import {isJSON, isJSONString} from './tool';
 export const session = {
   setKey(key: string, value: any) {
-    const str = JSON.stringify(value);
+    let str = value
+    if (isJSON(value)) {
+      str = JSON.stringify(value);
+    }
     window.sessionStorage.setItem(key, str);
   },
   getKey(key: string) {
     const val = window.sessionStorage.getItem(key);
-    return JSON.parse(val);
+    if (isJSONString(val)) {
+      return JSON.parse(val);
+    }
+    return val
   },
   clear() {
     window.sessionStorage.clear();

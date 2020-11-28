@@ -83,3 +83,23 @@ export function hasObject(obj: Object | undefined) {
   }
   return false
 }
+/**
+ *
+ * @param json
+ */
+export function isJSONString(str) {
+  try {
+    JSON.parse(str)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+export function isJSON(obj) {
+  try {
+    JSON.stringify(obj)
+    return true
+  } catch (error) {
+    return false
+  }
+}
