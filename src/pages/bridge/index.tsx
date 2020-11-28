@@ -28,12 +28,11 @@ const Bridge: FC<PropTypes> = function(props) {
     stage,
   });
   const bridgeMap = {
-    // @ts-ignore
-    onBackPress: () => onBackPress(),
-    // @ts-ignore
-    onBackPress1: () => onBackPress(),
-    // @ts-ignore
-    onBackPress2: () => onBackPress(),
+    onBackPress: () =>  onBackPress(),
+    voiceRecordStart: () => voiceRecordStart(),
+    voiceRecordEnd: () => voiceRecordEnd(),
+    voiceRecordPlay: () => voiceRecordPlay(),
+    nextStep: () => nextStep(),
   }
   const {} = useComponents()
   useEffect(() => {

@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react'
 import * as spritejs from 'spritejs'
 import * as Types from 'spritejs/typings/spritejs.d';
+import {BACK} from '@/utils/bridge';
 const {  Sprite, Rect, Block, Label, Polyline, Path, Group } = spritejs
 // type ElesType = Types.Label | Types.Sprite | Types.Rect | Types.Block
 type ElesType = any
@@ -44,12 +45,8 @@ interface PropTypes {
 }
 export default function useCreateEle(props: PropTypes) {
   const [elements, setElements] = useState<any>([])
-  const [eles, setEles] = useState<ElesConfig[]>([])
-  useEffect(() => {
-    if (Array.isArray(props.eles)) {
-      setEles(props.eles)
-    }
-  }, [])
+  const [eles, setEles] = useState<ElesConfig[]>([]),
+  defaultCommon = ['navBar'] // 默认挂载的组件
   const createFnMap = { // 生成配置项的方法
     label: createLabel,
     sprite: createSprite,
@@ -60,6 +57,11 @@ export default function useCreateEle(props: PropTypes) {
     group: createGroup
   }
   useEffect(() => {
+    if (Array.isArray(props.eles)) {
+      setEles(props.eles.concat(createCommomEle()))
+    }
+  }, [])
+  useEffect(() => {
     const queue = createQueue(eles);
     setElements(queue)
   }, [eles])
@@ -68,6 +70,28 @@ export default function useCreateEle(props: PropTypes) {
     if (!elements || elements.length === 0) return
     payloadElement(elements)
   }, [elements])
+  /**
+   * @description 创建默认的组件
+   */
+  function createCommomEle(): ElesConfig[] {
+    return defaultCommon.map((key, idx) => {
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: '',
+          pos: [36, 38],
+          size: [19, 33]
+        },
+        evt: [{
+          type: EvtNameEnum.CLICK,
+          callback: (evt, elm) => {
+            console.log('返回上一步');
+            BACK()
+          }
+        }]
+      }
+    })
+  }
   /**
    * @description 挂载dom及事件、动画
    */
