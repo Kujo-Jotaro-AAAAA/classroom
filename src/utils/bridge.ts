@@ -1,1 +1,1 @@
-export const BACK = () => onBackPress && onBackPress()
+export const BACK = () => onBackPress && onBackPress.postMessage()

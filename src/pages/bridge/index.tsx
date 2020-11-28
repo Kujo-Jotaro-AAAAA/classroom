@@ -27,9 +27,8 @@ const Bridge: FC<PropTypes> = function(props) {
   const { elements, setEles, eles } = useCreateEle({
     stage,
   });
-  // appobject.onBackPress
   const bridgeMap = {
-    onBackPress: () =>  onBackPress.postMessage(),
+    onBackPress: () =>  onBackPress.postMessage('1234567'),
     voiceRecordStart: () => voiceRecordStart.postMessage(),
     voiceRecordEnd: () => voiceRecordEnd.postMessage(),
     voiceRecordPlay: () => voiceRecordPlay.postMessage(),
@@ -63,6 +62,7 @@ const Bridge: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: () => {
               try {
+                onBackPress.postMessage('1234567')
                 bridgeMap[fnName]()
                 console.log(`调用${fnName}成功`)
               } catch (error) {

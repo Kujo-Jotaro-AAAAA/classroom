@@ -113,11 +113,11 @@ export default function useCreateEle(props: PropTypes) {
    */
   function payloadElement(elements) {
     elements.forEach((el, idx) => {
-      props.stage.layer.append(el)
       const events = elesMerge[idx].evt
       const animates = elesMerge[idx].animates
       handleEvent(el, events)
       handleAnimates(el, animates)
+      props.stage.layer.append(el)
     })
   }
   /**
@@ -177,17 +177,21 @@ export default function useCreateEle(props: PropTypes) {
   function createGroup(op, children) {
     const queue = createQueue(children)
     const group = new Group(op)
-    payloadGroupElement(group, queue, children)
+    const childrenElms = payloadGroupElement(queue, children)
+    childrenElms.forEach(elm => {
+      group.append(elm)
+    });
+
     return group
   }
-  function payloadGroupElement(group, elements, children) {
+  function payloadGroupElement(elements, children) {
     elements.forEach((el, idx) => {
-      group.append(el)
       const events = children[idx].evt
       const animates = children[idx].animates
       handleEvent(el, events)
       handleAnimates(el, animates)
     })
+    return elements
   }
   /* ********=*****************  工具函数   ******************************************************** */
   /**
