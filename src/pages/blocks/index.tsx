@@ -193,10 +193,14 @@ const Blocks: FC<PropTypes> = function(props) {
   function setColorBlockInitPos() {
     const colorPos = {};
     const answerPos = {};
+
     colorBolcksRef.current.forEach(elm => {
-      colorPos[elm.name] = elm.attr().pos;
+    if (!elm) return
+      colorPos[elm?.name] = elm.attr().pos;
     });
     answerBolcksRef.current.forEach(elm => {
+    if (!elm) return
+
       answerPos[elm.name] = elm.attr().pos;
     });
     initColorPos.current = colorPos;

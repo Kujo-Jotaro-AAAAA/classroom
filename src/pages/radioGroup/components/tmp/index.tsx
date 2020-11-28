@@ -96,6 +96,8 @@ const Part: FC<PropTypes> = function(props) {
     if (!Array.isArray(elements) || elements.length === 0) return;
     const blocks = [0, 1, 2].map(n => `${commonBlock}-${n}`);
     // const ref = findElesByNames(elements, blocks)
+    console.log('blocks',elements, blocks);
+
     optionElms.current = payloadEvtsByNames(elements, blocks, [
       {
         type: EvtNameEnum.CLICK,

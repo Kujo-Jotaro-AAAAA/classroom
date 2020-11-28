@@ -28,11 +28,11 @@ const Bridge: FC<PropTypes> = function(props) {
     stage,
   });
   const bridgeMap = {
-    onBackPress: () =>  onBackPress.postMessage('1234567'),
-    voiceRecordStart: () => voiceRecordStart.postMessage(),
-    voiceRecordEnd: () => voiceRecordEnd.postMessage(),
-    voiceRecordPlay: () => voiceRecordPlay.postMessage(),
-    nextStep: () => nextStep.postMessage(),
+    onBackPress: () => onBackPress.postMessage('1234567'),
+    voiceRecordStart: () => voiceRecordStart.postMessage('voiceRecordStart'),
+    voiceRecordEnd: () => voiceRecordEnd.postMessage('voiceRecordEnd'),
+    voiceRecordPlay: () => voiceRecordPlay.postMessage('voiceRecordPlay'),
+    nextStep: () => nextStep.postMessage('nextStep'),
   }
   const {} = useComponents()
   useEffect(() => {
@@ -62,7 +62,7 @@ const Bridge: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: () => {
               try {
-                onBackPress.postMessage('1234567')
+                // onBackPress.postMessage('1234567')
                 bridgeMap[fnName]()
                 console.log(`调用${fnName}成功`)
               } catch (error) {

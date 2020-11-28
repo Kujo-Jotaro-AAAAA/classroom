@@ -220,7 +220,7 @@ export default function useCreateEle(props: PropTypes) {
     const elms = findElesByNames(elm, names)
     elms.forEach(el => {
       evts.forEach(evt => {
-        el.addEventListener(evt.type, (e) => {
+        el?.addEventListener(evt.type, (e) => {
           evt.callback(e, el)
         })
       })

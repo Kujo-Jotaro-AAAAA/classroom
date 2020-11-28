@@ -152,6 +152,7 @@ const Record: FC<PropTypes> = function(props) {
           type: EvtNameEnum.CLICK,
           callback: (evt, elm) => {
             // 开始录音
+            voiceRecordStart.postMessage()
             elm.remove();
             // createRecordGroup()
             setEles([...createRecordingBtn()]);
@@ -179,6 +180,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 停止录音
+              voiceRecordEnd.postMessage()
               elm.remove();
               setEles([...createRecordCompleteBtns(), ...createStudent()]);
             },
@@ -214,6 +216,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 播放录音
+              voiceRecordPlay.postMessage()
               playLeftRef.current.animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {

@@ -15,14 +15,14 @@ declare namespace onBackPress {
   export function postMessage (str?: string): void
 }
 declare namespace voiceRecordStart {
-  export function postMessage (): void
+  export function postMessage (str?: string): void
 }
 declare namespace voiceRecordEnd {
-  export function postMessage (): void
+  export function postMessage (str?: string): void
 }
 declare namespace voiceRecordPlay {
-  export function postMessage (): void
+  export function postMessage (str?: string): void
 }
 declare namespace nextStep {
-  export function postMessage (): void
+  export function postMessage (str?: string): void
 }
