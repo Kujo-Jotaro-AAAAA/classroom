@@ -5,6 +5,9 @@ import { useState, useEffect, useRef } from 'react'
 import * as spritejs from 'spritejs'
 import * as Types from 'spritejs/typings/spritejs.d';
 import {BACK} from '@/utils/bridge';
+const assetsMap = {
+  back: require('@/assets/back.png')
+}
 const {  Sprite, Rect, Block, Label, Polyline, Path, Group } = spritejs
 // type ElesType = Types.Label | Types.Sprite | Types.Rect | Types.Block
 type ElesType = any
@@ -45,8 +48,16 @@ interface PropTypes {
 }
 export default function useCreateEle(props: PropTypes) {
   const [elements, setElements] = useState<any>([])
-  const [eles, setEles] = useState<ElesConfig[]>([]),
-  defaultCommon = ['navBar'] // 默认挂载的组件
+  const [eles, setEles] = useState<ElesConfig[]>([])
+  const [elesMerge, setElesMerge] = useState<ElesConfig[]>([]),
+  defaultCommon = ['navBar'], // 默认挂载的组件
+  commonAnimate = { // 通用动画
+    duration: 500,
+    easing: 'linear',
+    direction: 'alternate',
+    iterations: 1,
+    fill: 'forwards',
+  }
   const createFnMap = { // 生成配置项的方法
     label: createLabel,
     sprite: createSprite,
@@ -62,9 +73,12 @@ export default function useCreateEle(props: PropTypes) {
     }
   }, [])
   useEffect(() => {
-    const queue = createQueue(eles);
-    setElements(queue)
+    setElesMerge(createCommomEle().concat(eles))
   }, [eles])
+  useEffect(() => {
+    const queue = createQueue(elesMerge);
+    setElements(queue)
+  }, [elesMerge])
   useEffect(() => {
     if (!props.stage) return
     if (!elements || elements.length === 0) return
@@ -78,7 +92,8 @@ export default function useCreateEle(props: PropTypes) {
       return {
         type: EleTypeEnums.SPRITE,
         option: {
-          texture: '',
+          name: 'default_back',
+          texture: assetsMap.back,
           pos: [36, 38],
           size: [19, 33]
         },
@@ -98,8 +113,8 @@ export default function useCreateEle(props: PropTypes) {
   function payloadElement(elements) {
     elements.forEach((el, idx) => {
       props.stage.layer.append(el)
-      const events = eles[idx].evt
-      const animates = eles[idx].animates
+      const events = elesMerge[idx].evt
+      const animates = elesMerge[idx].animates
       handleEvent(el, events)
       handleAnimates(el, animates)
     })
@@ -220,6 +235,7 @@ export default function useCreateEle(props: PropTypes) {
     eles,
     setEles,
     payloadEvtsByNames,
-    resetElmsAttr
+    resetElmsAttr,
+    commonAnimate
   }
 }

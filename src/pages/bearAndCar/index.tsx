@@ -16,105 +16,287 @@ const assetsMap = {
   desk: require('./assets/桌子.png'),
   bear: require('./assets/png0018.png'),
   car: require('./assets/汽车.png'),
-}
-const canvasId = 'bearAndCar-container'
+  ellipse: require('./assets/椭圆形@2x.png'),
+};
+const canvasId = 'bearAndCar-container';
 interface PropTypes {}
-const sessionKey = 'optionPos';
+const replyPosSessionKey = 'replyPos'; // 回复椭圆框的点位
+const replySessionKey = 'replyKeys'; // 回复信息 ['A', 'A']
+const bearSessionKey = 'bear'; // 熊原始定位
+const carSessionKey = 'car'; // 车原始定位
 const BearAndCar: FC<PropTypes> = function(props) {
-  const {visible, setVisible, onClose} = useReward()
-  const answer = 'blue'
+  const { visible, setVisible, onClose } = useReward(),
+    ellipseRef = useRef<any[]>([]),
+    optionRef = useRef<any>({
+      bear: [],
+      car: []
+    }),
+    answerMap = {
+      A: 'bear',
+      B: 'car'
+    }
+  const answer = [ // 答案
+    'AAAAAA',
+    'BBBBBB',
+    'ABABAB',
+    'BABABA',
+    'AABAAB',
+    'ABBABB',
+    'BBABBA',
+    'BAABAA',
+    'ABAABA',
+    'BABBAB'
+  ];
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, eles } = useCreateEle({
+  const { elements, setEles, findElesByNames, commonAnimate } = useCreateEle({
     stage,
   });
-  const { createHorn, createQuestionLabel, createSubQuestionLabel } = useComponents()
+  const {
+    createHorn,
+    createQuestionLabel,
+    createSubQuestionLabel,
+  } = useComponents();
   useEffect(() => {
     if (stage) {
       stage.layer.attr({
-        bgcolor: '#FFF5EE'
-      })
+        bgcolor: '#FFF5EE',
+      });
     }
-  }, [stage])
+  }, [stage]);
   useEffect(() => {
-    initPage()
+    initPage();
     return () => {
       return session.clear();
     };
   }, []);
+  useEffect(() => {
+    if (!Array.isArray(elements) || elements.length === 0) return;
+    getReplyDefaultPos()
+    getOptionDefaultPos()
+  }, [elements]);
   function initPage() {
     setEles([
       createHorn(),
       createQuestionLabel('这里有很多玩具熊和玩具车，你想按照什么样的规律来'),
       createSubQuestionLabel('排列呢？试试看吧'),
       {
+        // 桌子
         type: EleTypeEnums.SPRITE,
         option: {
           texture: assetsMap.desk,
           pos: [68.1, 284.63],
-          size: [887.81, 222.84]
-        }
+          size: [887.81, 222.84],
+        },
       },
-      ...createBearAndCar()
+      ...createBearAndCar(),
+      ...createEllipse(),
     ]);
   }
-  useEffect(() => {
-    if (!Array.isArray(elements) || elements.length === 0) return;
-  }, [elements]);
-  function createBearAndCar() {
-    const bw = 70.27, bh = 73, cw = 88, ch = 68;
-    const bears = [['A','A','A'],['A','A','A']].map((list, i) => {
-      const y = 588 + (9 + bh + bh / 2) * i
-      return list.map((a, ai) => {
-        const x = 61 + bw / 2 + (8 + bw) * ai
-        return {
-          type: EleTypeEnums.SPRITE,
-          option: {
-            name: a,
-            anchor: [.5, .5],
-            texture: assetsMap.bear,
-            pos: [x, y],
-            size: [bw, bh]
-          },
-          evt: [{
-            type: EvtNameEnum.TOUCH_MOVE,
-            callback: moveBear
-          }]
-        }
-      })
-    }).flat()
-    const cars = [['B','B','B'],['B','B','B']].map((list, i) => {
-      const y = 588 + (14 + ch + ch / 2) * i
-      return list.map((b, bi) => {
-        const x = 687 + cw / 2 + (8 + cw ) * bi
-        return {
-          type: EleTypeEnums.SPRITE,
-          option: {
-            name: b,
-            anchor: [.5, .5],
-            texture: assetsMap.car,
-            pos: [x, y],
-            size: [cw, ch]
-          },
-          evt: [{
-            type: EvtNameEnum.TOUCH_MOVE,
-            callback: moveCar
-          }]
-        }
-      })
-    }).flat()
-    return [...bears, ...cars]
+  // 椭圆
+  function getReplyDefaultPos() {
+    ellipseRef.current = findElesByNames(elements, [
+      'ellipse0',
+      'ellipse1',
+      'ellipse2',
+      'ellipse3',
+      'ellipse4',
+      'ellipse5',
+    ]);
   }
-  function moveBear(evt, elm) {
-    elm.attr({
-      pos: [evt.x, evt.y]
-    })
+  /**
+   * @description 获取熊和车的默认定位
+   */
+  function getOptionDefaultPos() {
+    optionRef.current.bear = findElesByNames(elements, [
+      'A-0',
+      'A-1',
+      'A-2',
+      'A-3',
+      'A-4',
+      'A-5',
+    ])
+    optionRef.current.car = findElesByNames(elements, [
+      'B-0',
+      'B-1',
+      'B-2',
+      'B-3',
+      'B-4',
+      'B-5',
+    ])
+    console.log(optionRef.current.bear.map(c => c?.name), optionRef.current.car.map(c => c?.name));
+
   }
-  function moveCar(evt, elm) {
+  function createBearAndCar(): ElesConfig[] {
+    const bw = 70.27,
+      bh = 73,
+      cw = 88,
+      ch = 68;
+      let bearIdx = 0
+    const bears = [
+      ['A', 'A', 'A'],
+      ['A', 'A', 'A'],
+    ]
+      .map((list, i) => {
+        const y = 588 + (9 + bh + bh / 2) * i;
+        return list.map((a, ai) => {
+          const x = 61 + bw / 2 + (8 + bw) * ai;
+          bearIdx ++
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              name: `${a}-${bearIdx - 1}`,
+              anchor: [0.5, 0.5],
+              texture: assetsMap.bear,
+              pos: [x, y],
+              size: [bw, bh],
+            },
+            evt: [
+              {
+                type: EvtNameEnum.TOUCH_MOVE,
+                callback: moveOption,
+              },
+              {
+                type: EvtNameEnum.TOUCH_END,
+                callback: moveEndOption,
+              },
+            ],
+          };
+        });
+      })
+      .flat();
+    let carsIndex = 0
+    const cars = [
+      ['B', 'B', 'B'],
+      ['B', 'B', 'B'],
+    ]
+      .map((list, i) => {
+        const y = 588 + (14 + ch + ch / 2) * i;
+        return list.map((b, bi) => {
+          carsIndex ++
+          const x = 687 + cw / 2 + (8 + cw) * bi;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              name: `${b}-${carsIndex - 1}`,
+              anchor: [0.5, 0.5],
+              texture: assetsMap.car,
+              pos: [x, y],
+              size: [cw, ch],
+            },
+            evt: [
+              {
+                type: EvtNameEnum.TOUCH_MOVE,
+                callback: moveOption,
+              },
+              {
+                type: EvtNameEnum.TOUCH_END,
+                callback: moveEndOption,
+              },
+            ],
+          };
+        });
+      })
+      .flat();
+    session.setKey(bearSessionKey, bears.map(b => b.option.pos))
+    session.setKey(carSessionKey, cars.map(b => b.option.pos))
+    return [...bears, ...cars];
+  }
+  function createEllipse(): ElesConfig[] {
+    const y = 308,
+      w = 68,
+      h = 8;
+    const list = new Array(6).fill(6).map((ell, idx) => {
+      const x = 145 + w / 2 + (63 + w) * idx;
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          name: `ellipse${idx}`,
+          texture: assetsMap.ellipse,
+          anchor: [0.5, 0],
+          pos: [x, y],
+          size: [w, h],
+        },
+      };
+    });
+    const pointers = list.map(item => item.option.pos)
+    session.setKey(replyPosSessionKey, pointers)
+    return list
+  }
+
+  function moveOption(evt, elm) {
     elm.attr({
-      pos: [evt.x, evt.y]
+      pos: [evt.x, evt.y],
+    });
+  }
+  /**
+   * @description 移动
+   * @param evt
+   * @param elm
+   */
+  function moveEndOption(evt, elm) {
+    const [tag, i] = elm.name.split('-')
+    const defaultPos = session.getKey(replyPosSessionKey)
+    let flag = false // 是否有匹配点位
+    defaultPos.forEach((pos, idx) => {
+      const isCover = elm.isPointCollision(pos[0], pos[1])
+      if (isCover) {
+        flag = isCover
+        elm.animate([
+          {pos: [pos[0], pos[1] - 28]}
+        ], commonAnimate)
+        getSubmitInfo(tag, idx)
+        return
+      }
+    });
+    if (!flag) {
+      // const getTag
+      const keyType = answerMap[tag], pos = session.getKey(keyType)[i]
+      elm.animate([{pos}], commonAnimate)
+    }
+  }
+  /**
+   * @description 提交信息
+   */
+  function getSubmitInfo(tag, idx) {
+    const curr = session.getKey(replySessionKey) || new Array(6).fill('')
+    curr[idx] = tag
+    session.setKey(replySessionKey, curr)
+    const canSubmit = curr.every(ans => Boolean(ans)) // 答题完成
+    if (canSubmit) {
+      submit(curr)
+    }
+  }
+  /**
+   * @description 提交当前答案
+   * @param curr
+   */
+  function submit(curr) {
+    const isCorrect = answer.some(ans => ans === curr.join(''))
+    if (isCorrect) {
+      setVisible(true)
+      return
+    }
+    resetOptionPos()
+  }
+  /**
+   * @description 重置
+   * 错误，计数+1
+   */
+  function resetOptionPos() {
+    const bearPos = session.getKey(bearSessionKey)
+    const carPos = session.getKey(carSessionKey)
+    const posMap = {
+      bear: bearPos,
+      car: carPos
+    };
+    [...optionRef.current.bear, ...optionRef.current.car].forEach(sprite => {
+      const [tag, index] = sprite.name.split('-')
+      const pos = posMap[answerMap[tag]][index]
+      sprite.animate([{pos}], commonAnimate)
     })
+
   }
   return (
     <>
@@ -129,4 +311,4 @@ const BearAndCar: FC<PropTypes> = function(props) {
     </>
   );
 };
-export default BearAndCar
+export default BearAndCar;

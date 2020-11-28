@@ -22,7 +22,7 @@ const block = new Block({
 block.removeAttribute('bgcolor')
 ```
 
-
+`el.isPointCollision(x, y)`  判断是否与某点相交，在做拖拽的时候非常有效。
 
 ## 枚举
 
