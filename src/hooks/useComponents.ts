@@ -33,7 +33,18 @@ export default function useComponents() {
         text,
         fontSize: 34,
         pos: [61, 93],
-        width: 816
+        size: [816, 96]
+      },
+    };
+  }
+  function createSubQuestionLabel(text: string): ElesConfig {
+    return {
+      type: EleTypeEnums.LABEL,
+      option: {
+        text,
+        fontSize: 34,
+        pos: [61, 93 + 44],
+        size: [816, 96]
       },
     };
   }
@@ -112,6 +123,7 @@ export default function useComponents() {
   return {
     createHorn,
     createQuestionLabel,
+    createSubQuestionLabel,
     createOptionsBlock,
     createDoubleOptionsBlock,
     commonBlock,

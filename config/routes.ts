@@ -25,6 +25,7 @@ export default [
         path: '/radiosimple/shapeTwo',
         component: '@/pages/radioSimple/shapeTwo/index',
       },
+      { path: '/bearandcar', component: '@/pages/bearAndCar/index' },
       // --== 游戏 ==--
       { path: '/game/findpark', component: '@/pages/game/findPark/index' },
       // 送货

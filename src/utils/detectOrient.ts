@@ -1,5 +1,5 @@
 export const BASE_WIDTH = 1024  // 基准宽度
-export const BASE_HEIGHT = 768 - 44 // 基准高度
+export const BASE_HEIGHT = 768 // 基准高度
 export default function detectOrient() {
   // 利用 CSS3 旋转 对根容器逆时针旋转 90 度
   var width = document.documentElement.clientWidth,
