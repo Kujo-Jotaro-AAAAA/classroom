@@ -25,7 +25,7 @@ const replySessionKey = 'replyKeys'; // 回复信息 ['A', 'A']
 const bearSessionKey = 'bear'; // 熊原始定位
 const carSessionKey = 'car'; // 车原始定位
 const BearAndCar: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, getSessionStar, getSessionReply, addSessionReply } = useReward(),
+  const { visible, setVisible, onClose, getSessionStar, addSessionReply } = useReward(),
     ellipseRef = useRef<any[]>([]),
     optionRef = useRef<any>({
       bear: [],
@@ -37,15 +37,15 @@ const BearAndCar: FC<PropTypes> = function(props) {
     }
   const answer = [ // 答案
     'AAAAAA',
-    // 'BBBBBB',
-    // 'ABABAB',
-    // 'BABABA',
-    // 'AABAAB',
-    // 'ABBABB',
-    // 'BBABBA',
-    // 'BAABAA',
-    // 'ABAABA',
-    // 'BABBAB'
+    'BBBBBB',
+    'ABABAB',
+    'BABABA',
+    'AABAAB',
+    'ABBABB',
+    'BBABBA',
+    'BAABAA',
+    'ABAABA',
+    'BABBAB'
   ];
   const { stage } = useStage({
     elId: canvasId,

@@ -94,8 +94,8 @@ export default function useCreateEle(props: PropTypes) {
         option: {
           name: 'default_back',
           texture: assetsMap.back,
-          pos: [36, 38],
-          size: [19, 33]
+          pos: [55, 36],
+          size: [16, 28]
         },
         evt: [{
           type: EvtNameEnum.CLICK,
