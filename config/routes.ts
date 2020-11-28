@@ -29,6 +29,9 @@ export default [
       { path: '/game/findpark', component: '@/pages/game/findPark/index' },
       // 送货
       { path: '/delivery', component: '@/pages/delivery/index' },
+      // 调用原生页面
+      { path: '/bridge', component: '@/pages/bridge/index' },
+
       { exact: true, path: '/', redirect: '/balloons' },
     ],
   },

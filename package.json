@@ -45,7 +45,8 @@
     "typescript": "^3.9.3",
     "umi": "^3.2.28",
     "umi-types": "^0.5.14",
-    "yorkie": "^2.0.0"
+    "yorkie": "^2.0.0",
+    "zarm": "^2.6.1"
   },
   "husky": {
     "hooks": {

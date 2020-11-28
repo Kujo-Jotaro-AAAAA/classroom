@@ -29,6 +29,7 @@ const Blocks: FC<PropTypes> = function(props) {
   const colorBolcksRef = useRef([]);
   const initColorPos = useRef({});
   const answerBolcksRef = useRef([]);
+  const redBolcksRef = useRef([]);
   const initAnswerPos = useRef({});
   const { stage } = useStage({
     elId: canvasId,
@@ -51,6 +52,7 @@ const Blocks: FC<PropTypes> = function(props) {
     };
   }, []);
   function initPage() {
+
     setEles([
       createHorn(),
       {
@@ -62,8 +64,10 @@ const Blocks: FC<PropTypes> = function(props) {
         },
       },
       ...createQuestionBlocks(),
-      // 问题区
+      // 回答区
       ...createAnswerBlocks(),
+      // 红色盒子
+      ...createMaskColorBlocks(),
       // 占位
       ...createOptionsBlock(3, 'none'),
       // 答题色块
@@ -90,6 +94,25 @@ const Blocks: FC<PropTypes> = function(props) {
     );
   }
   /**
+   * @description
+   * * 设置了虚线后无法再将其清除, 框架会报错
+   *
+   */
+  function createMaskColorBlocks() {
+    const originBlock = createAnswerBlocks()
+    return originBlock.map((block, i) => {
+      Reflect.deleteProperty(block.option, 'borderDash')
+      block.option = {
+        ...block.option,
+        name: `redBox${i}`,
+        // @ts-ignore
+        opacity: 0,
+        border: [2, '#F57F57']
+      }
+      return block
+    })
+  }
+  /**
    * @description 回答区域
    */
   function createAnswerBlocks() {
@@ -105,7 +128,7 @@ const Blocks: FC<PropTypes> = function(props) {
           size: [w, h],
           pos: [x, 270 + h / 2],
           border: [2, main_color],
-          borderDash: 2,
+          borderDash: [2],
           borderRadius: 10,
           boxSizing: 'border-box'
         },
@@ -156,6 +179,11 @@ const Blocks: FC<PropTypes> = function(props) {
       'answer-0',
       'answer-1',
       'answer-2',
+    ]);
+    redBolcksRef.current = findElesByNames(elements, [
+      'redBox0',
+      'redBox1',
+      'redBox2',
     ]);
     setColorBlockInitPos();
   }
@@ -220,14 +248,11 @@ const Blocks: FC<PropTypes> = function(props) {
     if (correct) {
       setVisible(true);
       // 将选择区的框颜色变为红色
-      console.log('answerBolcksRef.current', answerBolcksRef.current);
-
-      answerBolcksRef.current.forEach(el => {
+      redBolcksRef.current.forEach(el => {
         el.attr({
-          borderColor: '#F57F57',
-          borderDash: 1
+          zIndex: 10,
+          opacity: 1
         })
-        // el.removeAttribute('borderDash')
       })
       return;
     }
