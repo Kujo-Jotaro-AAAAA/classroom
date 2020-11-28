@@ -149,7 +149,7 @@ const RadioGroup: React.FC = function(props) {
           texture: assertMap[key],
           size: [w, h],
           zIndex: 0,
-          pointerEvent: 'none',
+          pointerEvents: 'none',
           pos: [posX, posY + (115 + h) * idx]
         },
       }
@@ -167,7 +167,7 @@ const RadioGroup: React.FC = function(props) {
           texture: assertMap[key],
           size: [w, h],
           zIndex: 0,
-          pointerEvent: 'none',
+          pointerEvents: 'none',
           pos: [posX, posY + (115 + h) * idx]
         },
       }

@@ -97,7 +97,7 @@ const Balloons: FC<PropTypes> = function(props) {
         2: 'fb'
       }, posX = 240 + (35 + 158) * i
       block.option.pos = [posX, 457]
-      block.option.pointerEvent = 'visibled'
+      block.option.pointerEvents = 'visibled'
       block.option.name = colorMap[i]
       // block.option.zIndex = colorMap[i]
       return {
@@ -223,7 +223,7 @@ const Balloons: FC<PropTypes> = function(props) {
           texture: colorMap[imgKey],
           size: [ballW, ballH],
           anchor: [0.5, 0.5],
-          pointerEvent: 'none',
+          pointerEvents: 'none',
           zIndex: 1,
           pos: [initPosX + (112 + w) * idx, initPosY + h / 2],
         },

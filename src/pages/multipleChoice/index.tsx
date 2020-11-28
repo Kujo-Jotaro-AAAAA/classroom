@@ -84,7 +84,7 @@ const RadioGroup: React.FC = function(props) {
           texture: url,
           pos: posList[idx],
           size: sizeMap[queryTmp],
-          pointerEvent: 'none'
+          pointerEvents: 'none'
         },
       };
     });

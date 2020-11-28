@@ -109,7 +109,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
               size: [fgW, fgH],
               pos: [currPosx, 486],
               zIndex: 1,
-              pointerEvent: 'none'
+              pointerEvents: 'none'
             },
             evt: [{
               type: EvtNameEnum.CLICK,
@@ -159,7 +159,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
               size: [bgW, bgH],
               pos: [currPosx, 491],
               zIndex: 1,
-              pointerEvent: 'none'
+              pointerEvents: 'none'
             },
             evt: [{
               type: EvtNameEnum.CLICK,

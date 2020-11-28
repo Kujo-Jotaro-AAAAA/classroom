@@ -25,7 +25,7 @@ const replySessionKey = 'replyKeys'; // 回复信息 ['A', 'A']
 const bearSessionKey = 'bear'; // 熊原始定位
 const carSessionKey = 'car'; // 车原始定位
 const BearAndCar: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward(),
+  const { visible, setVisible, onClose, getSessionStar, getSessionReply, addSessionReply } = useReward(),
     ellipseRef = useRef<any[]>([]),
     optionRef = useRef<any>({
       bear: [],
@@ -37,15 +37,15 @@ const BearAndCar: FC<PropTypes> = function(props) {
     }
   const answer = [ // 答案
     'AAAAAA',
-    'BBBBBB',
-    'ABABAB',
-    'BABABA',
-    'AABAAB',
-    'ABBABB',
-    'BBABBA',
-    'BAABAA',
-    'ABAABA',
-    'BABBAB'
+    // 'BBBBBB',
+    // 'ABABAB',
+    // 'BABABA',
+    // 'AABAAB',
+    // 'ABBABB',
+    // 'BBABBA',
+    // 'BAABAA',
+    // 'ABAABA',
+    // 'BABBAB'
   ];
   const { stage } = useStage({
     elId: canvasId,
@@ -244,7 +244,10 @@ const BearAndCar: FC<PropTypes> = function(props) {
       if (isCover) {
         flag = isCover
         elm.animate([
-          {pos: [pos[0], pos[1] - 28]}
+          {
+            pos: [pos[0], pos[1] - 28],
+            pointerEvents: 'none'
+          }
         ], commonAnimate)
         getSubmitInfo(tag, idx)
         return
@@ -279,6 +282,7 @@ const BearAndCar: FC<PropTypes> = function(props) {
       return
     }
     resetOptionPos()
+    addSessionReply()
   }
   /**
    * @description 重置
@@ -294,9 +298,14 @@ const BearAndCar: FC<PropTypes> = function(props) {
     [...optionRef.current.bear, ...optionRef.current.car].forEach(sprite => {
       const [tag, index] = sprite.name.split('-')
       const pos = posMap[answerMap[tag]][index]
-      sprite.animate([{pos}], commonAnimate)
+      sprite.animate([
+        {
+          pos,
+          pointerEvents: 'visible'
+        }
+      ], commonAnimate)
     })
-
+    session.removeKey(replySessionKey)
   }
   return (
     <>
@@ -307,7 +316,7 @@ const BearAndCar: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
     </>
   );
 };

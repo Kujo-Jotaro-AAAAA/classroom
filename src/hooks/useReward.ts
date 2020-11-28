@@ -34,6 +34,9 @@ export default function useReward() {
   function setSessionReply (num: number) {
     session.setKey(replySessionKey, String(num))
   }
+  function addSessionReply() {
+    setSessionReply(getSessionReply() + 1)
+  }
   function getSessionReply() {
     return  Number(session.getKey(replySessionKey))
   }
@@ -53,7 +56,7 @@ export default function useReward() {
     setVisible,
     getStarFn,
     onClose,
-    // sessionReply
+    addSessionReply,
     setSessionReply,
     getSessionReply,
     getSessionStar,

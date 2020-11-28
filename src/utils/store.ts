@@ -1,8 +1,6 @@
 export const session = {
   setKey(key: string, value: any) {
     const str = JSON.stringify(value);
-    console.log('set', key, str);
-
     window.sessionStorage.setItem(key, str);
   },
   getKey(key: string) {
