@@ -13,7 +13,7 @@ import useCreateEle, {
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
 import Layout from './layout';
-import { Sprite } from 'spritejs';
+import {SHOW_TOAST} from '@/utils/bridge';
 const canvasId = 'FindPark-container';
 const assetsMap = {
   glass: require('./assets/游泳池@2x.png'),
@@ -32,7 +32,7 @@ const FindPark: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, findElesByNames } = useCreateEle({
+  const { elements, setEles, findElesByNames, findNameByLayer } = useCreateEle({
     stage,
   });
   const maskRef = useRef<any[]>();
@@ -224,7 +224,7 @@ const FindPark: FC<PropTypes> = function(props) {
    * @description 在页面上生成透明的五个方块用来回答
    */
   function createReply() {
-    return [
+    const replyList = [
       {
         name: 'glass',
         pos: [420, 336],
@@ -254,7 +254,8 @@ const FindPark: FC<PropTypes> = function(props) {
       const {pos} = item
       const x = pos[0] + item.size[0] / 2, y = pos[1] + item.size[1] / 2
       item.pos = [x, y]
-      return {
+      return [
+        {
         type: EleTypeEnums.RING,
         option: {
           ...item,
@@ -265,6 +266,37 @@ const FindPark: FC<PropTypes> = function(props) {
           // anchor: [.5, .5]
           opacity: 0,
         },
+        // evt: [
+        //   {
+        //     type: EvtNameEnum.CLICK,
+        //     callback: (evt, elm, {stage}) => {
+        //       // 添加答案, 如果已经有了，则不再添加
+        //       hideMask(stage.layer.children)
+        //       if (reply.includes(elm.name)) {
+        //         // 已经点过啦
+        //         SHOW_TOAST()
+        //         return;
+        //       }
+        //       elm.attr({
+        //         opacity: 1
+        //       })
+        //       reply.push(elm.name);
+        //       setReply([...reply]);
+        //     },
+        //   },
+        // ],
+      },
+      {
+        type: EleTypeEnums.BLOCK,
+        option: {
+          ...item,
+          zIndex: 999,
+          innerRadius: 15,
+          outerRadius: 30,
+          bgcolor: '#f40',
+          anchor: [.5, .5],
+          opacity: 0,
+        },
         evt: [
           {
             type: EvtNameEnum.CLICK,
@@ -273,9 +305,11 @@ const FindPark: FC<PropTypes> = function(props) {
               hideMask(stage.layer.children)
               if (reply.includes(elm.name)) {
                 // 已经点过啦
+                SHOW_TOAST()
                 return;
               }
-              elm.attr({
+              const elms = findNameByLayer(stage.layer, item.name)
+              elms[0].attr({
                 opacity: 1
               })
               reply.push(elm.name);
@@ -283,8 +317,10 @@ const FindPark: FC<PropTypes> = function(props) {
             },
           },
         ],
-      };
+      }
+      ];
     });
+    return replyList.flat()
   }
   useEffect(() => {
     if (reply.length === 5) {
