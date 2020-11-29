@@ -147,7 +147,6 @@ const FindPark: FC<PropTypes> = function(props) {
     const w = 374,
       h = 190;
     const doubtSize = [w * 2, h * 2] // 2倍图 * 2
-    const test = [346, 187, ...doubtSize];
     const sourceMap = {
       glass: {
         pos: [268, 253 + 2], // 椭圆的位置,
@@ -159,24 +158,22 @@ const FindPark: FC<PropTypes> = function(props) {
       },
       car: {
         pos: [364, 440],
-        sourceRect: [346 + 600, 187 + h, ...doubtSize], // 裁剪的位置
+        sourceRect: [346 + 375, 187 + 185, ...doubtSize], // 裁剪的位置
       },
       eleph: {
         pos: [28, 328 + 253],
-        sourceRect: test, // 裁剪的位置
+        sourceRect: [55, 328 + 320, ...doubtSize], // 裁剪的位置
       },
       kite: {
         pos: [648, 312 + 253],
-        sourceRect: test, // 裁剪的位置
+        sourceRect: [648 + 650, 312 + 310, ...doubtSize], // 裁剪的位置
       },
     };
     const unChioces = Object.keys(sourceMap).filter(k => !reply.includes(k)); // 过滤掉已选中
     const randomIdx = Math.floor(Math.random() * unChioces.length);
-    const source = sourceMap[unChioces[2]];
-    // const source = sourceMap[unChioces[randomIdx]];
+    const source = sourceMap[unChioces[randomIdx]];
     // 选中一个提示
     return [unChioces[randomIdx]].map((unKey, idx) => {
-    // return [unChioces[randomIdx]].map((unKey, idx) => {
       source.pos = [source.pos[0] + w / 2, source.pos[1] + h / 2];
       return {
         type: EleTypeEnums.SPRITE,

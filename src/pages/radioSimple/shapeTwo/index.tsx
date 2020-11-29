@@ -39,6 +39,8 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     answerMap = { // 答案
       finger: 1,
       finger2: 0,
+      finger3: 1,
+      finger4: 1,
       doughnut: 1,
     },blockRef = useRef<any[]>()
 
@@ -73,6 +75,8 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     const createMap = {
       finger: createFinger,
       finger2: createFinger2,
+      finger3: createFinger3,
+      finger4: createFinger4,
       doughnut:createDoughnut
     }
     return createMap[queryTmp]();
@@ -95,6 +99,126 @@ const ShapeTwo: FC<PropTypes> = function(props) {
       replyList = [
         ['fist', 'cloth'],
         ['fist', 'fist', 'cloth']
+      ];
+    const fgReplys = replyList
+      .map((replys, reIdx) => {
+        const replyPosX = {
+          0: 294,
+          1: 570,
+        };
+        return replys.map((key, idx) => {
+          const currPosx = replyPosX[reIdx] + (4 + fgW) * idx;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture: assetsMap.finger[key],
+              size: [fgW, fgH],
+              pos: [currPosx, 486],
+              zIndex: 1,
+              pointerEvents: 'none'
+            },
+            evt: [{
+              type: EvtNameEnum.CLICK,
+              callback: (evt, elm) => {
+                const currBlock = blockRef.current.find(b => b.name === `${reIdx}`)
+                handleBlockClick(currBlock)
+              }
+            }]
+          };
+        });
+      })
+      .flat();
+    const fgList = list.map((key, idx) => {
+      const currPosx = posX + (45 + fgW) * idx;
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assetsMap.finger[key],
+          size: [fgW, fgH],
+          pos: [currPosx, posY],
+        },
+      };
+    });
+    return [...fgList, ...fgReplys];
+  }
+  // 镜3
+  function createFinger3(): ElesConfig[] {
+    const posX = 61,
+      posY = 249,
+      list = [
+        'fist',
+        'scissors',
+        'cloth',
+        'fist',
+        'scissors',
+        'cloth',
+        'fist',
+        'scissors',
+        'cloth',
+      ],
+      replyList = [
+        ['fist', 'scissors'],
+        ['fist', 'scissors', 'cloth']
+      ];
+    const fgReplys = replyList
+      .map((replys, reIdx) => {
+        const replyPosX = {
+          0: 294,
+          1: 570,
+        };
+        return replys.map((key, idx) => {
+          const currPosx = replyPosX[reIdx] + (4 + fgW) * idx;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture: assetsMap.finger[key],
+              size: [fgW, fgH],
+              pos: [currPosx, 486],
+              zIndex: 1,
+              pointerEvents: 'none'
+            },
+            evt: [{
+              type: EvtNameEnum.CLICK,
+              callback: (evt, elm) => {
+                const currBlock = blockRef.current.find(b => b.name === `${reIdx}`)
+                handleBlockClick(currBlock)
+              }
+            }]
+          };
+        });
+      })
+      .flat();
+    const fgList = list.map((key, idx) => {
+      const currPosx = posX + (45 + fgW) * idx;
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assetsMap.finger[key],
+          size: [fgW, fgH],
+          pos: [currPosx, posY],
+        },
+      };
+    });
+    return [...fgList, ...fgReplys];
+  }
+  // 镜6
+  function createFinger4(): ElesConfig[] {
+    const posX = 61,
+      posY = 249,
+      list = [
+        'fist',
+        'scissors',
+        'scissors',
+        'fist',
+        'scissors',
+        'scissors',
+        'fist',
+        'scissors',
+        'scissors',
+      ],
+      replyList = [
+        ['fist', 'scissors'],
+        ['fist', 'scissors', 'scissors']
       ];
     const fgReplys = replyList
       .map((replys, reIdx) => {
@@ -198,6 +322,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     });
     return [...fgList, ...fgReplys];
   }
+
   function createDoughnut(): ElesConfig[] {
     const posX = 61,
       posY = 260,
