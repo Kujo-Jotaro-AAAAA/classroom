@@ -263,7 +263,7 @@ const FindPark: FC<PropTypes> = function(props) {
           outerRadius: 30,
           fillColor: '#f40',
           // anchor: [.5, .5]
-          opacity: .2,
+          opacity: 0,
         },
         evt: [
           {
