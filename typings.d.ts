@@ -35,3 +35,6 @@ declare namespace getLocalPicture {
 declare namespace voiceRecordComplete {
   export function postMessage (str?: string): void
 }
+declare namespace showToast {
+  export function postMessage (str?: string): void
+}

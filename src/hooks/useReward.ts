@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { session } from '@/utils/store';
+import {SHOW_TOAST} from '@/utils/bridge';
 export const replySessionKey = 'reply'
 interface PropTypes {
 }
@@ -32,6 +33,7 @@ export default function useReward() {
    * @param num
    */
   function setSessionReply (num: number) {
+    SHOW_TOAST()
     session.setKey(replySessionKey, String(num))
   }
   function addSessionReply() {

@@ -7,6 +7,7 @@ import RewardModal from '@/components/rewardModal';
 import { history } from 'umi';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
+
 import useComponents from '@/hooks/useComponents';
 import useCreateEle, {
   ElesConfig,

@@ -26,7 +26,7 @@ const assetsMap = {
   playLeft: require('../assets/play-left.png'),
 };
 // const imgUrl = Bridge.GET_PICTURE('xxxxxxxx')
-const imgUrl = session.getKey(bAndCResultSession)
+const imgUrl = session.getKey(bAndCResultSession);
 interface PropTypes {}
 // const sessionKey = 'optionPos';
 import { bAndCResultSession } from '../index';
@@ -46,7 +46,9 @@ const Record: FC<PropTypes> = function(props) {
     findEleByName,
     findElesByNames,
     commonAnimate,
-    findClassNameByLayer
+    findClassNameByLayer,
+    findNameByLayer,
+    findNamesByLayer
   } = useCreateEle({
     stage,
   });
@@ -63,25 +65,24 @@ const Record: FC<PropTypes> = function(props) {
     if (findEleByName(elements, 'play-right')) {
       playRightRef.current = findEleByName(elements, 'play-right');
     }
-    if (findEleByName(elements, 'play-left')) {
-      playRightRef.current = findEleByName(elements, 'play-left');
-    }
+    // if (findEleByName(elements, 'play-left')) {
+    //   playRightRef.current = findEleByName(elements, 'play-left');
+    // }
     if (findElesByNames(elements, ['reload', 'send']).length) {
       completedBtnsRef.current = findElesByNames(elements, ['reload', 'send']);
     }
-
-
   }, [elements]);
   function initPage() {
     setEles([
       createQuestionLabel('你是按照什么规律来排列的呢？按下录音键说一说吧'),
-      { // 上一步操作的截图
+      {
+        // 上一步操作的截图
         type: EleTypeEnums.SPRITE,
         option: {
           texture: imgUrl,
           size: [548, 421],
-          pos: [61, 236]
-        }
+          pos: [61, 236],
+        },
       },
 
       {
@@ -104,7 +105,6 @@ const Record: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
-              // 播放录音
               playRightRef.current.animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {
@@ -187,12 +187,12 @@ const Record: FC<PropTypes> = function(props) {
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm, {stage}) => {
+            callback: (evt, elm, { stage }) => {
               // 停止录音
               Bridge.VOICE_RECORD_END();
               console.log('stage ==>', stage);
               getFrequency(stage).forEach(e => {
-                e.remove()
+                e.remove();
               });
               elm.remove();
               setEles([...createRecordCompleteBtns(), ...createStudent()]);
@@ -218,8 +218,10 @@ const Record: FC<PropTypes> = function(props) {
   function createStudent(): ElesConfig[] {
     return [
       {
+        // 学生的banner
         type: EleTypeEnums.SPRITE,
         option: {
+          name: 'student_bar',
           texture: assetsMap.s_b,
           pos: [629, 391],
           size: [236.06, 72],
@@ -227,10 +229,11 @@ const Record: FC<PropTypes> = function(props) {
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm) => {
+            callback: (evt, elm, { stage }) => {
               // 播放录音
-              Bridge.VOICE_RECORD_PLAY;
-              playLeftRef.current.animate(
+              Bridge.VOICE_RECORD_PLAY();
+              const left = findNameByLayer(stage.layer, 'play-left');
+              left[0].animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {
                   ...commonAnimate,
@@ -246,6 +249,7 @@ const Record: FC<PropTypes> = function(props) {
         type: EleTypeEnums.SPRITE,
         option: {
           texture: assetsMap.student,
+          name: 'student',
           pos: [883, 387],
           size: [80, 80],
         },
@@ -288,8 +292,13 @@ const Record: FC<PropTypes> = function(props) {
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm) => {
+            callback: (evt, elm, { stage }) => {
               // 重新录制
+              const student = findNamesByLayer(stage.layer, ['student_bar', 'student']);
+              student.forEach(elm => {
+                elm.remove()
+              })
+              // student_bar
               completedBtnsRef.current.forEach(el => {
                 el.remove();
               });
@@ -311,7 +320,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 完成, 发送录音
-              Bridge.VOICE_RECORD_COMPLETE()
+              Bridge.VOICE_RECORD_COMPLETE();
             },
           },
         ],
@@ -362,7 +371,7 @@ const Record: FC<PropTypes> = function(props) {
    * @description 获取音波
    */
   function getFrequency(stage) {
-    return findClassNameByLayer(stage.layer, 'audio-frequency')
+    return findClassNameByLayer(stage.layer, 'audio-frequency');
   }
   return (
     <>

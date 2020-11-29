@@ -59,6 +59,16 @@ export const VOICE_RECORD_COMPLETE = () => {
   }
 }
 /**
+ * @description 录音完成
+ */
+export const SHOW_TOAST = () => {
+  try {
+    showToast.postMessage('showToast')
+  } catch (error) {
+    console.log('showToast');
+  }
+}
+/**
  * @description 截图
  */
 // export const GET_PICTURE = () => {
@@ -82,5 +92,6 @@ export default {
   VOICE_RECORD_PLAY,
   NEXT_STEP,
   GET_PICTURE,
-  VOICE_RECORD_COMPLETE
+  VOICE_RECORD_COMPLETE,
+  SHOW_TOAST
 }

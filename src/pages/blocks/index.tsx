@@ -23,7 +23,7 @@ interface PropTypes {}
 const sessionKey = 'replyKeys';
 
 const Blocks: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose,setReplyNum, replyNum, getStar, resetReply } = useReward();
+  const { visible, setVisible, onClose, resetReply,addSessionReply, getSessionStar } = useReward();
   const answer = ['yellow', 'red', 'blue']; // 答案
   const [layUp, setLayUp] = useState<string[]>([]);
   const colorBolcksRef = useRef([]);
@@ -260,7 +260,9 @@ const Blocks: FC<PropTypes> = function(props) {
       })
       return;
     }
-    setReplyNum(replyNum + 1)
+    console.log('addSessionReply ==>');
+
+    addSessionReply()
     // 提交错误
     moveColorBlockToInitPos();
     setLayUp([]);
@@ -339,7 +341,7 @@ const Blocks: FC<PropTypes> = function(props) {
    * @description 将颜色块放回原位
    */
   function moveColorBlockToInitPos() {
-    session.clear();
+    session.removeKey(sessionKey);
     resetReply();
     colorBolcksRef.current.forEach(async elm => {
       const pos = initColorPos.current[elm.name];
@@ -363,7 +365,7 @@ const Blocks: FC<PropTypes> = function(props) {
       />
       <RewardModal
         visible={visible}
-        star={getStar}
+        star={getSessionStar()}
         onClose={() => {
           onClose();
           moveColorBlockToInitPos();

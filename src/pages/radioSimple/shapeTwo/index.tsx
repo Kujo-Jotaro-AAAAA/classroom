@@ -31,7 +31,7 @@ const assetsMap = {
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const ShapeTwo: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, setSessionReply, getStarFn, getSessionReply, getSessionStar } = useReward();
+  const { visible, setVisible, onClose, setSessionReply, getSessionReply, getSessionStar } = useReward();
   const fgW = 60.44,
     fgH = 64.95,
     bgW = 60,
