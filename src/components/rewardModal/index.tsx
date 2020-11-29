@@ -9,8 +9,9 @@ interface PropTypes {
   star: 1 | 2 | 3; // 评分
   visible: boolean;
   onClose?: () => void;
+  needNextStep?: boolean // 是否需要调用原生, 默认需要
 }
-const ResultModal: FC<PropTypes> = function({ star, visible, onClose }) {
+const ResultModal: FC<PropTypes> = function({ star, visible, onClose, needNextStep = true }) {
   useEffect(() => {
     if (visible) {
       setTimeout(() => {
@@ -19,7 +20,9 @@ const ResultModal: FC<PropTypes> = function({ star, visible, onClose }) {
     }
   }, [visible])
   function closeModel() {
-    NEXT_STEP()
+    if (needNextStep) {
+      NEXT_STEP()
+    }
     onClose()
   }
 

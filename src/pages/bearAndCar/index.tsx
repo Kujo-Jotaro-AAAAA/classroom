@@ -7,13 +7,14 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
-import {SAVE_PICTURE} from '@/utils/bridge';
+// import {SAVE_PICTURE} from '@/utils/bridge';
+import {history} from 'umi';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-// export const bAndCResultSession = 'bAndCResultSession' // 小朋友操作完的结果图像
+export const bAndCResultSession = 'bAndCResultSession' // 小朋友操作完的结果图像
 const assetsMap = {
   desk: require('./assets/桌子.png'),
   bear: require('./assets/png0018.png'),
@@ -242,7 +243,7 @@ const BearAndCar: FC = function() {
    * @param evt
    * @param elm
    */
-  function moveEndOption(evt, elm) {
+  function moveEndOption(evt, elm, {stage}) {
     const [tag, i] = elm.name.split('-')
     const defaultPos = session.getKey(replyPosSessionKey)
     let flag = false // 是否有匹配点位
@@ -256,7 +257,7 @@ const BearAndCar: FC = function() {
             pointerEvents: 'none'
           }
         ], commonAnimate)
-        getSubmitInfo(tag, idx)
+        getSubmitInfo(tag, idx, stage)
         return
       }
     });
@@ -269,28 +270,29 @@ const BearAndCar: FC = function() {
   /**
    * @description 提交信息
    */
-  function getSubmitInfo(tag, idx) {
+  function getSubmitInfo(tag, idx, stage) {
     const curr = session.getKey(replySessionKey) || new Array(6).fill('')
     curr[idx] = tag
     session.setKey(replySessionKey, curr)
     const canSubmit = curr.every(ans => Boolean(ans)) // 答题完成
     if (canSubmit) {
-      submit(curr)
+      submit(curr, stage)
     }
   }
   /**
    * @description 提交当前答案
    * @param curr
    */
-  function submit(curr) {
+  function submit(curr, stage) {
     const isCorrect = answer.some(ans => ans === curr.join(''))
     if (isCorrect) {
-      // const img = toImage()
-      // session.setKey(bAndCResultSession, img)
-      SAVE_PICTURE()
       setTimeout(() => {
-        setVisible(true)
-      }, 500)
+      savePageSnapshot(stage)
+      setVisible(true)
+        setTimeout(() => {
+          history.push('/bearandcar/record')
+        }, 2000)
+      }, 1200)
       return
     }
     resetOptionPos()
@@ -319,6 +321,20 @@ const BearAndCar: FC = function() {
     })
     session.removeKey(replySessionKey)
   }
+  /**
+   * @description 将当前页面的图像保存到session
+   */
+  function savePageSnapshot(stage) {
+    session.setKey(bAndCResultSession, toImage(stage.scene))
+  }
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (!stage) return
+  //     const canvas = stage.scene.snapshot();
+  //     const image = canvas.toDataURL()
+  //     session.setKey(bAndCResultSession, image)
+  //   }, 1000)
+  // }, [stage])
   return (
     <>
       <div
@@ -328,7 +344,7 @@ const BearAndCar: FC = function() {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
+      <RewardModal visible={visible} needNextStep={false} star={getSessionStar()} onClose={onClose} />
     </>
   );
 };

@@ -49,11 +49,11 @@ export const NEXT_STEP = () => {
   }
 }
 /**
- * @description 截图
+ * @description 录音完成
  */
-export const SAVE_PICTURE = () => {
+export const VOICE_RECORD_COMPLETE = () => {
   try {
-    savePicture.postMessage('savePicture')
+    voiceRecordComplete.postMessage('savePicture')
   } catch (error) {
     console.log('savePicture');
   }
@@ -81,6 +81,6 @@ export default {
   VOICE_RECORD_END,
   VOICE_RECORD_PLAY,
   NEXT_STEP,
-  SAVE_PICTURE,
-  GET_PICTURE
+  GET_PICTURE,
+  VOICE_RECORD_COMPLETE
 }

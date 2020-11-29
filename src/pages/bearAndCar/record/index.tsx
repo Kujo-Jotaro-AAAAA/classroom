@@ -12,6 +12,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+import { session } from '@/utils/store';
 const canvasId = 'record-container';
 const assetsMap = {
   teacher: require('../assets/老师头像.png'),
@@ -24,19 +25,18 @@ const assetsMap = {
   play: require('../assets/play@2x.png'),
   playLeft: require('../assets/play-left.png'),
 };
-const imgUrl = Bridge.GET_PICTURE('xxxxxxxx')
-console.log('imgUrl', imgUrl);
-
+// const imgUrl = Bridge.GET_PICTURE('xxxxxxxx')
+const imgUrl = session.getKey(bAndCResultSession)
 interface PropTypes {}
 // const sessionKey = 'optionPos';
-// import { bAndCResultSession } from '../index';
+import { bAndCResultSession } from '../index';
 const Record: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose } = useReward(),
     playRightRef = useRef(null),
     playLeftRef = useRef(null),
     completedBtnsRef = useRef(null);
   const answer = 'blue';
-  // imgUrl = session.getKey(bAndCResultSession)
+
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -75,14 +75,14 @@ const Record: FC<PropTypes> = function(props) {
   function initPage() {
     setEles([
       createQuestionLabel('你是按照什么规律来排列的呢？按下录音键说一说吧'),
-      // { // 上一步操作的截图
-      //   type: EleTypeEnums.SPRITE,
-      //   option: {
-      //     texture: imgUrl,
-      //     size: [548, 421],
-      //     pos: [61, 236]
-      //   }
-      // },
+      { // 上一步操作的截图
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: imgUrl,
+          size: [548, 421],
+          pos: [61, 236]
+        }
+      },
 
       {
         type: EleTypeEnums.SPRITE,
@@ -311,6 +311,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 完成, 发送录音
+              Bridge.VOICE_RECORD_COMPLETE()
             },
           },
         ],

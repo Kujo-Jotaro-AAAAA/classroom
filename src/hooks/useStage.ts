@@ -21,8 +21,11 @@ export default function useStage(props: PropTypes) {
       layer,
     })
   }, [])
-  function toImage() {
-    return reward.current.childNodes[0].toDataURL("image/png")
+  /**
+   * @description 生成当前页面的快照
+   */
+  function toImage(scene) {
+    return scene.snapshot().toDataURL()
   }
   return {
     stage,
