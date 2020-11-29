@@ -14,7 +14,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-import {success_color, fail_color} from '@/utils/theme';
+import {success_color, fail_color, success_border} from '@/utils/theme';
 const keysImg = [
   require('@/assets/keys/1.png'),
   require('@/assets/keys/2.png'),
@@ -27,7 +27,7 @@ const canvasId = 'same-key-container';
 interface PropTypes extends PageOptionItemTypes {}
 const sessionKey = 'optionPos';
 const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose, addSessionReply, getSessionStar } = useReward();
   const answerRef = useRef<number[]>([]);
   const blockElmRef = useRef<any[]>([]);
   const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock, createStep } = useComponents();
@@ -94,10 +94,11 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
       } else {
         if (answerRef.current.length === 2) { // 回答错误
           // 播放错误语音后,重置
+          addSessionReply()
           setTimeout(() => {
             resetBlockBg();
             answerRef.current = [];
-          }, 3000);
+          }, 1000);
         }
         elm.attributes.bgcolor = fail_color;
       }
@@ -111,6 +112,7 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
     answer.forEach(an => {
       blockElmRef.current[an].attr({
         bgcolor: success_color,
+        borderColor: success_border
       });
     });
   }
@@ -156,7 +158,7 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
       />
       <RewardModal
         visible={visible}
-        star={3}
+        star={getSessionStar()}
         onClose={() => {
           resetBlockBg();
           onClose();
