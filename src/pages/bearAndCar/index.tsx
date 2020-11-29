@@ -12,7 +12,7 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-export const bAndCResultSession = 'bAndCResultSession' // 小朋友操作完的结果图像
+// export const bAndCResultSession = 'bAndCResultSession' // 小朋友操作完的结果图像
 const assetsMap = {
   desk: require('./assets/桌子.png'),
   bear: require('./assets/png0018.png'),
@@ -64,10 +64,10 @@ const BearAndCar: FC = function() {
       stage.layer.attr({
         bgcolor: '#FFF5EE',
       });
-      const img = toImage()
-      console.log(img);
+      // const img = toImage()
+      // console.log(img);
 
-      session.setKey(bAndCResultSession, img)
+      // session.setKey(bAndCResultSession, img)
     }
   }, [stage]);
   useEffect(() => {
@@ -133,8 +133,6 @@ const BearAndCar: FC = function() {
       'B-4',
       'B-5',
     ])
-    console.log(optionRef.current.bear.map(c => c?.name), optionRef.current.car.map(c => c?.name));
-
   }
   function createBearAndCar(): ElesConfig[] {
     const bw = 70.27,
@@ -286,8 +284,8 @@ const BearAndCar: FC = function() {
   function submit(curr) {
     const isCorrect = answer.some(ans => ans === curr.join(''))
     if (isCorrect) {
-      const img = toImage()
-      session.setKey(bAndCResultSession, img)
+      // const img = toImage()
+      // session.setKey(bAndCResultSession, img)
       setVisible(true)
       return
     }

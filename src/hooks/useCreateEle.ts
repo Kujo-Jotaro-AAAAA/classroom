@@ -29,7 +29,7 @@ export enum EvtNameEnum {
 }
 export interface EleEventTypes  {
   type: EvtNameEnum,
-  callback: (evt, el) => void
+  callback: (evt, el, attrs?: any) => void
 }
 export interface EleAnimateTypes {
   animate: any[],
@@ -129,7 +129,9 @@ export default function useCreateEle(props: PropTypes) {
     if (Array.isArray(events)) {
       events.forEach(ev => {
         el.addEventListener(ev.type, (evt) => {
-          ev.callback(evt, el)
+          ev.callback(evt, el, {
+            stage: props.stage
+          })
         })
       })
     }

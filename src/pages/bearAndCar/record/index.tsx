@@ -2,8 +2,6 @@
  * @description 页面描述
  */
 import React, { FC, useState, useEffect, useRef } from 'react';
-import { session } from '@/utils/store';
-import * as spritejs from 'spritejs';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
@@ -14,7 +12,6 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-const { Sprite, Rect, Block, Label, Polyline, Path, Group } = spritejs;
 const canvasId = 'record-container';
 const assetsMap = {
   teacher: require('../assets/老师头像.png'),
@@ -68,6 +65,8 @@ const Record: FC<PropTypes> = function(props) {
     if (findElesByNames(elements, ['reload', 'send']).length) {
       completedBtnsRef.current = findElesByNames(elements, ['reload', 'send']);
     }
+
+
   }, [elements]);
   function initPage() {
     setEles([
@@ -80,6 +79,7 @@ const Record: FC<PropTypes> = function(props) {
       //     pos: [61, 236]
       //   }
       // },
+
       {
         type: EleTypeEnums.SPRITE,
         option: {
@@ -153,10 +153,14 @@ const Record: FC<PropTypes> = function(props) {
           type: EvtNameEnum.CLICK,
           callback: (evt, elm) => {
             // 开始录音
-            Bridge.VOICE_RECORD_START()
+            Bridge.VOICE_RECORD_START();
             elm.remove();
             // createRecordGroup()
-            setEles([...createRecordingBtn()]);
+            setEles([
+              ...createRecordingBtn(),
+              ...createAudioFrequency(),
+              ...createAudioFrequency([834, 600]),
+            ]);
           },
         },
       ],
@@ -179,9 +183,13 @@ const Record: FC<PropTypes> = function(props) {
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm) => {
+            callback: (evt, elm, {stage}) => {
               // 停止录音
-              Bridge.VOICE_RECORD_END()
+              Bridge.VOICE_RECORD_END();
+              console.log('stage ==>', stage);
+              getFrequency(stage).forEach(e => {
+                e.remove()
+              });
               elm.remove();
               setEles([...createRecordCompleteBtns(), ...createStudent()]);
             },
@@ -217,7 +225,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 播放录音
-              Bridge.VOICE_RECORD_PLAY
+              Bridge.VOICE_RECORD_PLAY;
               playLeftRef.current.animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {
@@ -279,9 +287,9 @@ const Record: FC<PropTypes> = function(props) {
             callback: (evt, elm) => {
               // 重新录制
               completedBtnsRef.current.forEach(el => {
-                el.remove()
-              })
-              setEles([createRecord()])
+                el.remove();
+              });
+              setEles([createRecord()]);
             },
           },
         ],
@@ -304,6 +312,52 @@ const Record: FC<PropTypes> = function(props) {
         ],
       },
     ];
+  }
+  /**
+   * @description 创建波频效果
+   * @param initPos
+   */
+  function createAudioFrequency(initPos: number[] = [645, 600]): ElesConfig[] {
+    const [x, y] = initPos,
+      w = 5,
+      h = 34,
+      minh = 17;
+    return new Array(10).fill('').map((item, idx) => {
+      const currX = x + (4 + w) * idx;
+      const odd = idx % 2;
+      return {
+        type: EleTypeEnums.BLOCK,
+        option: {
+          className: 'audio-frequency',
+          anchor: [0.5, 0.5],
+          size: [4, odd ? h : minh],
+          pos: [currX + w, y + h / 2],
+          bgcolor: '#7a8dff',
+          borderRadius: 4,
+        },
+        animates: [
+          {
+            animate: [
+              {
+                height: odd ? minh : h,
+              },
+            ],
+            config: {
+              duration: 400,
+              easing: 'ease-in',
+              direction: 'alternate',
+              iterations: Infinity,
+            },
+          },
+        ],
+      };
+    });
+  }
+  /**
+   * @description 获取音波
+   */
+  function getFrequency(stage) {
+    return stage.layer.getElementsByClassName('audio-frequency')
   }
   return (
     <>
