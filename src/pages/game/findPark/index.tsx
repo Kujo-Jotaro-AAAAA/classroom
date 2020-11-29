@@ -129,7 +129,7 @@ const FindPark: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: () => {
-              hideMask();
+              hideMask(elements);
             },
           },
         ],
@@ -190,7 +190,7 @@ const FindPark: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
-              hideMask();
+              hideMask(elements)
             },
           },
           {
@@ -210,8 +210,8 @@ const FindPark: FC<PropTypes> = function(props) {
       };
     });
   }
-  function hideMask() {
-    findMaskElm(elements).forEach(elm => elm.remove());
+  function hideMask(elms) {
+    findMaskElm(elms).forEach(elm => elm.remove());
   }
   function magClick(elm) {
     // hideMask()
@@ -247,27 +247,37 @@ const FindPark: FC<PropTypes> = function(props) {
       },
       {
         name: 'kite',
-        pos: [850, 655],
+        pos: [855, 635],
         size: [70, 80],
       },
     ].map(item => {
+      const {pos} = item
+      const x = pos[0] + item.size[0] / 2, y = pos[1] + item.size[1] / 2
+      item.pos = [x, y]
       return {
-        type: EleTypeEnums.BLOCK,
+        type: EleTypeEnums.RING,
         option: {
           ...item,
-          bgcolor: '#f40', // 调试
           zIndex: 999,
-          opacity: 0,
+          innerRadius: 15,
+          outerRadius: 30,
+          fillColor: '#f40',
+          // anchor: [.5, .5]
+          opacity: .2,
         },
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm) => {
+            callback: (evt, elm, {stage}) => {
               // 添加答案, 如果已经有了，则不再添加
+              hideMask(stage.layer.children)
               if (reply.includes(elm.name)) {
                 // 已经点过啦
                 return;
               }
+              elm.attr({
+                opacity: 1
+              })
               reply.push(elm.name);
               setReply([...reply]);
             },

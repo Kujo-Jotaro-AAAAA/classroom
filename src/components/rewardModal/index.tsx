@@ -12,10 +12,12 @@ interface PropTypes {
 }
 const ResultModal: FC<PropTypes> = function({ star, visible, onClose }) {
   useEffect(() => {
-    setTimeout(() => {
-      closeModel()
-    }, 5000)
-  }, [])
+    if (visible) {
+      setTimeout(() => {
+        closeModel()
+      }, 5000)
+    }
+  }, [visible])
   function closeModel() {
     NEXT_STEP()
     onClose()

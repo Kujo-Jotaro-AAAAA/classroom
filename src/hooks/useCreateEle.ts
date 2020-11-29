@@ -8,7 +8,7 @@ import {BACK} from '@/utils/bridge';
 const assetsMap = {
   back: require('@/assets/back.png')
 }
-const {  Sprite, Rect, Block, Label, Polyline, Path, Group } = spritejs
+const {  Sprite, Rect, Block, Label, Polyline, Path, Group, Ring } = spritejs
 // type ElesType = Types.Label | Types.Sprite | Types.Rect | Types.Block
 type ElesType = any
 export enum EleTypeEnums {
@@ -18,7 +18,8 @@ export enum EleTypeEnums {
   BLOCK = 'block',
   POLYLINE = 'polyline',
   PATH = 'path',
-  GROUP = 'group'
+  GROUP = 'group',
+  RING = 'ring',
 }
 export enum EvtNameEnum {
   TOUCH_START = 'touchstart',
@@ -72,6 +73,7 @@ export default function useCreateEle(props: PropTypes) {
     block: createBlock,
     polyline: createPolyline,
     path: createPath,
+    ring: createRing,
     group: createGroup
   }
   useEffect(() => {
@@ -182,6 +184,9 @@ export default function useCreateEle(props: PropTypes) {
   function createPath(op) {
     return new Path(op)
   }
+  function createRing(op) {
+    return new Ring(op)
+  }
   function createGroup(op, children) {
     const queue = createQueue(children)
     const group = new Group(op)
@@ -192,6 +197,7 @@ export default function useCreateEle(props: PropTypes) {
 
     return group
   }
+
   function payloadGroupElement(elements, children) {
     elements.forEach((el, idx) => {
       const events = children[idx].evt
@@ -201,6 +207,7 @@ export default function useCreateEle(props: PropTypes) {
     })
     return elements
   }
+
   /* ********=*****************  工具函数   ******************************************************** */
   /**
    * @description 根据元素名称，查到到对应的元素
