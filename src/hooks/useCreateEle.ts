@@ -27,9 +27,15 @@ export enum EvtNameEnum {
   DROP_CAPTURE = 'drop',
   CLICK = 'click',
 }
+interface EleEventAttrsTypes {
+  stage: {
+    scene: any,
+    layer: any
+  }
+}
 export interface EleEventTypes  {
   type: EvtNameEnum,
-  callback: (evt, el, attrs?: any) => void
+  callback: (evt, el, attrs?: EleEventAttrsTypes) => void
 }
 export interface EleAnimateTypes {
   animate: any[],
