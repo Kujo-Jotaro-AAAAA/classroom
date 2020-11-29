@@ -145,20 +145,21 @@ const FindPark: FC<PropTypes> = function(props) {
   }
   function createSourceRect() {
     const w = 374,
-        h = 190;
-    const test = [28, 328, 28 + w, 328 + h]
+      h = 190;
+    const doubtSize = [w * 2, h * 2] // 2倍图 * 2
+    const test = [346, 187, ...doubtSize];
     const sourceMap = {
       glass: {
         pos: [268, 253 + 2], // 椭圆的位置,
-        sourceRect: test, // 裁剪的位置
+        sourceRect: [348 + 178, 83 -80 , ...doubtSize], // 裁剪的位置
       },
       rbt: {
         pos: [1, 137 + 253],
-        sourceRect: test, // 裁剪的位置
+        sourceRect: [1 , 137 + h -50, ...doubtSize], // 裁剪的位置
       },
       car: {
         pos: [364, 440],
-        sourceRect: test, // 裁剪的位置
+        sourceRect: [346 + 600, 187 + h, ...doubtSize], // 裁剪的位置
       },
       eleph: {
         pos: [28, 328 + 253],
@@ -171,10 +172,11 @@ const FindPark: FC<PropTypes> = function(props) {
     };
     const unChioces = Object.keys(sourceMap).filter(k => !reply.includes(k)); // 过滤掉已选中
     const randomIdx = Math.floor(Math.random() * unChioces.length);
-    const source = sourceMap[unChioces[randomIdx]];
+    const source = sourceMap[unChioces[2]];
+    // const source = sourceMap[unChioces[randomIdx]];
     // 选中一个提示
     return [unChioces[randomIdx]].map((unKey, idx) => {
-
+    // return [unChioces[randomIdx]].map((unKey, idx) => {
       source.pos = [source.pos[0] + w / 2, source.pos[1] + h / 2];
       return {
         type: EleTypeEnums.SPRITE,
@@ -184,7 +186,7 @@ const FindPark: FC<PropTypes> = function(props) {
           anchor: [0.5, 0.5],
           ...source,
           size: [w, h],
-          pointerEvents: 'none',
+          // pointerEvents: 'none',
           borderRadius: [w / 2, h / 2],
           zIndex: 2,
         },
@@ -195,6 +197,19 @@ const FindPark: FC<PropTypes> = function(props) {
               hideMask();
             },
           },
+          {
+            type: EvtNameEnum.TOUCH_MOVE,
+            callback: (evt, elm) => {
+              console.log({
+                x: evt.x,
+                y: evt.y
+              });
+
+              elm.attr({
+                pos: [evt.x, evt.y]
+              })
+            }
+          }
         ],
       };
     });
