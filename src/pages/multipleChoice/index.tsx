@@ -25,9 +25,11 @@ const assertMap = {
 export interface PageOptionItemTypes {
   optionElmInit: ElesConfig[];
   answer: number[];
+  pushState: string
 }
 export interface PageOptionTypes {
   [propsName: string]: PageOptionItemTypes;
+
 }
 const RadioGroup: React.FC = function(props) {
   const { createQuestionLabel } = useComponents(),
@@ -44,14 +46,15 @@ const RadioGroup: React.FC = function(props) {
           ...createImgs(),
         ],
         answer: [0, 5],
+        pushState: '/multiplechoice?tmp=robot'
       },
       robot: {
-        // 蘑菇胡萝卜玉米
         optionElmInit: [
           createQuestionLabel('哪两个机器人是一模一样的呢？点点看吧'),
           ...createImgs(),
         ],
-        answer: [3, 4],
+        answer: [2, 3],
+        pushState: undefined
       },
     });
   }

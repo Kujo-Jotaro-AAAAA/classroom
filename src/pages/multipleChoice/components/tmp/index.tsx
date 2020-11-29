@@ -7,14 +7,15 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
+import { history } from 'umi';
 import useComponents from '@/hooks/useComponents';
-import {PageOptionItemTypes} from '../../index';
+import { PageOptionItemTypes } from '../../index';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-import {success_color, fail_color, success_border} from '@/utils/theme';
+import { success_color, fail_color, success_border } from '@/utils/theme';
 const keysImg = [
   require('@/assets/keys/1.png'),
   require('@/assets/keys/2.png'),
@@ -26,11 +27,27 @@ const canvasId = 'same-key-container';
 
 interface PropTypes extends PageOptionItemTypes {}
 const sessionKey = 'optionPos';
-const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
-  const { visible, setVisible, onClose, addSessionReply, getSessionStar } = useReward();
+const MultipleTmp: FC<PropTypes> = function({
+  answer,
+  optionElmInit,
+  pushState,
+}) {
+  const {
+    visible,
+    setVisible,
+    onClose,
+    addSessionReply,
+    getSessionStar,
+  } = useReward();
   const answerRef = useRef<number[]>([]);
   const blockElmRef = useRef<any[]>([]);
-  const { createHorn, commonBlock, createQuestionLabel, createDoubleOptionsBlock, createStep } = useComponents();
+  const {
+    createHorn,
+    commonBlock,
+    createQuestionLabel,
+    createDoubleOptionsBlock,
+    createStep,
+  } = useComponents();
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -59,8 +76,8 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
     console.log('getBlocks ==>', blockElmRef.current);
   }, [elements]);
   function getBlocks() {
-    const  blockNames = [0,1,2,3,4,5].map(num => `${commonBlock}-${num}`)
-    return findElesByNames(elements, blockNames)
+    const blockNames = [0, 1, 2, 3, 4, 5].map(num => `${commonBlock}-${num}`);
+    return findElesByNames(elements, blockNames);
   }
   function createOptions() {
     const blueBlockConfigs = createDoubleOptionsBlock();
@@ -89,12 +106,19 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
       const correct =
         answer.length === answerRef.current.length &&
         answer.every(a => answerRef.current.includes(a));
+      console.log({
+        correct,
+        answerRef: answerRef.current,
+        answer,
+      });
+
       if (correct) {
         handleCorrect();
       } else {
-        if (answerRef.current.length === 2) { // 回答错误
+        if (answerRef.current.length === 2) {
+          // 回答错误
           // 播放错误语音后,重置
-          addSessionReply()
+          addSessionReply();
           setTimeout(() => {
             resetBlockBg();
             answerRef.current = [];
@@ -112,7 +136,7 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
     answer.forEach(an => {
       blockElmRef.current[an].attr({
         bgcolor: success_color,
-        borderColor: success_border
+        borderColor: success_border,
       });
     });
   }
@@ -158,10 +182,16 @@ const MultipleTmp: FC<PropTypes> = function({answer, optionElmInit}) {
       />
       <RewardModal
         visible={visible}
+        needNextStep={false}
         star={getSessionStar()}
         onClose={() => {
           resetBlockBg();
           onClose();
+          if (pushState) {
+            history.push(pushState)
+            location.reload()
+          }
+
         }}
       />
     </>
