@@ -24,6 +24,9 @@ const assetsMap = {
   play: require('../assets/play@2x.png'),
   playLeft: require('../assets/play-left.png'),
 };
+const imgUrl = Bridge.GET_PICTURE('xxxxxxxx')
+console.log('imgUrl', imgUrl);
+
 interface PropTypes {}
 // const sessionKey = 'optionPos';
 // import { bAndCResultSession } from '../index';
@@ -43,6 +46,7 @@ const Record: FC<PropTypes> = function(props) {
     findEleByName,
     findElesByNames,
     commonAnimate,
+    findClassNameByLayer
   } = useCreateEle({
     stage,
   });
@@ -357,7 +361,7 @@ const Record: FC<PropTypes> = function(props) {
    * @description 获取音波
    */
   function getFrequency(stage) {
-    return stage.layer.getElementsByClassName('audio-frequency')
+    return findClassNameByLayer(stage.layer, 'audio-frequency')
   }
   return (
     <>

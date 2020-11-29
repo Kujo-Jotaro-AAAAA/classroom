@@ -247,6 +247,32 @@ export default function useCreateEle(props: PropTypes) {
       })
     });
   }
+  /**
+   * @description 获取className, 可用于同类型的元素获取
+   * @param layer
+   * @param classname
+   */
+  function findClassNameByLayer(layer, classname: string) {
+    return layer.getElementsByClassName(classname)
+  }
+  /**
+   * @description name, 可用于同类型的元素获取
+   * @param layer
+   * @param classname
+   */
+  function findNameByLayer(layer, name: string): any[] {
+    return layer.getElementsByName(name)
+  }
+  /**
+   * @description name, 获取多个name
+   * @param layer
+   * @param classname
+   */
+  function findNamesByLayer(layer, names: string[]) {
+    return names.map(name => {
+      return findNameByLayer(layer, name)
+    }).flat()
+  }
   return {
     elements,
     createLabel,
@@ -260,6 +286,9 @@ export default function useCreateEle(props: PropTypes) {
     setEles,
     payloadEvtsByNames,
     resetElmsAttr,
-    commonAnimate
+    commonAnimate,
+    findClassNameByLayer,
+    findNameByLayer,
+    findNamesByLayer
   }
 }

@@ -26,3 +26,9 @@ declare namespace voiceRecordPlay {
 declare namespace nextStep {
   export function postMessage (str?: string): void
 }
+declare namespace savePicture {
+  export function postMessage (str?: string): void
+}
+declare namespace getLocalPicture {
+  export function postMessage (str?: string): void
+}

@@ -7,6 +7,7 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
+import {SAVE_PICTURE} from '@/utils/bridge';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -286,7 +287,10 @@ const BearAndCar: FC = function() {
     if (isCorrect) {
       // const img = toImage()
       // session.setKey(bAndCResultSession, img)
-      setVisible(true)
+      SAVE_PICTURE()
+      setTimeout(() => {
+        setVisible(true)
+      }, 500)
       return
     }
     resetOptionPos()

@@ -48,11 +48,39 @@ export const NEXT_STEP = () => {
     console.log('nextStep');
   }
 }
+/**
+ * @description 截图
+ */
+export const SAVE_PICTURE = () => {
+  try {
+    savePicture.postMessage('savePicture')
+  } catch (error) {
+    console.log('savePicture');
+  }
+}
+/**
+ * @description 截图
+ */
+// export const GET_PICTURE = () => {
+//   try {
+//     getLocalPicture.postMessage('getLocalPicture')
+//   } catch (error) {
+//     console.log('getLocalPicture');
+//   }
+// }
+// @ts-ignore
+export const GET_PICTURE = function getLocalPicture (path) {
+  // @ts-ignore
+  console.log(this);
+  return path
+}
 
 export default {
   BACK,
   VOICE_RECORD_START,
   VOICE_RECORD_END,
   VOICE_RECORD_PLAY,
-  NEXT_STEP
+  NEXT_STEP,
+  SAVE_PICTURE,
+  GET_PICTURE
 }
