@@ -38,6 +38,7 @@ const ShapeTwo: FC<PropTypes> = function(props) {
     bgH = 56,
     answerMap = { // 答案
       finger: 1,
+      finger2: 0,
       doughnut: 1,
     },blockRef = useRef<any[]>()
 
@@ -71,10 +72,12 @@ const ShapeTwo: FC<PropTypes> = function(props) {
   function mapTmpOption(): ElesConfig[] {
     const createMap = {
       finger: createFinger,
+      finger2: createFinger2,
       doughnut:createDoughnut
     }
     return createMap[queryTmp]();
   }
+  // 镜7
   function createFinger(): ElesConfig[] {
     const posX = 61,
       posY = 249,
@@ -97,6 +100,66 @@ const ShapeTwo: FC<PropTypes> = function(props) {
       .map((replys, reIdx) => {
         const replyPosX = {
           0: 294,
+          1: 570,
+        };
+        return replys.map((key, idx) => {
+          const currPosx = replyPosX[reIdx] + (4 + fgW) * idx;
+          return {
+            type: EleTypeEnums.SPRITE,
+            option: {
+              texture: assetsMap.finger[key],
+              size: [fgW, fgH],
+              pos: [currPosx, 486],
+              zIndex: 1,
+              pointerEvents: 'none'
+            },
+            evt: [{
+              type: EvtNameEnum.CLICK,
+              callback: (evt, elm) => {
+                const currBlock = blockRef.current.find(b => b.name === `${reIdx}`)
+                handleBlockClick(currBlock)
+              }
+            }]
+          };
+        });
+      })
+      .flat();
+    const fgList = list.map((key, idx) => {
+      const currPosx = posX + (45 + fgW) * idx;
+      return {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: assetsMap.finger[key],
+          size: [fgW, fgH],
+          pos: [currPosx, posY],
+        },
+      };
+    });
+    return [...fgList, ...fgReplys];
+  }
+  // 镜10
+  function createFinger2(): ElesConfig[] {
+    const posX = 61,
+      posY = 249,
+      list = [
+        'fist',
+        'cloth',
+        'cloth',
+        'fist',
+        'cloth',
+        'cloth',
+        'fist',
+        'cloth',
+        'cloth',
+      ],
+      replyList = [
+        ['fist', 'cloth', 'cloth'],
+        ['fist', 'fist', 'cloth']
+      ];
+    const fgReplys = replyList
+      .map((replys, reIdx) => {
+        const replyPosX = {
+          0: 261,
           1: 570,
         };
         return replys.map((key, idx) => {
@@ -212,6 +275,8 @@ const ShapeTwo: FC<PropTypes> = function(props) {
   }
   function handleBlockClick(elm) {
     const currAnswer = answerMap[queryTmp]
+    console.log('handleBlockClick', queryTmp,elm.name, currAnswer);
+
     if (elm.name == currAnswer) {
       elm.attr({
         borderColor: success_border,

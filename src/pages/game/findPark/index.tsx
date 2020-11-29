@@ -49,13 +49,14 @@ const FindPark: FC<PropTypes> = function(props) {
     if (!Array.isArray(elements) || elements.length === 0) return;
     maskRef.current = findElesByNames(elements, [
       'mask',
-      'tip'
+      // 'tip',
       // 'tip-glass',
       // 'tip-rbt',
       // 'tip-car',
       // 'tip-eleph',
       // 'tip-kite',
     ]);
+    console.log('maskRef.current', maskRef.current);
   }, [elements]);
   function renderPage() {
     setEles([
@@ -63,11 +64,13 @@ const FindPark: FC<PropTypes> = function(props) {
       createQuestionLabel('今天你是小小侦探噢，请在游乐园中找到画圈的事务，'),
       ...Layout(assetsMap),
       {
+        // 放大镜
         type: EleTypeEnums.SPRITE,
         option: {
           texture: assetsMap.magnifier,
           size: [43.76, 49.78],
-          pos: [921, 192],
+          pos: [921 + 43.76 / 2, 192 + 49.78 / 2],
+          anchor: [0.5, 0.5],
         },
         evt: [
           {
@@ -77,7 +80,48 @@ const FindPark: FC<PropTypes> = function(props) {
             },
           },
         ],
+        animates: [
+          {
+            animate: [
+              {
+                scale: [1.25, 1.25],
+              },
+              {
+                scale: [1, 1],
+              },
+            ],
+            config: {
+              delay: 30000,
+              duration: 500,
+              easing: 'ease-in',
+              direction: 'alternate',
+              iterations: 2,
+              fill: 'none',
+            },
+          },
+        ],
       },
+      // {
+      //   type: EleTypeEnums.BLOCK,
+      //   option: {
+      //     name: 'mask',
+      //     size: [1024, 515],
+      //     pos: [0, 253],
+      //     bgcolor: 'rgba(89, 132, 138, .45)',
+      //     zIndex: 1
+      //   },
+      //   evt: [{
+      //     type: EvtNameEnum.CLICK,
+      //     callback: () => {
+      //       hideMask()
+      //     }
+      //   }]
+      // },
+      // createSourceRect(),
+    ]);
+  }
+  function createMaskAndTip() {
+    setEles([
       {
         type: EleTypeEnums.BLOCK,
         option: {
@@ -85,81 +129,85 @@ const FindPark: FC<PropTypes> = function(props) {
           size: [1024, 515],
           pos: [0, 253],
           bgcolor: 'rgba(89, 132, 138, .45)',
-          zIndex: 1
+          zIndex: 1,
         },
-        evt: [{
-          type: EvtNameEnum.CLICK,
-          callback: () => {
-            hideMask()
-          }
-        }]
+        evt: [
+          {
+            type: EvtNameEnum.CLICK,
+            callback: () => {
+              hideMask();
+            },
+          },
+        ],
       },
-      // createSourceRect(),
+      ...createSourceRect(),
     ]);
   }
   function createSourceRect() {
+    const w = 374,
+        h = 190;
+    const test = [28, 328, 28 + w, 328 + h]
     const sourceMap = {
       glass: {
-        pos: [348, 336], // 椭圆的位置,
-        sourceRect: [348, 83, 500, 268], // 裁剪的位置
+        pos: [268, 253 + 2], // 椭圆的位置,
+        sourceRect: test, // 裁剪的位置
       },
       rbt: {
-        pos: [556, 336],
-        sourceRect: [348, 83, 500, 268], // 裁剪的位置
+        pos: [1, 137 + 253],
+        sourceRect: test, // 裁剪的位置
       },
       car: {
-        pos: [348, 700],
-        sourceRect: [348, 83, 500, 268], // 裁剪的位置
+        pos: [364, 440],
+        sourceRect: test, // 裁剪的位置
       },
       eleph: {
-        pos: [200, 500],
-        sourceRect: [348, 83, 500, 268], // 裁剪的位置
+        pos: [28, 328 + 253],
+        sourceRect: test, // 裁剪的位置
       },
       kite: {
-        pos: [320, 400],
-        sourceRect: [348, 83, 500, 268], // 裁剪的位置
+        pos: [648, 312 + 253],
+        sourceRect: test, // 裁剪的位置
       },
     };
-
     const unChioces = Object.keys(sourceMap).filter(k => !reply.includes(k)); // 过滤掉已选中
-    const randomIdx = Math.floor(Math.random() * unChioces.length)
-    console.log('randomIdx', randomIdx);
-    const source = sourceMap[unChioces[randomIdx]]
-    // return unChioces.map(unKey => {
+    const randomIdx = Math.floor(Math.random() * unChioces.length);
+    const source = sourceMap[unChioces[randomIdx]];
+    // 选中一个提示
+    return [unChioces[randomIdx]].map((unKey, idx) => {
+
+      source.pos = [source.pos[0] + w / 2, source.pos[1] + h / 2];
       return {
         type: EleTypeEnums.SPRITE,
         option: {
-          name: `tip`,
+          name: `tip-${unKey}`,
           texture: assetsMap.bg,
-          ...source,
-          size: [400, 160],
           anchor: [0.5, 0.5],
-          // sourceRect: [348, 83, 500, 268],
-          borderRadius: 200,
+          ...source,
+          size: [w, h],
+          pointerEvents: 'none',
+          borderRadius: [w / 2, h / 2],
           zIndex: 2,
         },
-        evt: [{
-          type: EvtNameEnum.CLICK,
-          callback: () => {
-            hideMask()
-          }
-        }]
+        evt: [
+          {
+            type: EvtNameEnum.CLICK,
+            callback: (evt, elm) => {
+              hideMask();
+            },
+          },
+        ],
       };
-    // });
+    });
   }
   function hideMask() {
     maskRef.current.forEach((mask, idx) => {
       mask.attr({
-        zIndex: -(1 + idx)
-      })
-    })
+        zIndex: -(1 + idx),
+      });
+    });
   }
   function magClick(elm) {
-    maskRef.current.forEach((mask, idx) => {
-      mask.attr({
-        zIndex: 10 + idx
-      })
-    })
+    createMaskAndTip();
   }
   return (
     <>
