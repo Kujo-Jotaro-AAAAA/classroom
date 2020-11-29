@@ -8,6 +8,7 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
+import * as Bridge from '@/utils/bridge';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -152,7 +153,7 @@ const Record: FC<PropTypes> = function(props) {
           type: EvtNameEnum.CLICK,
           callback: (evt, elm) => {
             // 开始录音
-            voiceRecordStart.postMessage()
+            Bridge.VOICE_RECORD_START()
             elm.remove();
             // createRecordGroup()
             setEles([...createRecordingBtn()]);
@@ -180,7 +181,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 停止录音
-              voiceRecordEnd.postMessage()
+              Bridge.VOICE_RECORD_END()
               elm.remove();
               setEles([...createRecordCompleteBtns(), ...createStudent()]);
             },
@@ -216,7 +217,7 @@ const Record: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               // 播放录音
-              voiceRecordPlay.postMessage()
+              Bridge.VOICE_RECORD_PLAY
               playLeftRef.current.animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {
