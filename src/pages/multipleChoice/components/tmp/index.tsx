@@ -25,12 +25,15 @@ const keysImg = [
 ];
 const canvasId = 'same-key-container';
 
-interface PropTypes extends PageOptionItemTypes {}
+interface PropTypes extends PageOptionItemTypes {
+  tmp: string
+}
 const sessionKey = 'optionPos';
 const MultipleTmp: FC<PropTypes> = function({
   answer,
   optionElmInit,
   pushState,
+  tmp
 }) {
   const {
     visible,
@@ -60,9 +63,16 @@ const MultipleTmp: FC<PropTypes> = function({
       return session.clear();
     };
   }, []);
+  function createNav() {
+    const sMap = {
+      colorKey: 4,
+      robot: 5
+    }
+    return sMap[tmp] ? createStep(sMap[tmp]) : []
+  }
   function initPage() {
     setEles([
-      ...createStep(1),
+      ...createNav(),
       createHorn(),
       // createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
       ...createOptions(),

@@ -31,11 +31,17 @@ export interface PageOptionTypes {
 }
 const RadioGroup: React.FC = function(props) {
   const [tmp, setTmp] = useState<string>(),
-    { createQuestionLabel } = useComponents(),
+    { createQuestionLabel, createStep } = useComponents(),
     [pageOption, setPageOption] = useState<PageOptionTypes>();
   useEffect(() => {
     init();
   }, []);
+  function createNav() {
+    const stepMap = {
+      cone: 1
+    }
+    return createStep(stepMap[queryTmp])
+  }
   function init() {
     setPageOption({
       rmc: {
@@ -71,6 +77,7 @@ const RadioGroup: React.FC = function(props) {
       cone: {
         optionElmInit: [
           createQuestionLabel('哪一组是有规律排列的呢？点点看吧！'),
+          ...createNav(),
           ...createCone(),
         ],
         answer: '1',

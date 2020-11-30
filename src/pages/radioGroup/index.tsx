@@ -30,11 +30,11 @@ const RadioGroup: React.FC = function (props) {
     }
   }
   useEffect(() => {
-    console.log('history',history.location.query.tmp);
+    // console.log('history',history.location.query.tmp);
     setTmp(history.location.query?.tmp)
   }, [])
   return <>
-    {tmp && <TmpPage {...assertMap[tmp]} />}
+    {tmp && <TmpPage tmp={tmp} {...assertMap[tmp]} />}
   </>
 }
 export default RadioGroup

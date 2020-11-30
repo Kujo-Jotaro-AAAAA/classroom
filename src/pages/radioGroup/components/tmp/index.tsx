@@ -21,6 +21,7 @@ interface PropTypes {
   },
   label: string // 题干
   answer: string
+  tmp: string
 }
 const Part: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose, addSessionReply, getSessionStar } = useReward();
@@ -28,7 +29,7 @@ const Part: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { createOptionsBlock, createHorn, commonBlock } = useComponents();
+  const { createOptionsBlock, createHorn, commonBlock, createStep } = useComponents();
   const { elements, setEles, resetElmsAttr, payloadEvtsByNames } = useCreateEle(
     {
       stage,
@@ -42,9 +43,16 @@ const Part: FC<PropTypes> = function(props) {
       return session.clear();
     };
   }, []);
+  function createNav() {
+    const sMap = {
+      glove: 3
+    }
+    return sMap[props.tmp] ? createStep(sMap[props.tmp]) : []
+  }
   function initPage() {
     setEles([
       createHorn(),
+      ...createNav(),
       {
         type: EleTypeEnums.LABEL,
         option: {

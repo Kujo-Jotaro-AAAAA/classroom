@@ -76,7 +76,10 @@ const ShapeTwo: FC<PropTypes> = function(props) {
    */
   function createNav() {
     // createStep(1)
-    return ['finger', 'finger2'].includes(queryTmp) ? [] : createStep(0)
+    const stepMap = {
+      doughnut: 0
+    }
+    return ['finger', 'finger2', 'doughnut'].includes(queryTmp) ? [] : createStep(stepMap[queryTmp])
   }
   function mapTmpOption(): ElesConfig[] {
     const createMap = {

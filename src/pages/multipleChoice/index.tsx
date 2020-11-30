@@ -32,11 +32,12 @@ export interface PageOptionTypes {
 
 }
 const RadioGroup: React.FC = function(props) {
-  const { createQuestionLabel } = useComponents(),
+  const { createQuestionLabel, createStep } = useComponents(),
     [pageOption, setPageOption] = useState<PageOptionTypes>();
   useEffect(() => {
     init();
   }, []);
+
   function init() {
     setPageOption({
       colorKey: {
@@ -98,7 +99,7 @@ const RadioGroup: React.FC = function(props) {
   return (
     <>
       {pageOption && pageOption[queryTmp] && (
-        <TmpPage {...pageOption[queryTmp]} />
+        <TmpPage tmp={queryTmp} {...pageOption[queryTmp]} />
       )}
     </>
   );
