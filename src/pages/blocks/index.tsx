@@ -254,6 +254,10 @@ const Blocks: FC<PropTypes> = function(props) {
           opacity: 1,
         });
       });
+      const commonBlock = findElesByNames(elements, ['commonBlock-0', 'commonBlock-1', 'commonBlock-2'])
+      commonBlock.forEach(block => {
+        block.remove()
+      })
       return;
     }
     // stage.layer.deactivateAnimations()
@@ -276,11 +280,6 @@ const Blocks: FC<PropTypes> = function(props) {
     const isAnsCoverPosIdx = aPos.findIndex(([apx, apy]) =>
       ele.isPointCollision(apx, apy),
     );
-    console.log('isAnsCoverPosIdx', {
-      isAnsCoverPosIdx,
-      isAnsCoverPos
-    });
-
     if (isAnsCoverPos) {
       ele.animate([{ pos: isAnsCoverPos }], {
         duration: 200,
@@ -306,7 +305,6 @@ const Blocks: FC<PropTypes> = function(props) {
       }
       const newReply = session.getKey(sessionKey) || [null, null, null];
       newReply.splice(isAnsCoverPosIdx, 1, ele.name);
-      // console.log(newReply, index, ele.name);
       session.setKey(sessionKey, newReply);
       setLayUp(newReply);
     } else {
