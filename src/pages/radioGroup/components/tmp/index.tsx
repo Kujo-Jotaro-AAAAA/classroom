@@ -6,7 +6,7 @@ import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
-import { success_color, fail_color } from '@/utils/theme';
+import { success_color, success_border,fail_color } from '@/utils/theme';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
@@ -95,9 +95,6 @@ const Part: FC<PropTypes> = function(props) {
   useEffect(() => {
     if (!Array.isArray(elements) || elements.length === 0) return;
     const blocks = [0, 1, 2].map(n => `${commonBlock}-${n}`);
-    // const ref = findElesByNames(elements, blocks)
-    console.log('blocks',elements, blocks);
-
     optionElms.current = payloadEvtsByNames(elements, blocks, [
       {
         type: EvtNameEnum.CLICK,
@@ -110,7 +107,13 @@ const Part: FC<PropTypes> = function(props) {
   }, [elements]);
   function onSubmit(el) {
     const correct = el.name === answer;
-    const bgcolorStatus = correct ? success_color : fail_color;
+    const bgcolorStatus = correct ? {
+      bgcolor: success_color,
+      borderColor: success_border
+    } : {
+      bgcolor: fail_color
+    };
+
     if (correct) {
       setVisible(true);
     } else {
@@ -120,9 +123,7 @@ const Part: FC<PropTypes> = function(props) {
         resetElmsAttr(elements, ['bgcolor']);
       }, 1000);
     }
-    el.attr({
-      bgcolor: bgcolorStatus,
-    });
+    el.attr(bgcolorStatus);
   }
   return (
     <>
