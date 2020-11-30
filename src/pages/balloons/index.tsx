@@ -14,8 +14,8 @@ import useCreateEle, {
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
 import { fail_color, success_border, success_color } from '@/utils/theme';
-const balloonTmp = history.location.query.tmp;
-const currIndex = balloonTmp || 0
+const queryTmp = history.location.query.tmp;
+const currIndex = queryTmp || 0
 // const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const [blue, red, yellow] = [
   require('@/assets/png0015.png'),
@@ -84,9 +84,15 @@ const Balloons: FC<PropTypes> = function(props) {
       return session.clear();
     };
   }, []);
+  function createNav() {
+    const sMap = {
+      1: 5
+    }
+    return createStep(sMap[queryTmp] || 4)
+  }
   function initPage() {
     setEles([
-      ...createStep(0),
+      ...createNav(),
       {
         type: EleTypeEnums.LABEL,
         option: {

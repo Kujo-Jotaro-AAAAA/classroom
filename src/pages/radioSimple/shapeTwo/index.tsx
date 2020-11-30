@@ -77,7 +77,9 @@ const ShapeTwo: FC<PropTypes> = function(props) {
   function createNav() {
     // createStep(1)
     const stepMap = {
-      doughnut: 0
+      doughnut: 0,
+      finger3: 0,
+      finger4: 1,
     }
     return ['finger', 'finger2', 'doughnut'].includes(queryTmp) ? [] : createStep(stepMap[queryTmp])
   }

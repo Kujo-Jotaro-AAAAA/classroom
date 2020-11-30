@@ -38,7 +38,9 @@ const RadioGroup: React.FC = function(props) {
   }, []);
   function createNav() {
     const stepMap = {
-      cone: 1
+      cone: 1,
+      rmc: 2,
+      rmc2: 3
     }
     return createStep(stepMap[queryTmp])
   }
