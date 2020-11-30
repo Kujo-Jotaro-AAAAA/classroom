@@ -37,7 +37,23 @@ function replyNotice(assetsMap): ElesConfig[] {
         boxSize = 88,
         bx = 81 + (boxSize + 79) * idx,
         by = 148;
+      console.log('答案', ans);
+
       return [
+        {
+          type: EleTypeEnums.RING,
+          option: {
+            name: ans,
+            pos: [bx + boxSize / 2, by + boxSize / 2],
+            size: [boxSize, boxSize],
+            zIndex: 999,
+            innerRadius: 32,
+            outerRadius: 40,
+            fillColor: '#f40',
+            // anchor: [.5, .5]
+            opacity: 0,
+          },
+        },,
         {
           // 背景盒子
           type: EleTypeEnums.BLOCK,

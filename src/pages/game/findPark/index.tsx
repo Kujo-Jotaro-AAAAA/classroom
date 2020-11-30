@@ -249,18 +249,18 @@ const FindPark: FC<PropTypes> = function(props) {
         y = pos[1] + item.size[1] / 2;
       item.pos = [x, y];
       return [
-        {
-          type: EleTypeEnums.RING,
-          option: {
-            ...item,
-            zIndex: 999,
-            innerRadius: 32,
-            outerRadius: 40,
-            fillColor: '#f40',
-            // anchor: [.5, .5]
-            opacity: 0,
-          },
-        },
+        // {
+        //   type: EleTypeEnums.RING,
+        //   option: {
+        //     ...item,
+        //     zIndex: 999,
+        //     innerRadius: 32,
+        //     outerRadius: 40,
+        //     fillColor: '#f40',
+        //     // anchor: [.5, .5]
+        //     opacity: 0,
+        //   },
+        // },
         {
           type: EleTypeEnums.BLOCK,
           option: {
