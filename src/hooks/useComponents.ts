@@ -114,7 +114,7 @@ export default function useComponents() {
         option: {
           size: [w, h],
           pos: [x, y],
-          bgcolor: step === idx ? '#62CA5D' : '#D8F1D6'
+          bgcolor: step >= idx ? '#62CA5D' : '#D8F1D6'
         }
       }
     })

@@ -74,7 +74,7 @@ const Record: FC<PropTypes> = function(props) {
   }, [elements]);
   function initPage() {
     setEles([
-      createQuestionLabel('你是按照什么规律来排列的呢？按下录音键说一说吧'),
+      createQuestionLabel('你是按照什么规律来排列的呢？按下录音键说一说吧.'),
       {
         // 上一步操作的截图
         type: EleTypeEnums.SPRITE,

@@ -70,7 +70,7 @@ const Balloons: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.LABEL,
         option: {
-          text: '虚线框里应该放哪个气球呢? 点点看吧!',
+          text: '虚线框里应该放哪个球呢? 点点看吧!',
           fontSize: 34,
           // anchor: [0.5, 0.5],
           pos: [61, 93],

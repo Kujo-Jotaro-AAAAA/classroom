@@ -12,13 +12,13 @@ interface PropTypes {
   needNextStep?: boolean // 是否需要调用原生, 默认需要
 }
 const ResultModal: FC<PropTypes> = function({ star, visible, onClose, needNextStep = true }) {
-  // useEffect(() => {
-  //   if (visible) {
-  //     setTimeout(() => {
-  //       closeModel()
-  //     }, 5000)
-  //   }
-  // }, [visible])
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => {
+        closeModel()
+      }, 3500)
+    }
+  }, [visible])
   function closeModel() {
     if (needNextStep) {
       NEXT_STEP()
@@ -29,7 +29,9 @@ const ResultModal: FC<PropTypes> = function({ star, visible, onClose, needNextSt
   return (
     <>
       {visible && (
-        <div className={styles['reward_modal']} onClick={closeModel}>
+        <div className={styles['reward_modal']}
+        // onClick={closeModel}
+        >
           <Reward star={star} />
         </div>
       )}

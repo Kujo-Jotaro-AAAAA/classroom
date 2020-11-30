@@ -23,7 +23,7 @@ interface PropTypes {
   answer: string
 }
 const Part: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward();
+  const { visible, setVisible, onClose, addSessionReply, getSessionStar } = useReward();
   const optionElms = useRef([]);
   const { stage } = useStage({
     elId: canvasId,
@@ -115,6 +115,7 @@ const Part: FC<PropTypes> = function(props) {
       setVisible(true);
     } else {
       // TODO 播放，重置
+      addSessionReply()
       setTimeout(() => {
         resetElmsAttr(elements, ['bgcolor']);
       }, 1000);
@@ -132,7 +133,7 @@ const Part: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
     </>
   );
 };

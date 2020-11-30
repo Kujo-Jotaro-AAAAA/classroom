@@ -4,18 +4,17 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
-
+import {BASE_WIDTH, BASE_HEIGHT} from '@/utils/detectOrient';
 const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const icon = require('@/assets/reward-gold.png');
 const flyIcon = require('@/assets/fly-reward-gold.png');
 const tigerIcon = require('@/assets/巧虎.png');
 interface PropTypes {
   star: 1 | 2 | 3; // 评分
+  onCompleted?: () => void // 关闭
   // visible: boolean
   // onClose?: () => void
 }
-const vpWidth = window.innerWidth;
-const vpHeight = window.innerHeight;
 const Reward: FC<PropTypes> = function(props) {
   const { stage } = useStage({
     elId: 'container',
@@ -36,16 +35,16 @@ const Reward: FC<PropTypes> = function(props) {
     await setTimeout(() => {
       assets.animate.tiger.animate([
         // {
-        //   y: vpHeight
+        //   y: BASE_HEIGHT
         // },
         {
-          y: vpHeight - 269 / 2 + 50
+          y: BASE_HEIGHT - 269 / 2 + 50
         },
         {
-          y: vpHeight - 269 / 2 - 50
+          y: BASE_HEIGHT - 269 / 2 - 50
         },
         {
-          y: vpHeight - 269 / 2
+          y: BASE_HEIGHT - 269 / 2
         },
       ], {
         duration: 500,
@@ -103,13 +102,8 @@ const Reward: FC<PropTypes> = function(props) {
     }, initTime + 900)
     await setTimeout(() => {
       assets.animate.coin.attr('text', 18 + props.star)
+      props.onCompleted && props.onCompleted()
     }, initTime + 1100)
-    // await assets.animate.coin.animate([{ text: 18 + props.star }], {
-    //   duration: 2500,
-    //   iterations: 1,
-    //   easing: 'ease-out',
-    //   fill: 'forwards',
-    // });
   }
   /**
    * @description 加载页面
@@ -138,7 +132,7 @@ const Reward: FC<PropTypes> = function(props) {
   function createMask() {
     return new Rect({
       posi: [0, 0],
-      size: [vpWidth, vpHeight],
+      size: [BASE_WIDTH, BASE_HEIGHT],
       fillColor: '#6A6A6A',
       opacity: 0.64,
     });
@@ -148,8 +142,8 @@ const Reward: FC<PropTypes> = function(props) {
       texture: tigerIcon,
       size: [373, 269],
       anchor: [0.5, 0.5],
-      // pos: [vpWidth / 2, vpHeight - 269 / 2],
-      pos: [vpWidth / 2, vpHeight + 269]
+      // pos: [BASE_WIDTH / 2, BASE_HEIGHT - 269 / 2],
+      pos: [BASE_WIDTH / 2, BASE_HEIGHT + 269]
     });
   }
   /**
@@ -163,8 +157,8 @@ const Reward: FC<PropTypes> = function(props) {
     for (let index = 1; index <= props.star; index++) {
       const w = 108,
         h = 105,
-        centerW = vpWidth / 2,
-        centerH = vpHeight / 2 + 20;
+        centerW = BASE_WIDTH / 2,
+        centerH = BASE_HEIGHT / 2 + 20;
       const xMap = {
           1: centerW,
           2: centerW + (index === 1 ? -(55 + w / 2) : 55 + w / 2),
@@ -225,8 +219,8 @@ const Reward: FC<PropTypes> = function(props) {
       fillColor: '#fff',
     });
     const addNum = new Label({
-      text: `+${props.star}`,
-      pos: [490, 270],
+      text: `＋${props.star}`,
+      pos: [490 - 10, 270],
       fillColor: '#fff',
       opacity: 0,
       fontSize: 34,

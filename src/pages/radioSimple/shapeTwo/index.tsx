@@ -18,13 +18,13 @@ const queryTmp = history.location.query.tmp;
 const canvasId = 'shapeTwo-container';
 const assetsMap = {
   finger: {
-    fist: require('@/assets/shapeTwo/png0003.png'), // ✊
-    cloth: require('@/assets/shapeTwo/png0004.png'), // 布
-    scissors: require('@/assets/shapeTwo/png0009.png'), // ✂️
+    fist: require('@/assets/shapeTwo/png0003@2x.png'), // ✊
+    cloth: require('@/assets/shapeTwo/png0004@2x.png'), // 布
+    scissors: require('@/assets/shapeTwo/png0009@2x.png'), // ✂️
   },
   doughnut: {
-    0: require('@/assets/shapeTwo/png0032.png'),
-    1: require('@/assets/shapeTwo/png0033.png'), // 💕
+    0: require('@/assets/shapeTwo/png0032@2x.png'),
+    1: require('@/assets/shapeTwo/png0033@2x.png'), // 💕
   },
 };
 
@@ -64,12 +64,19 @@ const ShapeTwo: FC<PropTypes> = function(props) {
 
   function initPage() {
     setEles([
-      createQuestionLabel('是哪一种规律呢？点点看吧'),
+      createQuestionLabel('是哪一种规律呢？点点看吧!'),
       createHorn(),
-      ...createStep(1),
+      ...createNav(),
       ...mapTmpOption(),
       ...createBlock(),
     ]);
+  }
+  /**
+   * @description 导航栏
+   */
+  function createNav() {
+    // createStep(1)
+    return ['finger', 'finger2'].includes(queryTmp) ? [] : createStep(0)
   }
   function mapTmpOption(): ElesConfig[] {
     const createMap = {

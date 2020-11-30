@@ -256,10 +256,10 @@ const Blocks: FC<PropTypes> = function(props) {
       });
       return;
     }
-    console.log('addSessionReply ==>');
-
+    // stage.layer.deactivateAnimations()
     addSessionReply();
     // 提交错误
+
     moveColorBlockToInitPos();
     setLayUp([]);
   }
@@ -283,7 +283,7 @@ const Blocks: FC<PropTypes> = function(props) {
 
     if (isAnsCoverPos) {
       ele.animate([{ pos: isAnsCoverPos }], {
-        duration: 400,
+        duration: 200,
         easing: 'ease-in',
         direction: 'alternate',
         iterations: 1,
@@ -297,7 +297,7 @@ const Blocks: FC<PropTypes> = function(props) {
         // 跟其他盒子覆盖了
         const pos = initColorPos.current[isCoverColor.name];
         isCoverColor.animate([{ pos }], {
-          duration: 400,
+          duration: 200,
           easing: 'ease-in',
           direction: 'alternate',
           iterations: 1,
@@ -325,62 +325,23 @@ const Blocks: FC<PropTypes> = function(props) {
     }, 200);
   }
   /**
-   * @description 判断当前色块是否移动过,
+   * @description 将颜色块放回原位
    */
-  function colorBlockUnMove(elm) {
-    const elmPos = elm.attr().pos;
-    const initPos = initColorPos.current[elm.name];
-    return initPos.every((initVal, idx) => initVal === elmPos[idx]);
-  }
-  /**
-   * @description 放置到答题框并纠正方块的位置
-   */
-  function pullRightBlock(ele) {
-    let flag = false; // 为true时，说明已经有一项匹配了
-    answerBolcksRef.current.forEach(async answerBlock => {
-      const [x, y] = ele.attr().pos;
-      const isCover = answerBlock.isPointCollision(x, y); // 已放进回答框
-      if (isCover) {
-        flag = true;
-        const pos = initAnswerPos.current[answerBlock.name];
-        await ele.animate([{ pos }], {
-          duration: 400,
+  function moveColorBlockToInitPos() {
+    setTimeout(() => {
+      session.removeKey(sessionKey);
+      resetReply();
+      colorBolcksRef.current.forEach(async elm => {
+        const pos = initColorPos.current[elm.name];
+        await elm.animate([{ pos }], {
+          duration: 200,
           easing: 'ease-in',
           direction: 'alternate',
           iterations: 1,
           fill: 'forwards',
         });
-        return;
-      }
-      if (flag) return;
-      const initPos = initColorPos.current[ele.name];
-      await ele.animate([{ pos: initPos }], {
-        // 滚动回初始节点
-        duration: 400,
-        easing: 'ease-in',
-        direction: 'alternate',
-        iterations: 1,
-        fill: 'forwards',
       });
-    });
-    return flag;
-  }
-  /**
-   * @description 将颜色块放回原位
-   */
-  function moveColorBlockToInitPos() {
-    session.removeKey(sessionKey);
-    resetReply();
-    colorBolcksRef.current.forEach(async elm => {
-      const pos = initColorPos.current[elm.name];
-      await elm.animate([{ pos }], {
-        duration: 400,
-        easing: 'ease-in',
-        direction: 'alternate',
-        iterations: 1,
-        fill: 'forwards',
-      });
-    });
+    }, 500)
   }
   return (
     <>

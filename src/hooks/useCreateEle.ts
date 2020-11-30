@@ -103,7 +103,7 @@ export default function useCreateEle(props: PropTypes) {
         option: {
           name: 'default_back',
           texture: assetsMap.back,
-          pos: [55, 36],
+          pos: [35, 36],
           size: [16, 28]
         },
         evt: [{

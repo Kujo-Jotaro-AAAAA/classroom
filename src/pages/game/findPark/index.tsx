@@ -114,7 +114,11 @@ const FindPark: FC<PropTypes> = function(props) {
       ...createReply(),
     ]);
   }
+  /**
+   * @description 生成遮罩
+   */
   function createMaskAndTip() {
+    // findElesByNames
     setEles([
       {
         type: EleTypeEnums.BLOCK,
@@ -191,19 +195,6 @@ const FindPark: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
               hideMask(elements)
-            },
-          },
-          {
-            type: EvtNameEnum.TOUCH_MOVE,
-            callback: (evt, elm) => {
-              console.log({
-                x: evt.x,
-                y: evt.y,
-              });
-
-              elm.attr({
-                pos: [evt.x, evt.y],
-              });
             },
           },
         ],

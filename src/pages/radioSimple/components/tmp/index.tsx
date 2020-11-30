@@ -45,7 +45,7 @@ const Part: FC<PropTypes> = function(props) {
   function initPage() {
     setEles([
       createHorn(),
-      ...createStep(0),
+      // ...createStep(0),
       ...props.optionElmInit,
       // 选项区
       ...createOptionsBox(),
