@@ -13,7 +13,7 @@ import useCreateEle, {
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
 import Layout from './layout';
-import {SHOW_TOAST} from '@/utils/bridge';
+import { SHOW_TOAST } from '@/utils/bridge';
 const canvasId = 'FindPark-container';
 const assetsMap = {
   glass: require('./assets/游泳池@2x.png'),
@@ -38,7 +38,7 @@ const FindPark: FC<PropTypes> = function(props) {
   const maskRef = useRef<any[]>();
   const [reply, setReply] = useState<string[]>([]); // 答题
 
-  const answer = ['glass', 'rbt', 'car', 'eleph', 'kite']; // 答案
+  // const answer = ['glass', 'rbt', 'car', 'eleph', 'kite']; // 答案
   useEffect(() => {
     renderPage();
     return () => {
@@ -79,8 +79,8 @@ const FindPark: FC<PropTypes> = function(props) {
         evt: [
           {
             type: EvtNameEnum.CLICK,
-            callback: (evt, elm) => {
-              magClick(elm);
+            callback: (evt, elm, {stage}) => {
+              magClick(elm, stage.layer);
             },
           },
         ],
@@ -117,10 +117,11 @@ const FindPark: FC<PropTypes> = function(props) {
   /**
    * @description 生成遮罩
    */
-  function createMaskAndTip() {
-    // findElesByNames
-    setEles([
-      {
+  function createMaskAndTip(layer) {
+    const maskElm = findNameByLayer(layer, 'mask')
+    const newMask = [...createSourceRect()];
+    if (maskElm.length === 0) {
+      newMask.unshift({
         type: EleTypeEnums.BLOCK,
         option: {
           name: 'mask',
@@ -137,9 +138,9 @@ const FindPark: FC<PropTypes> = function(props) {
             },
           },
         ],
-      },
-      ...createSourceRect(),
-    ]);
+      });
+    }
+    setEles(newMask);
   }
   /**
    * @description 生成页面上的追光提示
@@ -151,31 +152,31 @@ const FindPark: FC<PropTypes> = function(props) {
     const sourceMap = {
       glass: {
         pos: [268, 253 + 2], // 椭圆的位置,
-        sourceRect: [348 + 178, 83 - 80, ...doubtSize], // 裁剪的位置
+        sourceRect: [536, 3, ...doubtSize], // 裁剪的位置
       },
       rbt: {
         pos: [1, 137 + 253],
-        sourceRect: [1, 137 + h - 50, ...doubtSize], // 裁剪的位置
+        sourceRect: [1, 274, ...doubtSize], // 裁剪的位置
       },
       eleph: {
         pos: [364, 440],
-        sourceRect: [346 + 375, 187 + 185, ...doubtSize], // 裁剪的位置
+        sourceRect: [728, 374, ...doubtSize], // 裁剪的位置
       },
       car: {
         pos: [28, 328 + 253],
-        sourceRect: [55, 328 + 320, ...doubtSize], // 裁剪的位置
+        sourceRect: [55, 655, ...doubtSize], // 裁剪的位置
       },
       kite: {
         pos: [648, 312 + 253],
-        sourceRect: [648 + 650, 312 + 310, ...doubtSize], // 裁剪的位置
+        sourceRect: [1296, 625, ...doubtSize], // 裁剪的位置
       },
     };
 
     const unChioces = Object.keys(sourceMap).filter(k => !reply.includes(k)); // 过滤掉已选中
     const randomIdx = Math.floor(Math.random() * unChioces.length);
-    const source = sourceMap[unChioces[randomIdx]];
+    const source = sourceMap[unChioces[2]];
     // 选中一个提示
-    if (!unChioces[randomIdx]) return []
+    if (!unChioces[randomIdx]) return [];
     return [unChioces[randomIdx]].map((unKey, idx) => {
       source.pos = [source.pos[0] + w / 2, source.pos[1] + h / 2];
       return {
@@ -194,7 +195,7 @@ const FindPark: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
-              hideMask(elements)
+              hideMask(elements);
             },
           },
         ],
@@ -204,12 +205,13 @@ const FindPark: FC<PropTypes> = function(props) {
   function hideMask(elms) {
     findMaskElm(elms).forEach(elm => elm.remove());
   }
-  function magClick(elm) {
+  function magClick(elm, layer) {
     // hideMask()
     maskRef.current.forEach(item => {
-      item.remove()
-    })
-    createMaskAndTip();
+      if (item.name === 'mask') return;
+      item.remove();
+    });
+    createMaskAndTip(layer);
   }
   /**
    * @description 在页面上生成透明的五个方块用来回答
@@ -242,84 +244,66 @@ const FindPark: FC<PropTypes> = function(props) {
         size: [70, 80],
       },
     ].map(item => {
-      const {pos} = item
-      const x = pos[0] + item.size[0] / 2, y = pos[1] + item.size[1] / 2
-      item.pos = [x, y]
+      const { pos } = item;
+      const x = pos[0] + item.size[0] / 2,
+        y = pos[1] + item.size[1] / 2;
+      item.pos = [x, y];
       return [
         {
-        type: EleTypeEnums.RING,
-        option: {
-          ...item,
-          zIndex: 999,
-          innerRadius: 15,
-          outerRadius: 30,
-          fillColor: '#f40',
-          // anchor: [.5, .5]
-          opacity: 0,
-        },
-        // evt: [
-        //   {
-        //     type: EvtNameEnum.CLICK,
-        //     callback: (evt, elm, {stage}) => {
-        //       // 添加答案, 如果已经有了，则不再添加
-        //       hideMask(stage.layer.children)
-        //       if (reply.includes(elm.name)) {
-        //         // 已经点过啦
-        //         SHOW_TOAST()
-        //         return;
-        //       }
-        //       elm.attr({
-        //         opacity: 1
-        //       })
-        //       reply.push(elm.name);
-        //       setReply([...reply]);
-        //     },
-        //   },
-        // ],
-      },
-      {
-        type: EleTypeEnums.BLOCK,
-        option: {
-          ...item,
-          zIndex: 999,
-          innerRadius: 15,
-          outerRadius: 30,
-          bgcolor: '#f40',
-          anchor: [.5, .5],
-          opacity: 0,
-        },
-        evt: [
-          {
-            type: EvtNameEnum.CLICK,
-            callback: (evt, elm, {stage}) => {
-              // 添加答案, 如果已经有了，则不再添加
-              hideMask(stage.layer.children)
-              if (reply.includes(elm.name)) {
-                // 已经点过啦
-                SHOW_TOAST()
-                return;
-              }
-              const elms = findNameByLayer(stage.layer, item.name)
-              elms[0].attr({
-                opacity: 1
-              })
-              reply.push(elm.name);
-              setReply([...reply]);
-            },
+          type: EleTypeEnums.RING,
+          option: {
+            ...item,
+            zIndex: 999,
+            innerRadius: 32,
+            outerRadius: 40,
+            fillColor: '#f40',
+            // anchor: [.5, .5]
+            opacity: 0,
           },
-        ],
-      }
+        },
+        {
+          type: EleTypeEnums.BLOCK,
+          option: {
+            ...item,
+            zIndex: 999,
+            innerRadius: 15,
+            outerRadius: 30,
+            bgcolor: '#f40',
+            anchor: [0.5, 0.5],
+            opacity: 0,
+          },
+          evt: [
+            {
+              type: EvtNameEnum.CLICK,
+              callback: (evt, elm, { stage }) => {
+                // 添加答案, 如果已经有了，则不再添加
+                hideMask(stage.layer.children);
+                if (reply.includes(elm.name)) {
+                  // 已经点过啦
+                  SHOW_TOAST();
+                  return;
+                }
+                const elms = findNameByLayer(stage.layer, item.name);
+                elms[0].attr({
+                  opacity: 1,
+                });
+                reply.push(elm.name);
+                setReply([...reply]);
+              },
+            },
+          ],
+        },
       ];
     });
-    return replyList.flat()
+    return replyList.flat();
   }
   useEffect(() => {
     if (reply.length === 5) {
-      submit()
+      submit();
     }
-  }, [reply])
+  }, [reply]);
   function submit() {
-    setVisible(true)
+    setVisible(true);
   }
   return (
     <>
@@ -330,7 +314,11 @@ const FindPark: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
+      <RewardModal
+        visible={visible}
+        star={getSessionStar()}
+        onClose={onClose}
+      />
     </>
   );
 };
