@@ -182,7 +182,7 @@ const MultipleTmp: FC<PropTypes> = function({
       />
       <RewardModal
         visible={visible}
-        needNextStep={false}
+        needNextStep={!Boolean(pushState)}
         star={getSessionStar()}
         onClose={() => {
           resetBlockBg();

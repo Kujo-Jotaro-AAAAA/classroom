@@ -23,7 +23,14 @@ interface PropTypes {}
 const sessionKey = 'replyKeys';
 
 const Blocks: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose, resetReply,addSessionReply, getSessionStar } = useReward();
+  const {
+    visible,
+    setVisible,
+    onClose,
+    resetReply,
+    addSessionReply,
+    getSessionStar,
+  } = useReward();
   const answer = ['yellow', 'red', 'blue']; // 答案
   const [layUp, setLayUp] = useState<string[]>([]);
   const colorBolcksRef = useRef([]);
@@ -52,7 +59,6 @@ const Blocks: FC<PropTypes> = function(props) {
     };
   }, []);
   function initPage() {
-
     setEles([
       createHorn(),
       {
@@ -99,18 +105,18 @@ const Blocks: FC<PropTypes> = function(props) {
    *
    */
   function createMaskColorBlocks() {
-    const originBlock = createAnswerBlocks()
+    const originBlock = createAnswerBlocks();
     return originBlock.map((block, i) => {
-      Reflect.deleteProperty(block.option, 'borderDash')
+      Reflect.deleteProperty(block.option, 'borderDash');
       block.option = {
         ...block.option,
         name: `redBox${i}`,
         // @ts-ignore
         opacity: 0,
-        border: [2, '#F57F57']
-      }
-      return block
-    })
+        border: [2, '#F57F57'],
+      };
+      return block;
+    });
   }
   /**
    * @description 回答区域
@@ -130,7 +136,7 @@ const Blocks: FC<PropTypes> = function(props) {
           border: [2, main_color],
           borderDash: [2],
           borderRadius: 10,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
         },
       };
     });
@@ -195,11 +201,11 @@ const Blocks: FC<PropTypes> = function(props) {
     const answerPos = {};
 
     colorBolcksRef.current.forEach(elm => {
-    if (!elm) return
+      if (!elm) return;
       colorPos[elm?.name] = elm.attr().pos;
     });
     answerBolcksRef.current.forEach(elm => {
-    if (!elm) return
+      if (!elm) return;
 
       answerPos[elm.name] = elm.attr().pos;
     });
@@ -227,21 +233,11 @@ const Blocks: FC<PropTypes> = function(props) {
   function handleColorEleEnd(evt, ele) {
     const newReply = session.getKey(sessionKey) || [];
     if (newReply?.includes(ele.name)) return;
-    const isEdit = replaceColorBlock(ele);
-    const isDone = pullRightBlock(ele);
-    if (!isEdit && isDone) {
-      newReply.push(ele.name);
-      session.setKey(sessionKey, newReply);
-      setLayUp(newReply);
-    }
-    setTimeout(() => {
-      ele.removeAttribute('zIndex');
-    }, 500)
+    replaceColorBlock(ele);
   }
   useEffect(() => {
-    if (layUp.length === 3) {
+    if (layUp.filter(v => Boolean(v)).length === 3) {
       submit();
-
     }
   }, [layUp]);
   /**
@@ -255,14 +251,14 @@ const Blocks: FC<PropTypes> = function(props) {
       redBolcksRef.current.forEach(el => {
         el.attr({
           zIndex: 10,
-          opacity: 1
-        })
-      })
+          opacity: 1,
+        });
+      });
       return;
     }
     console.log('addSessionReply ==>');
 
-    addSessionReply()
+    addSessionReply();
     // 提交错误
     moveColorBlockToInitPos();
     setLayUp([]);
@@ -272,38 +268,69 @@ const Blocks: FC<PropTypes> = function(props) {
    * @param ele
    */
   function replaceColorBlock(ele) {
-    let isEdit = false;
-    colorBolcksRef.current.forEach(async elm => {
-      const [x, y] = ele.attr().pos;
-      const isCover = elm.isPointCollision(x, y); // 跟当前色块覆盖了
-      if (elm.name !== ele.name && isCover) {
-        if (colorBlockUnMove(elm)) return //  没移动过，不继续操作
-        const newReply = session.getKey(sessionKey) || [];
-        isEdit = true;
-        const pos = initColorPos.current[elm.name];
-        await elm.animate([{ pos }], {
+    const aPos = answerBolcksRef.current.map(elm => elm.attr().pos);
+    const elseColor = colorBolcksRef.current.filter(v => v.name !== ele.name);
+    const isAnsCoverPos = aPos.find(([apx, apy]) =>
+      ele.isPointCollision(apx, apy),
+    );
+    const isAnsCoverPosIdx = aPos.findIndex(([apx, apy]) =>
+      ele.isPointCollision(apx, apy),
+    );
+    console.log('isAnsCoverPosIdx', {
+      isAnsCoverPosIdx,
+      isAnsCoverPos
+    });
+
+    if (isAnsCoverPos) {
+      ele.animate([{ pos: isAnsCoverPos }], {
+        duration: 400,
+        easing: 'ease-in',
+        direction: 'alternate',
+        iterations: 1,
+        fill: 'forwards',
+      });
+      const isCoverColor = elseColor.find(celm => {
+        const [cx, cy] = celm.attr().pos;
+        return ele.isPointCollision(cx, cy);
+      });
+      if (isCoverColor) {
+        // 跟其他盒子覆盖了
+        const pos = initColorPos.current[isCoverColor.name];
+        isCoverColor.animate([{ pos }], {
           duration: 400,
           easing: 'ease-in',
           direction: 'alternate',
           iterations: 1,
           fill: 'forwards',
         });
-        const index = newReply.findIndex(c => c === elm.name);
-        newReply.splice(index, 1, ele.name);
-        // console.log(newReply, index, ele.name);
-        session.setKey(sessionKey, newReply);
-        setLayUp(newReply);
       }
-    });
-    return isEdit;
+      const newReply = session.getKey(sessionKey) || [null, null, null];
+      newReply.splice(isAnsCoverPosIdx, 1, ele.name);
+      // console.log(newReply, index, ele.name);
+      session.setKey(sessionKey, newReply);
+      setLayUp(newReply);
+    } else {
+      const initPos = initColorPos.current[ele.name];
+      ele.animate([{ pos: initPos }], {
+        // 滚动回初始节点
+        duration: 400,
+        easing: 'ease-in',
+        direction: 'alternate',
+        iterations: 1,
+        fill: 'forwards',
+      });
+    }
+     setTimeout(() => {
+      ele.removeAttribute('zIndex');
+    }, 200);
   }
   /**
    * @description 判断当前色块是否移动过,
    */
   function colorBlockUnMove(elm) {
-    const elmPos = elm.attr().pos
+    const elmPos = elm.attr().pos;
     const initPos = initColorPos.current[elm.name];
-    return initPos.every((initVal, idx) => initVal === elmPos[idx])
+    return initPos.every((initVal, idx) => initVal === elmPos[idx]);
   }
   /**
    * @description 放置到答题框并纠正方块的位置
@@ -323,11 +350,12 @@ const Blocks: FC<PropTypes> = function(props) {
           iterations: 1,
           fill: 'forwards',
         });
-        return
+        return;
       }
       if (flag) return;
       const initPos = initColorPos.current[ele.name];
-      await ele.animate([{ pos: initPos }], { // 滚动回初始节点
+      await ele.animate([{ pos: initPos }], {
+        // 滚动回初始节点
         duration: 400,
         easing: 'ease-in',
         direction: 'alternate',

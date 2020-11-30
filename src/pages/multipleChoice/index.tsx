@@ -81,6 +81,9 @@ const RadioGroup: React.FC = function(props) {
         colorKey: [52, 111],
         robot: [93, 109],
       };
+      if (queryTmp === 'colorKey' && idx === 1) {
+        sizeMap[queryTmp][0] = 37
+      }
       return {
         type: EleTypeEnums.SPRITE,
         option: {
