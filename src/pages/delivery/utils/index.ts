@@ -61,42 +61,31 @@ export function getCoordinate(oPoint: PointerTypes, currPonit: PointerTypes) {
   const coordinateMap = {
     truetrue: 1,
     falsetrue: 2,
-    falsefalse: 3,
-    truefalse: 4,
+    truefalse: 3,
+    falsefalse: 4,
   };
   return coordinateMap[key];
 }
 /**
- * @description 对比当前点与原点的x，y大小，获取行进方向。x > y
+ * @description 对比当前点与原点的x，y大小，获取距离远端相对位置。x > y
+ * ! 浏览器的象限是倒转的, 1,2 <->3,4
  * 象限:
  * 1 x > y →，返回x和原点的y 否则↑, 返回原点x和y
  * 2 x > y ←，否则↑
  * 3 x > y ←，否则↓
  * 4 x > y →，否则↓
- *
  * @param oPoint
  * @param currPonit
  * @param coordinate
  */
-export function getDirection(oPoint: PointerTypes, currPonit: PointerTypes) {
+export function getPos(oPoint: PointerTypes, currPonit: PointerTypes) {
   const [ox, oy] = oPoint;
   const coordinate = getCoordinate(oPoint, currPonit);
-  const [x, y] = getXYToList(oPoint, currPonit),
-    isX = x > y;
-  // console.log('获取行进方向', '象限', coordinate, x, y);
-  // const pos = [1, 2].includes(coordinate) ?
-  const posMap = {
-    1: isX ? [x, oy] : [ox, y],
-    2: isX ? [-x, oy] : [ox, y],
-    3: isX ? [-x, oy] : [ox, -y],
-    4: isX ? [x, oy] : [ox, -y],
-  };
+  const [xDistance, yDistance] = getXYToList(oPoint, currPonit),
+    isX = Math.abs(xDistance) > Math.abs(yDistance);
+  const pos: [number, number] = isX ? [ox + xDistance , oy]: [ox, oy + yDistance]
   return {
     coordinate,
-    pos: posMap[coordinate],
+    pos,
   };
 }
-/**
- * @description 获取点到点拖动的距离(貌似不需要)
- */
-export function getDistance() {}

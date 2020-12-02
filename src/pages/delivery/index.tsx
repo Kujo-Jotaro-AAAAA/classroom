@@ -1,19 +1,18 @@
 /**
  * @description 页面描述
  */
-import React, { FC, useState, useEffect, useRef, useMemo } from 'react';
-import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
-import useStage from '@/hooks/useStage';
-import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
-import {debounce, throttle} from 'lodash';
-import { createMarks, getDirection } from './utils';
 import useCreateEle, {
-  ElesConfig,
   EleTypeEnums,
-  EvtNameEnum,
+  EvtNameEnum
 } from '@/hooks/useCreateEle';
+import useReward from '@/hooks/useReward';
+import useStage from '@/hooks/useStage';
+import { session } from '@/utils/store';
+import { throttle } from 'lodash';
+import React, { FC, useEffect, useRef } from 'react';
+import { createMarks, getPos } from './utils';
 const [bg, qiao] = [
   require('./assets/bg.png'),
   require('./assets/qiao@2x.png'),
@@ -27,23 +26,16 @@ const Delivery: FC<PropTypes> = function(props) {
     h = 93, // 白色圆点的大小
     moveW = 60,
     moveH = 80; // 移动老虎的大小
-  const lineRef = useRef<any>(null);
+  const pointerElesRef = useRef<any[]>([]);
   const { stage } = useStage({
     elId: canvasId,
   });
-  const {
-    elesMerge,
-    elements,
-    setEles,
-    findEleByName,
-    findElesByNames,
-    findNamesByLayer,
-  } = useCreateEle({
+  const { elements, setEles, findNamesByLayer } = useCreateEle({
     stage,
   });
   const { createHorn, createQuestionLabel } = useComponents();
   const defaultMarks = createMarks(),
-  linePoints = useRef<number[]>(defaultMarks[0]); // 线的锚点
+    linePoints = useRef<number[]>(defaultMarks[0]); // 线的锚点
   useEffect(() => {
     initPage();
     return () => {
@@ -69,6 +61,7 @@ const Delivery: FC<PropTypes> = function(props) {
           points: fixLineAnchor(defaultMarks[0]),
           strokeColor: '#F79674',
           lineWidth: 26,
+          smooth: true,
           zIndex: 20,
         },
       },
@@ -78,7 +71,7 @@ const Delivery: FC<PropTypes> = function(props) {
         option: {
           name: 'move',
           anchor: [0.5, 0.5],
-          pos: fixMoveAnchor(defaultMarks[0]),
+          pos: [84 + moveW / 2, 289 + moveH / 2],
           size: [moveW, moveH],
           texture: qiao,
           zIndex: 99,
@@ -95,55 +88,76 @@ const Delivery: FC<PropTypes> = function(props) {
       ...createPointers(),
     ]);
   }
-  const throttleTouchMove = throttle(touchMove, 40)
+  const throttleTouchMove = throttle(touchMove, 40);
   /**
    * @description 处理移动
    * @param evt
    * @param param1
    */
-  function touchMove(evt, {move, line, pointerEles}) {
-    move.attr({
-        pos: [evt.x, evt.y],
-      });
-      const matchPointer = patternPointer([evt.x, evt.y], pointerEles);
-      if (matchPointer) { // 已滑动到点位
-        // 增加点位
-        linePoints.current = linePoints.current.concat(matchPointer)
-      }
-      handleLineEvent(line, [evt.x, evt.y])
+  function touchMove({x, y}, { move, line, pointerEles }) {
+    if (isCompleted()) return
+    const prev: [number, number] = [
+      linePoints.current[linePoints.current.length - 2],
+      linePoints.current[linePoints.current.length - 1],
+    ];
+    // const dir = getCoordinate(prev, [evt.x, evt.y]);
+    // console.log('getPos', getPos(prev, [evt.x, evt.y]));
+
+    // const pos: [number, number] = [1, 4].includes(dir) ? [evt.x, prev[1]] : [prev[0], evt.y]
+    const {pos, coordinate} = getPos(prev, [x, y]);
+    console.log('prev',JSON.stringify(prev),'pos',  JSON.stringify(pos));
+    handleAddPointer(pos, pointerEles);
+    move.attr('pos', fixMoveAnchor(pos));
+    handleLineEvent(line, pos);
   }
   /**
    * @description 为了使用hook, 在外面监听事件
    */
   function bindMoveListener() {
     const list = findNamesByLayer(stage.layer, ['move', 'line']);
-    const pointerEles = findNamesByLayer(stage.layer, ['pointer']);
+    pointerElesRef.current = findNamesByLayer(stage.layer, ['pointer']);
     if (list.length === 0) return;
     const [move, line] = list;
     if (!move) return;
     // setLinePoints
-    move.addEventListener(EvtNameEnum.TOUCH_MOVE,(evt) => throttleTouchMove(evt, {
-      move,
-      line,
-      pointerEles
-    }));
+    move.addEventListener(EvtNameEnum.TOUCH_MOVE, evt =>
+      throttleTouchMove(evt, {
+        move,
+        line,
+        pointerEles: pointerElesRef.current,
+      }),
+    );
   }
-
+  /**
+   * @description 处理节点匹配成功添加节点事件
+   * @param param0
+   * @param pointerEles
+   */
+  function handleAddPointer([x, y], pointerEles) {
+    const matchPointer = patternPointer([x, y], pointerEles);
+    if (matchPointer) {
+      // 已滑动到点位
+      // 增加点位
+      linePoints.current = linePoints.current.concat(matchPointer);
+    }
+  }
   /**
    * @description 处理线的移动
    * @param lineElm
    * @param points
    */
   function handleLineEvent(lineElm, points: number[]) {
-    lineElm.attr('points', fixLineAnchor([...linePoints.current, ...points]))
+    points[0] = points[0] - moveW;
+    lineElm.attr('points', fixLineAnchor([...linePoints.current, ...points]));
   }
   /**
-   * @description 跟当前默认的节点位置匹配
+   * @description 是否跟当前默认的节点位置匹配
+   * 用点位的ele来判断是否进入，返回精确的默认点位
    * @param pointer
    */
   function patternPointer([x, y], pointerEles) {
     return defaultMarks.find((pointer, i) => {
-      return pointerEles[i].isPointCollision(x, y) && pointer
+      return pointerEles[i].isPointCollision(x, y) && pointer;
     });
   }
   /**
@@ -152,7 +166,7 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function fixMoveAnchor(pos: number[]) {
     const [x, y] = pos;
-    return [x + moveW * 0.7, y + moveH / 2];
+    return [x + moveW / 2, y + moveH / 2];
   }
   /**
    * @description 修正线的锚点
@@ -163,6 +177,16 @@ const Delivery: FC<PropTypes> = function(props) {
       const isX = (i + 1) % 2 === 1;
       return isX ? p + w / 2 : p + h / 2;
     });
+  }
+  /**
+   * @description 是否已走完最后一个
+   * @param pos
+   */
+  function isCompleted() {
+    let len = linePoints.current.length
+    if (len <=10 ) return false // 少于5个点，不校验
+    const lastPointer = linePoints.current.slice(len - 2)
+    return defaultMarks[defaultMarks.length - 1].every((m, i) => lastPointer[i] === m)
   }
   /**
    * @description 初始化点位
