@@ -10,6 +10,7 @@ import useCreateEle, {
 import useReward from '@/hooks/useReward';
 import useStage from '@/hooks/useStage';
 import { session } from '@/utils/store';
+import {success_color, success_border, success_color_rgb} from '@/utils/theme';
 import { throttle } from 'lodash';
 import React, { FC, useEffect, useRef } from 'react';
 import { createMarks, getPos } from './utils';
@@ -25,7 +26,7 @@ const Delivery: FC<PropTypes> = function(props) {
   const w = 93,
     h = 93, // 白色圆点的大小
     moveW = 60,
-    moveH = 80; // 移动老虎的大小
+    moveH = 80, activeBgColor = 'FFEEE4', activeBorderColor = 'F69472'; // 移动老虎的大小
   const pointerElesRef = useRef<any[]>([]);
   const { stage } = useStage({
     elId: canvasId,
@@ -105,7 +106,7 @@ const Delivery: FC<PropTypes> = function(props) {
 
     // const pos: [number, number] = [1, 4].includes(dir) ? [evt.x, prev[1]] : [prev[0], evt.y]
     const {pos, coordinate} = getPos(prev, [x, y]);
-    console.log('prev',JSON.stringify(prev),'pos',  JSON.stringify(pos));
+    // console.log('prev',JSON.stringify(prev),'pos',  JSON.stringify(pos));
     handleAddPointer(pos, pointerEles);
     move.attr('pos', fixMoveAnchor(pos));
     handleLineEvent(line, pos);
@@ -134,12 +135,29 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param pointerEles
    */
   function handleAddPointer([x, y], pointerEles) {
-    const matchPointer = patternPointer([x, y], pointerEles);
-    if (matchPointer) {
+    const {pattern, patternIndex} = patternPointer([x, y], pointerEles);
+    if (pattern) {
       // 已滑动到点位
       // 增加点位
-      linePoints.current = linePoints.current.concat(matchPointer);
+      linePoints.current = linePoints.current.concat(pattern);
+      activeBg(patternIndex)
     }
+  }
+  /**
+   * @description 高亮已连接的点
+   * @param idx
+   */
+  function activeBg(idx: number) {
+      console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
+    // if (pointerElesRef.current[idx].attr().bgcolor === success_color_rgb) {
+    //   pointerElesRef.current[idx].removeAttribute('bgcolor')
+    //   pointerElesRef.current[idx].removeAttribute('borderColor')
+    //   return
+    // }
+    pointerElesRef.current[idx].attr({
+      bgcolor: success_color,
+      borderColor: success_border
+    })
   }
   /**
    * @description 处理线的移动
@@ -156,9 +174,17 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param pointer
    */
   function patternPointer([x, y], pointerEles) {
-    return defaultMarks.find((pointer, i) => {
-      return pointerEles[i].isPointCollision(x, y) && pointer;
+    let patternIndex = undefined
+    const pattern =  defaultMarks.find((pointer, i) => {
+      if (pointerEles[i].isPointCollision(x, y)) {
+        patternIndex = i
+        return pointer
+      }
     });
+    return {
+      pattern,
+      patternIndex
+    }
   }
   /**
    * @description 修正move的锚点
@@ -192,7 +218,7 @@ const Delivery: FC<PropTypes> = function(props) {
    * @description 初始化点位
    */
   function createPointers() {
-    return defaultMarks.map(([posx, posy]) => {
+    return defaultMarks.map(([posx, posy], idx) => {
       const currX = posx + w / 2,
         currY = posy + h / 2;
       return {
@@ -201,9 +227,11 @@ const Delivery: FC<PropTypes> = function(props) {
           name: 'pointer',
           anchor: [0.5, 0.5],
           size: [w, h],
-          border: [2, '#f40'],
+          border: [2, idx === 0 && success_border],
           borderRadius: w / 2,
+          bgcolor: idx === 0 && success_color,
           pos: [currX, currY],
+          zIndex: 21
         },
       };
     });
