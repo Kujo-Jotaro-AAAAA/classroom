@@ -282,6 +282,7 @@ export default function useCreateEle(props: PropTypes) {
   }
   return {
     elements,
+    elesMerge,
     createLabel,
     createSprite,
     createRect,

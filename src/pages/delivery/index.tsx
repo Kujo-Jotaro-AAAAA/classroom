@@ -1,101 +1,185 @@
 /**
  * @description 页面描述
  */
-import React, { FC, useState, useEffect, useRef } from 'react';
+import React, { FC, useState, useEffect, useRef, useMemo } from 'react';
 import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
-import { create12Checkerboard, getDirection } from './utils';
+import { createMarks, getDirection } from './utils';
 import useCreateEle, {
   ElesConfig,
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
-const [placeholderImg] = [require('@/assets/重播按钮.png')]
-const canvasId = 'delivery-container'
+const [bg, qiao] = [
+  require('./assets/bg.png'),
+  require('./assets/qiao@2x.png'),
+];
+const canvasId = 'delivery-container';
 interface PropTypes {}
 const sessionKey = 'optionPos';
 const Delivery: FC<PropTypes> = function(props) {
-  const {visible, setVisible, onClose} = useReward(),
-  [fixAnchors, setFixAnchors] = useState([])
-  const answer = 'blue',
-  originPos = [50, 50] // 起始点
-  const lineRef = useRef<any>(null)
+  const { visible, setVisible, onClose } = useReward();
+  const w = 93,
+    h = 93, // 白色圆点的大小
+    moveW = 60,
+    moveH = 80; // 移动老虎的大小
+  const lineRef = useRef<any>(null);
   const { stage } = useStage({
     elId: canvasId,
   });
-  const { elements, setEles, findEleByName } = useCreateEle({
+  const {
+    elesMerge,
+    elements,
+    setEles,
+    findEleByName,
+    findElesByNames,
+    findNamesByLayer,
+  } = useCreateEle({
     stage,
   });
-  // const {} = useComponents()
+  const { createHorn, createQuestionLabel } = useComponents();
+  const defaultMarks = createMarks(),
+  linePoints = useRef<number[]>(defaultMarks[0]); // 线的锚点
   useEffect(() => {
-    initPage()
+    initPage();
     return () => {
       return session.clear();
     };
   }, []);
   useEffect(() => {
-    if (!Array.isArray(elements) || elements.length === 0) return;
-    lineRef.current = findEleByName(elements, 'line')
-  }, [elements]);
+    if (!stage?.layer) return;
+    bindMoveListener();
+  }, [stage?.layer, elements]);
+
   function initPage() {
     setEles([
+      createHorn(),
+      createQuestionLabel('巧虎想去看大熊猫，请你试试看哪条路线才是正确的呢?'),
       {
+        // 线
         type: EleTypeEnums.POLYLINE,
         option: {
           name: 'line',
-          pos: originPos,
-          points: originPos,
-          strokeColor: 'blue',
-          lineWidth: 3,
-        }
-      },{
+          pos: [0, 0],
+          // pos: defaultMarks[0],
+          points: fixLineAnchor(defaultMarks[0]),
+          strokeColor: '#F79674',
+          lineWidth: 26,
+          zIndex: 20,
+        },
+      },
+      {
+        // 拖动，巧虎
         type: EleTypeEnums.SPRITE,
         option: {
           name: 'move',
-          anchor: [.5, .5],
-          pos: originPos,
-          size: [100,100],
-          texture: placeholderImg
+          anchor: [0.5, 0.5],
+          pos: fixMoveAnchor(defaultMarks[0]),
+          size: [moveW, moveH],
+          texture: qiao,
+          zIndex: 99,
         },
-        evt: [{
-          type: EvtNameEnum.TOUCH_MOVE,
-          callback: handleMoveEvent
-        }]
       },
-      ...createMarks()
+      {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: bg,
+          size: [1024, 535.25],
+          pos: [0, 233],
+        },
+      },
+      ...createPointers(),
     ]);
   }
   /**
-   * @description 生成标记好的点
+   * @description 为了使用hook, 在外面监听事件
    */
-  function createMarks(): ElesConfig[] {
-    const board = create12Checkerboard()
-    setFixAnchors(board.anchors)
-    return board.anchors.map(pos => {
+  function bindMoveListener() {
+    const list = findNamesByLayer(stage.layer, ['move', 'line']);
+    const pointerEles = findNamesByLayer(stage.layer, ['pointer']);
+    // console.log('pointerEles ==>', pointerEles);
+    if (list.length === 0) return;
+    const [move, line] = list;
+    if (!move) return;
+    // setLinePoints
+    move.addEventListener(EvtNameEnum.TOUCH_MOVE, evt => {
+      // console.log('xxxx', evt);
+      move.attr({
+        pos: [evt.x, evt.y],
+      });
+      const matchPointer = patternPointer([evt.x, evt.y], pointerEles);
+      if (matchPointer) { // 已滑动到点位
+        // 增加点位
+        linePoints.current = linePoints.current.concat(matchPointer)
+      }
+
+
+      handleMoveEvent(line, [evt.x, evt.y])
+    });
+  }
+  function handleMoveEvent(lineElm, points: number[]) {
+
+    lineElm.attr('points', fixLineAnchor(linePoints.current))
+    // const points = fixLineAnchor([
+    //   ...defaultMarks[0],
+    //   ...defaultMarks[1],
+    //   ...defaultMarks[2],
+    //   defaultMarks[3][0],
+    //   evt.y,
+    // ]);
+    console.log(lineElm.attr('points'));
+  }
+  /**
+   * @description 跟当前默认的节点位置匹配
+   * @param pointer
+   */
+  function patternPointer([x, y], pointerEles) {
+    return defaultMarks.find((pointer, i) => {
+      return pointerEles[i].isPointCollision(x, y) && pointer
+    });
+  }
+  /**
+   * @description 修正move的锚点
+   * @param pos
+   */
+  function fixMoveAnchor(pos: number[]) {
+    const [x, y] = pos;
+    return [x + moveW * 0.7, y + moveH / 2];
+  }
+  /**
+   * @description 修正线的锚点
+   * @param pointers
+   */
+  function fixLineAnchor(pointers: number[]) {
+    return pointers.map((p, i) => {
+      const isX = (i + 1) % 2 === 1;
+      return isX ? p + w / 2 : p + h / 2;
+    });
+  }
+  /**
+   * @description 初始化点位
+   */
+  function createPointers() {
+    return defaultMarks.map(([posx, posy]) => {
+      const currX = posx + w / 2,
+        currY = posy + h / 2;
       return {
         type: EleTypeEnums.BLOCK,
         option: {
-          anchor: [.5, .5],
-          size: [50, 50],
+          name: 'pointer',
+          anchor: [0.5, 0.5],
+          size: [w, h],
           border: [2, '#f40'],
-          borderRadius: 25,
-          pos
-        }
-      }
-    })
+          borderRadius: w / 2,
+          pos: [currX, currY],
+        },
+      };
+    });
   }
-  function handleMoveEvent(evt, elm) {
-    const move = getDirection([139, 229], [evt.x, evt.y])
-    console.log('move', move);
-    elm.attr({
-      pos: [evt.x, originPos[1]]
-    })
-    lineRef.current.attr('points', [...originPos, evt.x, originPos[1]])
-    console.log(lineRef.current.attr('points'));
-  }
+
   return (
     <>
       <div
@@ -109,4 +193,4 @@ const Delivery: FC<PropTypes> = function(props) {
     </>
   );
 };
-export default Delivery
+export default Delivery;

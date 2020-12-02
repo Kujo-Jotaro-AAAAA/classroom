@@ -7,32 +7,20 @@ export function determineDirection(origin: number[], curr: number[]): string {
 }
 
 /**
- * @description 生成12宫格棋盘, 依据point数量等分vp生成网格的坐标系
- * 范围坐标系[x, y]的二维数组, 及等分的尺寸
- * @param vp 视口[宽，高]
+ * @description 生成标记好的点
  */
-export function create12Checkerboard(
-  vp: [number, number] = [BASE_WIDTH, BASE_HEIGHT],
-) {
-  const copiesW = 4,
-    copiesH = 3,
-    [vpW, vpH] = vp,
-    equalW = vpW / copiesW,
-    equalH = vpH / copiesH,
-    pointers = [],
-    anchors = [];
-  for (let x = 0; x < copiesW; x++) {
-    for (let y = 0; y < copiesH; y++) {
-      pointers.push([x, y]);
-      anchors.push([equalW + x * equalW, equalH + equalH * y]);
+export function createMarks(): number[][] {
+  const xs = [66, 267, 464, 662, 864],
+    ys = [283, 408, 521, 645],
+    pointers = [];
+  for (let xi = 0; xi < xs.length; xi++) {
+    const xPointer = xs[xi];
+    for (let yi = 0; yi < ys.length; yi++) {
+      const yPointer = ys[yi];
+      pointers.push([xPointer, yPointer]);
     }
   }
-  return {
-    pointers, // 点位
-    equalW, // 等宽
-    equalH, // 等高
-    anchors, // 锚点
-  };
+  return pointers;
 }
 type PointerTypes = [number, number];
 /**
