@@ -58,7 +58,8 @@ const Delivery: FC<PropTypes> = function(props) {
         option: {
           name: 'line',
           pos: [0, 0],
-          // pos: defaultMarks[0],
+
+          // points: fixLineAnchor([...defaultMarks[0], ...defaultMarks[4], ...defaultMarks[5], ...defaultMarks[6]]),
           points: fixLineAnchor(defaultMarks[0]),
           strokeColor: '#F79674',
           lineWidth: 26,
@@ -72,7 +73,8 @@ const Delivery: FC<PropTypes> = function(props) {
         option: {
           name: 'move',
           anchor: [0.5, 0.5],
-          pos: [84 + moveW / 2, 289 + moveH / 2],
+          // pos: [84 + moveW / 2, 289 + moveH / 2],
+          pos: fixMoveAnchor([84, 289 ]),
           size: [moveW, moveH],
           texture: qiao,
           zIndex: 99,
@@ -165,7 +167,7 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param points
    */
   function handleLineEvent(lineElm, points: number[]) {
-    points[0] = points[0] - moveW;
+    // points[0] = points[0] - moveW;
     lineElm.attr('points', fixLineAnchor([...linePoints.current, ...points]));
   }
   /**
