@@ -7,6 +7,7 @@ import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
 import useComponents from '@/hooks/useComponents';
+import {debounce, throttle} from 'lodash';
 import { createMarks, getDirection } from './utils';
 import useCreateEle, {
   ElesConfig,
@@ -94,20 +95,14 @@ const Delivery: FC<PropTypes> = function(props) {
       ...createPointers(),
     ]);
   }
+  const throttleTouchMove = throttle(touchMove, 40)
   /**
-   * @description 为了使用hook, 在外面监听事件
+   * @description 处理移动
+   * @param evt
+   * @param param1
    */
-  function bindMoveListener() {
-    const list = findNamesByLayer(stage.layer, ['move', 'line']);
-    const pointerEles = findNamesByLayer(stage.layer, ['pointer']);
-    // console.log('pointerEles ==>', pointerEles);
-    if (list.length === 0) return;
-    const [move, line] = list;
-    if (!move) return;
-    // setLinePoints
-    move.addEventListener(EvtNameEnum.TOUCH_MOVE, evt => {
-      // console.log('xxxx', evt);
-      move.attr({
+  function touchMove(evt, {move, line, pointerEles}) {
+    move.attr({
         pos: [evt.x, evt.y],
       });
       const matchPointer = patternPointer([evt.x, evt.y], pointerEles);
@@ -115,22 +110,32 @@ const Delivery: FC<PropTypes> = function(props) {
         // 增加点位
         linePoints.current = linePoints.current.concat(matchPointer)
       }
-
-
-      handleMoveEvent(line, [evt.x, evt.y])
-    });
+      handleLineEvent(line, [evt.x, evt.y])
   }
-  function handleMoveEvent(lineElm, points: number[]) {
+  /**
+   * @description 为了使用hook, 在外面监听事件
+   */
+  function bindMoveListener() {
+    const list = findNamesByLayer(stage.layer, ['move', 'line']);
+    const pointerEles = findNamesByLayer(stage.layer, ['pointer']);
+    if (list.length === 0) return;
+    const [move, line] = list;
+    if (!move) return;
+    // setLinePoints
+    move.addEventListener(EvtNameEnum.TOUCH_MOVE,(evt) => throttleTouchMove(evt, {
+      move,
+      line,
+      pointerEles
+    }));
+  }
 
-    lineElm.attr('points', fixLineAnchor(linePoints.current))
-    // const points = fixLineAnchor([
-    //   ...defaultMarks[0],
-    //   ...defaultMarks[1],
-    //   ...defaultMarks[2],
-    //   defaultMarks[3][0],
-    //   evt.y,
-    // ]);
-    console.log(lineElm.attr('points'));
+  /**
+   * @description 处理线的移动
+   * @param lineElm
+   * @param points
+   */
+  function handleLineEvent(lineElm, points: number[]) {
+    lineElm.attr('points', fixLineAnchor([...linePoints.current, ...points]))
   }
   /**
    * @description 跟当前默认的节点位置匹配
