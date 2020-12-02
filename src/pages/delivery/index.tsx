@@ -3,14 +3,15 @@
  */
 import RewardModal from '@/components/rewardModal';
 import useComponents from '@/hooks/useComponents';
-import useCreateEle, {
-  EleTypeEnums,
-  EvtNameEnum
-} from '@/hooks/useCreateEle';
+import useCreateEle, { EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
 import useReward from '@/hooks/useReward';
 import useStage from '@/hooks/useStage';
 import { session } from '@/utils/store';
-import {success_color, success_border, success_color_rgb} from '@/utils/theme';
+import {
+  success_color,
+  success_border,
+  success_color_rgb,
+} from '@/utils/theme';
 import { throttle } from 'lodash';
 import React, { FC, useEffect, useRef } from 'react';
 import { createMarks, getPos } from './utils';
@@ -26,7 +27,9 @@ const Delivery: FC<PropTypes> = function(props) {
   const w = 93,
     h = 93, // 白色圆点的大小
     moveW = 60,
-    moveH = 80, activeBgColor = 'FFEEE4', activeBorderColor = 'F69472'; // 移动老虎的大小
+    moveH = 80,
+    activeBgColor = 'FFEEE4',
+    activeBorderColor = 'F69472'; // 移动老虎的大小
   const pointerElesRef = useRef<any[]>([]);
   const { stage } = useStage({
     elId: canvasId,
@@ -74,7 +77,7 @@ const Delivery: FC<PropTypes> = function(props) {
           name: 'move',
           anchor: [0.5, 0.5],
           // pos: [84 + moveW / 2, 289 + moveH / 2],
-          pos: fixMoveAnchor([84, 289 ]),
+          pos: fixMoveAnchor([84, 289]),
           size: [moveW, moveH],
           texture: qiao,
           zIndex: 99,
@@ -97,21 +100,25 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param evt
    * @param param1
    */
-  function touchMove({x, y}, { move, line, pointerEles }) {
-    if (isCompleted()) return
+  function touchMove({ x, y }, { move, line, pointerEles }) {
+    if (isCompleted()) return;
     const prev: [number, number] = [
       linePoints.current[linePoints.current.length - 2],
       linePoints.current[linePoints.current.length - 1],
     ];
-    // const dir = getCoordinate(prev, [evt.x, evt.y]);
-    // console.log('getPos', getPos(prev, [evt.x, evt.y]));
-
-    // const pos: [number, number] = [1, 4].includes(dir) ? [evt.x, prev[1]] : [prev[0], evt.y]
-    const {pos, coordinate} = getPos(prev, [x, y]);
-    // console.log('prev',JSON.stringify(prev),'pos',  JSON.stringify(pos));
+    const { pos, isX } = getPos(prev, [x, y]);
+    const movePos = [isX ? pos[0] - 40 : pos[0] + 20, isX ? pos[1] : pos[1] - 40],
+    linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40]
     handleAddPointer(pos, pointerEles);
-    move.attr('pos', fixMoveAnchor(pos));
-    handleLineEvent(line, pos);
+    console.log(
+      isX,
+      'movePos',
+      JSON.stringify(movePos),
+      'pos',
+      JSON.stringify(pos),
+    );
+    move.attr('pos', fixMoveAnchor(movePos));
+    handleLineEvent(line, linePos);
   }
   /**
    * @description 为了使用hook, 在外面监听事件
@@ -136,13 +143,13 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param param0
    * @param pointerEles
    */
-  function handleAddPointer([x, y], pointerEles) {
-    const {pattern, patternIndex} = patternPointer([x, y], pointerEles);
+  function handleAddPointer([x, y]: number[], pointerEles) {
+    const { pattern, patternIndex } = patternPointer([x, y], pointerEles);
     if (pattern) {
       // 已滑动到点位
       // 增加点位
       linePoints.current = linePoints.current.concat(pattern);
-      activeBg(patternIndex)
+      activeBg(patternIndex);
     }
   }
   /**
@@ -150,7 +157,7 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param idx
    */
   function activeBg(idx: number) {
-      console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
+    console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
     // if (pointerElesRef.current[idx].attr().bgcolor === success_color_rgb) {
     //   pointerElesRef.current[idx].removeAttribute('bgcolor')
     //   pointerElesRef.current[idx].removeAttribute('borderColor')
@@ -158,8 +165,8 @@ const Delivery: FC<PropTypes> = function(props) {
     // }
     pointerElesRef.current[idx].attr({
       bgcolor: success_color,
-      borderColor: success_border
-    })
+      borderColor: success_border,
+    });
   }
   /**
    * @description 处理线的移动
@@ -176,17 +183,17 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param pointer
    */
   function patternPointer([x, y], pointerEles) {
-    let patternIndex = undefined
-    const pattern =  defaultMarks.find((pointer, i) => {
+    let patternIndex = undefined;
+    const pattern = defaultMarks.find((pointer, i) => {
       if (pointerEles[i].isPointCollision(x, y)) {
-        patternIndex = i
-        return pointer
+        patternIndex = i;
+        return pointer;
       }
     });
     return {
       pattern,
-      patternIndex
-    }
+      patternIndex,
+    };
   }
   /**
    * @description 修正move的锚点
@@ -211,10 +218,12 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param pos
    */
   function isCompleted() {
-    let len = linePoints.current.length
-    if (len <=10 ) return false // 少于5个点，不校验
-    const lastPointer = linePoints.current.slice(len - 2)
-    return defaultMarks[defaultMarks.length - 1].every((m, i) => lastPointer[i] === m)
+    let len = linePoints.current.length;
+    if (len <= 10) return false; // 少于5个点，不校验
+    const lastPointer = linePoints.current.slice(len - 2);
+    return defaultMarks[defaultMarks.length - 1].every(
+      (m, i) => lastPointer[i] === m,
+    );
   }
   /**
    * @description 初始化点位
@@ -233,7 +242,7 @@ const Delivery: FC<PropTypes> = function(props) {
           borderRadius: w / 2,
           bgcolor: idx === 0 && success_color,
           pos: [currX, currY],
-          zIndex: 21
+          zIndex: 21,
         },
       };
     });

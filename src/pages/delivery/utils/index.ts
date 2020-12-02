@@ -87,5 +87,6 @@ export function getPos(oPoint: PointerTypes, currPonit: PointerTypes) {
   return {
     coordinate,
     pos,
+    isX,
   };
 }
