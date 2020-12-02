@@ -31,6 +31,7 @@ const Delivery: FC<PropTypes> = function(props) {
     activeBgColor = 'FFEEE4',
     activeBorderColor = 'F69472'; // 移动老虎的大小
   const pointerElesRef = useRef<any[]>([]);
+  const moveElmsRef = useRef<any[]>([]);
   const { stage } = useStage({
     elId: canvasId,
   });
@@ -39,7 +40,9 @@ const Delivery: FC<PropTypes> = function(props) {
   });
   const { createHorn, createQuestionLabel } = useComponents();
   const defaultMarks = createMarks(),
-    linePoints = useRef<number[]>(defaultMarks[0]); // 线的锚点
+    linePoints = useRef<number[]>(defaultMarks[0]), // 线的锚点
+    disabledPointer = [1, 6, 8, 10, 11, 15, 17], // 禁用的点位
+    disabledRef = useRef([])
   useEffect(() => {
     initPage();
     return () => {
@@ -51,49 +54,7 @@ const Delivery: FC<PropTypes> = function(props) {
     bindMoveListener();
   }, [stage?.layer, elements]);
 
-  function initPage() {
-    setEles([
-      createHorn(),
-      createQuestionLabel('巧虎想去看大熊猫，请你试试看哪条路线才是正确的呢?'),
-      {
-        // 线
-        type: EleTypeEnums.POLYLINE,
-        option: {
-          name: 'line',
-          pos: [0, 0],
 
-          // points: fixLineAnchor([...defaultMarks[0], ...defaultMarks[4], ...defaultMarks[5], ...defaultMarks[6]]),
-          points: fixLineAnchor(defaultMarks[0]),
-          strokeColor: '#F79674',
-          lineWidth: 26,
-          smooth: true,
-          zIndex: 20,
-        },
-      },
-      {
-        // 拖动，巧虎
-        type: EleTypeEnums.SPRITE,
-        option: {
-          name: 'move',
-          anchor: [0.5, 0.5],
-          // pos: [84 + moveW / 2, 289 + moveH / 2],
-          pos: fixMoveAnchor([84, 289]),
-          size: [moveW, moveH],
-          texture: qiao,
-          zIndex: 99,
-        },
-      },
-      {
-        type: EleTypeEnums.SPRITE,
-        option: {
-          texture: bg,
-          size: [1024, 535.25],
-          pos: [0, 233],
-        },
-      },
-      ...createPointers(),
-    ]);
-  }
   const throttleTouchMove = throttle(touchMove, 40);
   /**
    * @description 处理移动
@@ -101,42 +62,75 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param param1
    */
   function touchMove({ x, y }, { move, line, pointerEles }) {
-    if (isCompleted()) return;
+    if (isCompleted())  return
+    console.log('disabledRef.current', isDisabledPos(x, y));
+    if (isDisabledPos(x, y)) {
+      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
+      return
+    }
+    // {
+    //   move.releaseMouseCapture()
+    // };
     const prev: [number, number] = [
       linePoints.current[linePoints.current.length - 2],
       linePoints.current[linePoints.current.length - 1],
     ];
     const { pos, isX } = getPos(prev, [x, y]);
-    const movePos = [isX ? pos[0] - 40 : pos[0] + 20, isX ? pos[1] : pos[1] - 40],
-    linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40]
+    const movePos = [
+        isX ? pos[0] - 40 : pos[0] + 20,
+        isX ? pos[1] : pos[1] - 40,
+      ],
+      linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40];
     handleAddPointer(pos, pointerEles);
-    console.log(
-      isX,
-      'movePos',
-      JSON.stringify(movePos),
-      'pos',
-      JSON.stringify(pos),
-    );
+    // console.log(
+    //   isX,
+    //   'movePos',
+    //   JSON.stringify(movePos),
+    //   'pos',
+    //   JSON.stringify(pos),
+    // );
     move.attr('pos', fixMoveAnchor(movePos));
     handleLineEvent(line, linePos);
+  }
+  function isDisabledPos(x, y) {
+    let flag = false
+    disabledRef.current.forEach(dElm => {
+      if (dElm.isPointCollision(x, y)) {
+        flag = true
+      }
+    })
+    return flag
   }
   /**
    * @description 为了使用hook, 在外面监听事件
    */
   function bindMoveListener() {
-    const list = findNamesByLayer(stage.layer, ['move', 'line']);
+    moveElmsRef.current = findNamesByLayer(stage.layer, ['move', 'line']);
     pointerElesRef.current = findNamesByLayer(stage.layer, ['pointer']);
-    if (list.length === 0) return;
-    const [move, line] = list;
+    bindDisabledElms()
+    if (moveElmsRef.current.length === 0) return;
+    const [move] = moveElmsRef.current;
     if (!move) return;
-    // setLinePoints
-    move.addEventListener(EvtNameEnum.TOUCH_MOVE, evt =>
-      throttleTouchMove(evt, {
+    move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
+    move.addEventListener(EvtNameEnum.TOUCH_END, (evt) => {
+        move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
+    });
+  }
+  function moveEventListener(evt) {
+    const [move, line] = moveElmsRef.current;
+    throttleTouchMove(evt, {
         move,
         line,
         pointerEles: pointerElesRef.current,
-      }),
-    );
+      })
+  }
+  /**
+   * @description 绑定禁止走的点位
+   */
+  function bindDisabledElms() {
+    disabledRef.current = disabledPointer.map(idx => {
+      return pointerElesRef.current[idx]
+    })
   }
   /**
    * @description 处理节点匹配成功添加节点事件
@@ -247,7 +241,49 @@ const Delivery: FC<PropTypes> = function(props) {
       };
     });
   }
+  function initPage() {
+    setEles([
+      createHorn(),
+      createQuestionLabel('巧虎想去看大熊猫，请你试试看哪条路线才是正确的呢?'),
+      {
+        // 线
+        type: EleTypeEnums.POLYLINE,
+        option: {
+          name: 'line',
+          pos: [0, 0],
 
+          // points: fixLineAnchor([...defaultMarks[0], ...defaultMarks[4], ...defaultMarks[5], ...defaultMarks[6]]),
+          points: fixLineAnchor(defaultMarks[0]),
+          strokeColor: '#F79674',
+          lineWidth: 26,
+          smooth: true,
+          zIndex: 20,
+        },
+      },
+      {
+        // 拖动，巧虎
+        type: EleTypeEnums.SPRITE,
+        option: {
+          name: 'move',
+          anchor: [0.5, 0.5],
+          // pos: [84 + moveW / 2, 289 + moveH / 2],
+          pos: fixMoveAnchor([84, 289]),
+          size: [moveW, moveH],
+          texture: qiao,
+          zIndex: 99,
+        },
+      },
+      {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: bg,
+          size: [1024, 535.25],
+          pos: [0, 233],
+        },
+      },
+      ...createPointers(),
+    ]);
+  }
   return (
     <>
       <div
