@@ -30,7 +30,7 @@ const Delivery: FC<PropTypes> = function(props) {
     moveH = 80,
     activeBgColor = 'FFEEE4',
     activeBorderColor = 'F69472'; // 移动老虎的大小
-  const pointerElesRef = useRef<any[]>([]);
+  const pointerElesRef = useRef<any[]>([]); // 圆点elm
   const moveElmsRef = useRef<any[]>([]);
   const { stage } = useStage({
     elId: canvasId,
@@ -42,7 +42,26 @@ const Delivery: FC<PropTypes> = function(props) {
   const defaultMarks = createMarks(),
     linePoints = useRef<number[]>(defaultMarks[0]), // 线的锚点
     disabledPointer = [1, 6, 8, 10, 11, 15, 17], // 禁用的点位
-    disabledRef = useRef([])
+    disabledRef = useRef([]),
+    coordinateMap = { // 可用象限映射
+      0: [1],
+      // 1: [1,3],
+      2: [1,3],
+      3: [3],
+      // 第二排
+      4: [2,1],
+      7: [4, 3],
+      // 第三排
+      8: [2, 1],
+      // 11: [4,3],
+      // 第四排
+      12: [2, 1],
+      // 15: [4,3],
+      // 第五排
+      16: [2],
+      // 17: [4,2],
+      18: [4,2],
+    }
   useEffect(() => {
     initPage();
     return () => {
@@ -63,35 +82,49 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function touchMove({ x, y }, { move, line, pointerEles }) {
     if (isCompleted())  return
-    console.log('disabledRef.current', isDisabledPos(x, y));
-    if (isDisabledPos(x, y)) {
+    if (isDisabledPos(x, y)) { // 障碍物, 去除
       move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
       return
     }
-    // {
-    //   move.releaseMouseCapture()
-    // };
     const prev: [number, number] = [
       linePoints.current[linePoints.current.length - 2],
       linePoints.current[linePoints.current.length - 1],
     ];
-    const { pos, isX } = getPos(prev, [x, y]);
+    const { pos, isX, distance, coordinate } = getPos(prev, [x, y]);
+    // console.log('xiangxian', distance, coordinate);
+    if (handleDir(coordinate, prev, pointerEles) === false)  return
     const movePos = [
         isX ? pos[0] - 40 : pos[0] + 20,
         isX ? pos[1] : pos[1] - 40,
       ],
       linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40];
     handleAddPointer(pos, pointerEles);
-    // console.log(
-    //   isX,
-    //   'movePos',
-    //   JSON.stringify(movePos),
-    //   'pos',
-    //   JSON.stringify(pos),
-    // );
     move.attr('pos', fixMoveAnchor(movePos));
     handleLineEvent(line, linePos);
   }
+  /**
+   * @description 判断可使用的方向
+   * 通过当前原点位置和象限表的比对，限制拖动的象限
+   */
+  function handleDir(coordinate, originPos, pointerEles) {
+    let index;
+    if (linePoints.current.length === 2) { // 初始点位
+      index = 0
+    }
+    const pointIndex = defaultMarks.findIndex(marks => {
+      return marks.every((p, i) => p === originPos[i])
+    })
+    if (pointIndex !== -1) {
+      index = pointIndex
+    }
+    if (!index || !coordinateMap[index]) return
+    return coordinateMap[index].includes(coordinate)
+  }
+  /**
+   * @description 路障禁止通行
+   * @param x
+   * @param y
+   */
   function isDisabledPos(x, y) {
     let flag = false
     disabledRef.current.forEach(dElm => {
@@ -151,7 +184,7 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param idx
    */
   function activeBg(idx: number) {
-    console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
+    // console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
     // if (pointerElesRef.current[idx].attr().bgcolor === success_color_rgb) {
     //   pointerElesRef.current[idx].removeAttribute('bgcolor')
     //   pointerElesRef.current[idx].removeAttribute('borderColor')

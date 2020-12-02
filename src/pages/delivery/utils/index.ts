@@ -50,10 +50,10 @@ export function getCoordinateToList(
 /**
  * @description 通过getCoordinateToList方法解析四象限
  * 象限决定了方向:
- * 1: ↑→
- * 2: ↑←
- * 3: ←↓
- * 4: ↓→
+ * 1: ↓→
+ * 2: ←↓
+ * 3: ↑→
+ * 4: ↑→
  * @param coordinate
  */
 export function getCoordinate(oPoint: PointerTypes, currPonit: PointerTypes) {
@@ -88,5 +88,9 @@ export function getPos(oPoint: PointerTypes, currPonit: PointerTypes) {
     coordinate,
     pos,
     isX,
+    distance: {
+      x: xDistance,
+      y: yDistance
+    }
   };
 }
