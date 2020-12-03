@@ -124,7 +124,7 @@ const Part: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getStarFn(getSessionReply())} onClose={onClose} />
+      <RewardModal visible={visible} reload star={getStarFn(getSessionReply())} onClose={onClose} />
     </>
   );
 };

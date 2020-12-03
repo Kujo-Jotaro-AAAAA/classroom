@@ -10,8 +10,9 @@ interface PropTypes {
   visible: boolean;
   onClose?: () => void;
   needNextStep?: boolean // 是否需要调用原生, 默认需要
+  reload?: boolean // 切换路由的时候无法更新页面, true会刷新页面
 }
-const ResultModal: FC<PropTypes> = function({ star, visible, onClose, needNextStep = true }) {
+const ResultModal: FC<PropTypes> = function({ star, visible,reload, onClose, needNextStep = true }) {
   useEffect(() => {
     if (visible) {
       setTimeout(() => {
@@ -22,6 +23,7 @@ const ResultModal: FC<PropTypes> = function({ star, visible, onClose, needNextSt
   function closeModel() {
     if (needNextStep) {
       NEXT_STEP()
+      reload && location.reload()
     }
     onClose()
   }
