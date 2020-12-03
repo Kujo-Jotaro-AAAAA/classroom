@@ -83,17 +83,17 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function touchMove({ x, y }, { move, line, pointerEles }) {
     if (isCompleted())  return
-
     const prev: [number, number] = [
       linePoints.current[linePoints.current.length - 2],
       linePoints.current[linePoints.current.length - 1],
     ];
-    const { pos, isX, distance, coordinate } = getPos(prev, [x, y]);
-    if (isDisabledPos(pos[0], pos[1])) { // 障碍物, 去除
+
+    const { pos, isX, coordinate } = getPos(prev, [x, y]);
+    console.log(JSON.stringify(prev), JSON.stringify(pos), linePoints.current);
+    if (isDisabledPos(pos[0], pos[1])) { // 障碍物, 去除事件监听(在touchENd时加回来)
       move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
       return
     }
-    // console.log('xiangxian', distance, coordinate);
     if (handleDir(coordinate, prev, pointerEles) === false)  return
     const movePos = [
         isX ? pos[0] - 40 : pos[0] + 20,
@@ -101,8 +101,8 @@ const Delivery: FC<PropTypes> = function(props) {
       ],
       linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40];
     handleAddPointer(pos, pointerEles);
-    move.attr('pos', fixMoveAnchor(movePos));
     handleLineEvent(line, linePos);
+    move.attr('pos', fixMoveAnchor(movePos));
   }
   /**
    * @description 判断可使用的方向
@@ -175,6 +175,8 @@ const Delivery: FC<PropTypes> = function(props) {
   function handleAddPointer([x, y]: number[], pointerEles) {
     const { pattern, patternIndex } = patternPointer([x, y], pointerEles);
     if (pattern) {
+      console.log('pattern', linePoints.current, pattern);
+
       // 已滑动到点位
       // 增加点位
       linePoints.current = linePoints.current.concat(pattern);
