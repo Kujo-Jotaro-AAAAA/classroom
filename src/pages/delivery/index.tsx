@@ -15,9 +15,10 @@ import {
 import { throttle } from 'lodash';
 import React, { FC, useEffect, useRef } from 'react';
 import { createMarks, getPos } from './utils';
-const [bg, qiao] = [
+const [bg, qiao, back] = [
   require('./assets/bg.png'),
   require('./assets/qiao@2x.png'),
+  require('./assets/back@2x.png'),
 ];
 const canvasId = 'delivery-container';
 interface PropTypes {}
@@ -314,8 +315,46 @@ const Delivery: FC<PropTypes> = function(props) {
           pos: [0, 233],
         },
       },
+      {
+        type: EleTypeEnums.SPRITE,
+        option: {
+          texture: back,
+          size: [53, 53],
+          pos: [911, 167],
+        },
+        evt: [{
+          type: EvtNameEnum.CLICK,
+          callback: () => {
+            reset()
+          }
+        }]
+      },
       ...createPointers(),
     ]);
+  }
+  /**
+   * @description 重置页面
+   */
+  function reset() {
+    location.reload()
+    // linePoints.current = defaultMarks[0]
+    // const [move, line] = moveElmsRef.current
+    // move.attr({
+    //   pos: fixMoveAnchor([84, 289]),
+    //   size: [moveW, moveH],
+    // })
+    // line.attr({
+    //   points: fixLineAnchor(defaultMarks[0]),
+    // })
+    // pointerElesRef.current.forEach((elm, idx) => {
+    //   if (idx !== 0) {
+    //     elm.removeAttribute('bgcolor')
+    //     // elm.removeAttribute('borderColor')
+    //     elm.attr({
+    //       border: [0, '#fff']
+    //     })
+    //   }
+    // })
   }
   return (
     <>
