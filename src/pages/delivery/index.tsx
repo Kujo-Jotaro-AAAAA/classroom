@@ -83,15 +83,16 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function touchMove({ x, y }, { move, line, pointerEles }) {
     if (isCompleted())  return
-    if (isDisabledPos(x, y)) { // 障碍物, 去除
-      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
-      return
-    }
+
     const prev: [number, number] = [
       linePoints.current[linePoints.current.length - 2],
       linePoints.current[linePoints.current.length - 1],
     ];
     const { pos, isX, distance, coordinate } = getPos(prev, [x, y]);
+    if (isDisabledPos(pos[0], pos[1])) { // 障碍物, 去除
+      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
+      return
+    }
     // console.log('xiangxian', distance, coordinate);
     if (handleDir(coordinate, prev, pointerEles) === false)  return
     const movePos = [
@@ -129,7 +130,7 @@ const Delivery: FC<PropTypes> = function(props) {
   function isDisabledPos(x, y) {
     let flag = false
     disabledRef.current.forEach(dElm => {
-      if (dElm.isPointCollision(x, y)) {
+      if (dElm.isPointCollision(x + 20, y + 20)) {
         flag = true
       }
     })
