@@ -14,7 +14,7 @@ import {
 } from '@/utils/theme';
 import { throttle } from 'lodash';
 import React, { FC, useEffect, useRef } from 'react';
-import { createMarks, getPos } from './utils';
+import { defaultMarks, getPos, findLinePointsIndex, coordinateMap } from './utils';
 const [bg, qiao, back] = [
   require('./assets/bg.png'),
   require('./assets/qiao@2x.png'),
@@ -28,9 +28,7 @@ const Delivery: FC<PropTypes> = function(props) {
   const w = 93,
     h = 93, // 白色圆点的大小
     moveW = 60,
-    moveH = 80,
-    activeBgColor = 'FFEEE4',
-    activeBorderColor = 'F69472'; // 移动老虎的大小
+    moveH = 80
   const pointerElesRef = useRef<any[]>([]); // 圆点elm
   const moveElmsRef = useRef<any[]>([]);
   const { stage } = useStage({
@@ -40,29 +38,9 @@ const Delivery: FC<PropTypes> = function(props) {
     stage,
   });
   const { createHorn, createQuestionLabel } = useComponents();
-  const defaultMarks = createMarks(),
-    linePoints = useRef<number[]>(defaultMarks[0]), // 线的锚点
+  const linePoints = useRef<number[][]>([defaultMarks[0]]), // 线的锚点
     disabledPointer = [1, 6, 8, 10, 11, 15, 17], // 禁用的点位
-    disabledRef = useRef([]),
-    coordinateMap = { // 可用象限映射
-      0: [1],
-      // 1: [1,3],
-      2: [1,3],
-      3: [3],
-      // 第二排
-      4: [2,1],
-      7: [4, 3],
-      // 第三排
-      8: [2, 1],
-      // 11: [4,3],
-      // 第四排
-      12: [2, 1],
-      // 15: [4,3],
-      // 第五排
-      16: [2],
-      // 17: [4,2],
-      18: [4,2],
-    }
+    disabledRef = useRef([])
   useEffect(() => {
     initPage();
     return () => {
@@ -74,7 +52,6 @@ const Delivery: FC<PropTypes> = function(props) {
     bindMoveListener();
   }, [stage?.layer, elements]);
 
-
   const throttleTouchMove = throttle(touchMove, 40);
   /**
    * @description 处理移动
@@ -82,24 +59,31 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param param1
    */
   function touchMove({ x, y }, { move, line, pointerEles }) {
-    if (isCompleted())  return
-    const prev: [number, number] = [
-      linePoints.current[linePoints.current.length - 2],
-      linePoints.current[linePoints.current.length - 1],
+    if (isCompleted()) return;
+    const prev = linePoints.current[linePoints.current.length - 1] as [
+      number,
+      number,
     ];
-
     const { pos, isX, coordinate } = getPos(prev, [x, y]);
-    console.log(JSON.stringify(prev), JSON.stringify(pos), linePoints.current);
-    if (isDisabledPos(pos[0], pos[1])) { // 障碍物, 去除事件监听(在touchENd时加回来)
-      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
-      return
-    }
-    if (handleDir(coordinate, prev, pointerEles) === false)  return
+    console.log('touchMove =>', JSON.stringify({
+      prev,
+      pos,
+      curr:  linePoints.current
+    }));
+
+    if (handleDir(coordinate, prev, pointerEles) === false) return;
+
     const movePos = [
         isX ? pos[0] - 40 : pos[0] + 20,
         isX ? pos[1] : pos[1] - 40,
       ],
       linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40];
+    if (isDisabledPos(movePos[0], movePos[1])) {
+      // 障碍物, 去除事件监听(在touchENd时加回来)
+      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
+      return;
+    }
+    splicePointer(prev, movePos);
     handleAddPointer(pos, pointerEles);
     handleLineEvent(line, linePos);
     move.attr('pos', fixMoveAnchor(movePos));
@@ -110,17 +94,18 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function handleDir(coordinate, originPos, pointerEles) {
     let index;
-    if (linePoints.current.length === 2) { // 初始点位
-      index = 0
+    if (linePoints.current.length === 1) {
+      // 初始点位
+      index = 0;
     }
     const pointIndex = defaultMarks.findIndex(marks => {
-      return marks.every((p, i) => p === originPos[i])
-    })
+      return marks.every((p, i) => p === originPos[i]);
+    });
     if (pointIndex !== -1) {
-      index = pointIndex
+      index = pointIndex;
     }
-    if (!index || !coordinateMap[index]) return
-    return coordinateMap[index].includes(coordinate)
+    if (!index || !coordinateMap[index]) return;
+    return coordinateMap[index].includes(coordinate);
   }
   /**
    * @description 路障禁止通行
@@ -128,13 +113,35 @@ const Delivery: FC<PropTypes> = function(props) {
    * @param y
    */
   function isDisabledPos(x, y) {
-    let flag = false
+    let flag = false;
     disabledRef.current.forEach(dElm => {
       if (dElm.isPointCollision(x + 20, y + 20)) {
-        flag = true
+        flag = true;
       }
-    })
-    return flag
+    });
+    return flag;
+  }
+  /**
+   * @description 如果当前移动的点比最后一个点小, 说明用户往回拖拽了，要去掉该点
+   */
+  function splicePointer(prevPos, pos) {
+    console.log(
+      JSON.stringify({
+        prevPos,
+        pos,
+      }),
+    );
+    if (linePoints.current.length === 1) return;
+    if (pos.some((p, i) => p < prevPos[i])) {
+      linePoints.current.pop();
+      pointerElesRef.current.forEach(elm => {
+        elm.removeAttribute('bgcolor');
+        elm.attr({
+          border: [0, '#fff'],
+        });
+      });
+      activeBg()
+    }
   }
   /**
    * @description 为了使用hook, 在外面监听事件
@@ -142,30 +149,30 @@ const Delivery: FC<PropTypes> = function(props) {
   function bindMoveListener() {
     moveElmsRef.current = findNamesByLayer(stage.layer, ['move', 'line']);
     pointerElesRef.current = findNamesByLayer(stage.layer, ['pointer']);
-    bindDisabledElms()
+    bindDisabledElms();
     if (moveElmsRef.current.length === 0) return;
     const [move] = moveElmsRef.current;
     if (!move) return;
     move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
-    move.addEventListener(EvtNameEnum.TOUCH_END, (evt) => {
-        move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener)
+    move.addEventListener(EvtNameEnum.TOUCH_END, evt => {
+      move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
     });
   }
   function moveEventListener(evt) {
     const [move, line] = moveElmsRef.current;
     throttleTouchMove(evt, {
-        move,
-        line,
-        pointerEles: pointerElesRef.current,
-      })
+      move,
+      line,
+      pointerEles: pointerElesRef.current,
+    });
   }
   /**
    * @description 绑定禁止走的点位
    */
   function bindDisabledElms() {
     disabledRef.current = disabledPointer.map(idx => {
-      return pointerElesRef.current[idx]
-    })
+      return pointerElesRef.current[idx];
+    });
   }
   /**
    * @description 处理节点匹配成功添加节点事件
@@ -174,29 +181,34 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function handleAddPointer([x, y]: number[], pointerEles) {
     const { pattern, patternIndex } = patternPointer([x, y], pointerEles);
-    if (pattern) {
-      console.log('pattern', linePoints.current, pattern);
-
+    if (pattern && !isRepeat(pattern)) {
       // 已滑动到点位
       // 增加点位
-      linePoints.current = linePoints.current.concat(pattern);
-      activeBg(patternIndex);
+      linePoints.current = linePoints.current.concat([pattern]);
+      activeBg();
     }
+  }
+  /**
+   * @description 是否重复了
+   * @param pos
+   */
+  function isRepeat(pos: number[]) {
+    return linePoints.current.find(ps => {
+      return ps.every((p, i) => p === pos[i]);
+    });
   }
   /**
    * @description 高亮已连接的点
    * @param idx
    */
-  function activeBg(idx: number) {
-    // console.log('bgcolor', pointerElesRef.current[idx].attr().bgcolor);
-    // if (pointerElesRef.current[idx].attr().bgcolor === success_color_rgb) {
-    //   pointerElesRef.current[idx].removeAttribute('bgcolor')
-    //   pointerElesRef.current[idx].removeAttribute('borderColor')
-    //   return
-    // }
-    pointerElesRef.current[idx].attr({
-      bgcolor: success_color,
-      borderColor: success_border,
+  function activeBg() {
+    const indexs = findLinePointsIndex(linePoints.current);
+    indexs.forEach(idx => {
+      pointerElesRef.current[idx].attr({
+        bgcolor: success_color,
+        border: [2, success_border]
+        // borderColor: success_border,
+      });
     });
   }
   /**
@@ -206,7 +218,10 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function handleLineEvent(lineElm, points: number[]) {
     // points[0] = points[0] - moveW;
-    lineElm.attr('points', fixLineAnchor([...linePoints.current, ...points]));
+    lineElm.attr(
+      'points',
+      fixLineAnchor([...linePoints.current.flat(), ...points]),
+    );
   }
   /**
    * @description 是否跟当前默认的节点位置匹配
@@ -250,11 +265,11 @@ const Delivery: FC<PropTypes> = function(props) {
    */
   function isCompleted() {
     let len = linePoints.current.length;
-    if (len <= 10) return false; // 少于5个点，不校验
-    const lastPointer = linePoints.current.slice(len - 2);
-    return defaultMarks[defaultMarks.length - 1].every(
-      (m, i) => lastPointer[i] === m,
-    );
+    if (len <= 5) return false; // 少于5个点，不校验
+    const lastPointer = linePoints.current.slice(len - 1);
+    return defaultMarks[defaultMarks.length - 1]
+      .flat()
+      .every((m, i) => lastPointer.flat()[i] === m);
   }
   /**
    * @description 初始化点位
@@ -325,12 +340,14 @@ const Delivery: FC<PropTypes> = function(props) {
           size: [53, 53],
           pos: [911, 167],
         },
-        evt: [{
-          type: EvtNameEnum.CLICK,
-          callback: () => {
-            reset()
-          }
-        }]
+        evt: [
+          {
+            type: EvtNameEnum.CLICK,
+            callback: () => {
+              reset();
+            },
+          },
+        ],
       },
       ...createPointers(),
     ]);
@@ -339,7 +356,7 @@ const Delivery: FC<PropTypes> = function(props) {
    * @description 重置页面
    */
   function reset() {
-    location.reload()
+    location.reload();
     // linePoints.current = defaultMarks[0]
     // const [move, line] = moveElmsRef.current
     // move.attr({

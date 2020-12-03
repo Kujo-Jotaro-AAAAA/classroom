@@ -1,4 +1,24 @@
 import { BASE_WIDTH, BASE_HEIGHT } from '@/utils/detectOrient';
+export const coordinateMap = {
+  // 可用象限映射
+  0: [1],
+  // 1: [1,3],
+  2: [1, 3],
+  3: [3],
+  // 第二排
+  4: [2, 1],
+  7: [4, 3],
+  // 第三排
+  8: [2, 1],
+  // 11: [4,3],
+  // 第四排
+  12: [2, 1],
+  // 15: [4,3],
+  // 第五排
+  16: [2],
+  // 17: [4,2],
+  18: [4, 2],
+};
 /**
  * @description 判定点位与原点的方位
  */
@@ -22,6 +42,7 @@ export function createMarks(): number[][] {
   }
   return pointers;
 }
+export const defaultMarks = createMarks();
 type PointerTypes = [number, number];
 /**
  * @description 获取与原点的距离xy
@@ -83,14 +104,28 @@ export function getPos(oPoint: PointerTypes, currPonit: PointerTypes) {
   const coordinate = getCoordinate(oPoint, currPonit);
   const [xDistance, yDistance] = getXYToList(oPoint, currPonit),
     isX = Math.abs(xDistance) > Math.abs(yDistance);
-  const pos: [number, number] = isX ? [ox + xDistance , oy]: [ox, oy + yDistance]
+  const pos: [number, number] = isX
+    ? [ox + xDistance, oy]
+    : [ox, oy + yDistance];
   return {
     coordinate,
     pos,
     isX,
     distance: {
       x: xDistance,
-      y: yDistance
-    }
+      y: yDistance,
+    },
   };
+}
+/**
+ * @description 找到点在默认的marks里面的index
+ * @param linePoints
+ * @param posList
+ */
+export function findLinePointsIndex(posList: number[][]) {
+  return posList.map(pos => {
+    return defaultMarks.findIndex(marks => {
+      return marks.every((m, i) => m === pos[i]);
+    });
+  });
 }
