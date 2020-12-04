@@ -31,7 +31,7 @@ export default [
       // --== 游戏 ==--
       { path: '/game/findpark', component: '@/pages/game/findPark/index' },
       // 送货
-      { path: '/delivery', component: '@/pages/delivery/index' },
+      { path: '/delivery', component: '@/pages/delivery/index2' },
       // 调用原生页面
       { path: '/bridge', component: '@/pages/bridge/index' },
 

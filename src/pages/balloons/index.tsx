@@ -222,17 +222,17 @@ const Balloons: FC<PropTypes> = function(props) {
               // anchor: [0.5, 0.5],
               pos: [currPosX, initPosY],
             },
-            animates: [
-              {
-                animate: [{ pos: [currPosX, initPosY + 20] }],
-                config: {
-                  duration: 1200,
-                  easing: 'ease-in',
-                  direction: 'alternate',
-                  iterations: Infinity,
-                },
-              },
-            ],
+            // animates: [
+            //   {
+            //     animate: [{ pos: [currPosX, initPosY + 20] }],
+            //     config: {
+            //       duration: 1200,
+            //       easing: 'ease-in',
+            //       direction: 'alternate',
+            //       iterations: Infinity,
+            //     },
+            //   },
+            // ],
           }
         : {
             type: EleTypeEnums.BLOCK,

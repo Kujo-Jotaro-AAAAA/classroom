@@ -8,385 +8,510 @@ import useReward from '@/hooks/useReward';
 import useStage from '@/hooks/useStage';
 import { session } from '@/utils/store';
 import {
-  success_color,
-  success_border,
-  success_color_rgb,
+    success_color,
+    success_border,
+    success_color_rgb,
 } from '@/utils/theme';
+import config from 'config/config';
 import { throttle } from 'lodash';
 import React, { FC, useEffect, useRef } from 'react';
-import { defaultMarks, getPos, findLinePointsIndex, coordinateMap } from './utils';
+import { createMarks, getPos } from './utils';
 const [bg, qiao, back] = [
-  require('./assets/bg.png'),
-  require('./assets/qiao@2x.png'),
-  require('./assets/back@2x.png'),
+    require('./assets/bg.png'),
+    require('./assets/qiao@2x.png'),
+    require('./assets/back@2x.png'),
 ];
+
 const canvasId = 'delivery-container';
-interface PropTypes {}
+interface PropTypes { }
 const sessionKey = 'optionPos';
-const Delivery: FC<PropTypes> = function(props) {
-  const { visible, setVisible, onClose } = useReward();
-  const w = 93,
-    h = 93, // 白色圆点的大小
-    moveW = 60,
-    moveH = 80
-  const pointerElesRef = useRef<any[]>([]); // 圆点elm
-  const moveElmsRef = useRef<any[]>([]);
-  const { stage } = useStage({
-    elId: canvasId,
-  });
-  const { elements, setEles, findNamesByLayer } = useCreateEle({
-    stage,
-  });
-  const { createHorn, createQuestionLabel } = useComponents();
-  const linePoints = useRef<number[][]>([defaultMarks[0]]), // 线的锚点
-    disabledPointer = [1, 6, 8, 10, 11, 15, 17], // 禁用的点位
-    disabledRef = useRef([])
-  useEffect(() => {
-    initPage();
-    return () => {
-      return session.clear();
-    };
-  }, []);
-  useEffect(() => {
-    if (!stage?.layer) return;
-    bindMoveListener();
-  }, [stage?.layer, elements]);
+const Delivery: FC<PropTypes> = function (props) {
+    const { visible, setVisible, onClose } = useReward();
 
-  const throttleTouchMove = throttle(touchMove, 40);
-  /**
-   * @description 处理移动
-   * @param evt
-   * @param param1
-   */
-  function touchMove({ x, y }, { move, line, pointerEles }) {
-    if (isCompleted()) return;
-    const prev = linePoints.current[linePoints.current.length - 1] as [
-      number,
-      number,
-    ];
-    const { pos, isX, coordinate } = getPos(prev, [x, y]);
-    console.log('touchMove =>', JSON.stringify({
-      prev,
-      pos,
-      curr:  linePoints.current
-    }));
-
-    if (handleDir(coordinate, prev, pointerEles) === false) return;
-
-    const movePos = [
-        isX ? pos[0] - 40 : pos[0] + 20,
-        isX ? pos[1] : pos[1] - 40,
-      ],
-      linePos = [isX ? pos[0] - 40 : pos[0], isX ? pos[1] : pos[1] - 40];
-    if (isDisabledPos(movePos[0], movePos[1])) {
-      // 障碍物, 去除事件监听(在touchENd时加回来)
-      move.removeEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
-      return;
-    }
-    splicePointer(prev, movePos);
-    handleAddPointer(pos, pointerEles);
-    handleLineEvent(line, linePos);
-    move.attr('pos', fixMoveAnchor(movePos));
-  }
-  /**
-   * @description 判断可使用的方向
-   * 通过当前原点位置和象限表的比对，限制拖动的象限
-   */
-  function handleDir(coordinate, originPos, pointerEles) {
-    let index;
-    if (linePoints.current.length === 1) {
-      // 初始点位
-      index = 0;
-    }
-    const pointIndex = defaultMarks.findIndex(marks => {
-      return marks.every((p, i) => p === originPos[i]);
+    const { stage } = useStage({
+        elId: canvasId,
     });
-    if (pointIndex !== -1) {
-      index = pointIndex;
-    }
-    if (!index || !coordinateMap[index]) return;
-    return coordinateMap[index].includes(coordinate);
-  }
-  /**
-   * @description 路障禁止通行
-   * @param x
-   * @param y
-   */
-  function isDisabledPos(x, y) {
-    let flag = false;
-    disabledRef.current.forEach(dElm => {
-      if (dElm.isPointCollision(x + 20, y + 20)) {
-        flag = true;
-      }
+
+    const { elements, setEles, findNamesByLayer } = useCreateEle({
+        stage,
     });
-    return flag;
-  }
-  /**
-   * @description 如果当前移动的点比最后一个点小, 说明用户往回拖拽了，要去掉该点
-   */
-  function splicePointer(prevPos, pos) {
-    console.log(
-      JSON.stringify({
-        prevPos,
-        pos,
-      }),
-    );
-    if (linePoints.current.length === 1) return;
-    if (pos.some((p, i) => p < prevPos[i])) {
-      linePoints.current.pop();
-      pointerElesRef.current.forEach(elm => {
-        elm.removeAttribute('bgcolor');
-        elm.attr({
-          border: [0, '#fff'],
+
+    const { createHorn, createQuestionLabel } = useComponents();
+
+    useEffect(() => {
+        initPage();
+        return () => {
+            return session.clear();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!stage?.layer) return;
+        init([0, 0]);
+        bindEvents();
+
+        // setTimeout(() => {
+        //     commit([1, 0]);
+        // }, 1000);
+
+        // setTimeout(() => {
+        //     commit([1, 1]);
+        // }, 2000);
+
+        // setTimeout(() => {
+        //     commit([2, 1]);
+        // }, 3000);
+    }, [stage?.layer, elements]);
+
+    const configs = {
+        circle: {
+            coordinate: [
+                [[112, 330], [112, 455], [112, 568], [112, 692]],
+                [[313, 330], [313, 455], [313, 568], [313, 692]],
+                [[510, 330], [510, 455], [510, 568], [510, 692]],
+                [[709, 330], [709, 455], [709, 568], [709, 692]],
+                [[910, 330], [910, 455], [910, 568], [910, 692]],
+            ],
+            radius: 46,
+            border: { color: '#F69472', width: 2 },
+            color: '#FFEEE4',
+        },
+        blocks: [[0, 1], [1, 2], [2, 0], [2, 2], [2, 3], [3, 3], [4, 1]],
+        polyline: {
+            coordinate: [
+                [[112, 323], [112, 448], [112, 575], [112, 691]],
+                [[312, 323], [312, 448], [312, 575], [312, 691]],
+                [[511, 323], [511, 448], [511, 575], [511, 691]],
+                [[712, 323], [712, 448], [712, 575], [712, 691]],
+                [[910, 323], [910, 448], [910, 575], [910, 691]],
+            ],
+            width: 26,
+            color: '#F79674',
+        },
+        tiger: {
+            width: 60,
+            height: 80,
+        },
+        backward: {
+            width: 53,
+            height: 53,
+            coordinate: [911, 167],
+        },
+        background: {
+            width: 1024,
+            height: 535.25,
+            coordinate: [0, 233],
+        }
+    }
+
+    const state = {
+        circles: [],
+        polylines: [],
+        current: null,
+    }
+
+    let isEventBinded = false;
+    let isTouchMoveEnabled = true;
+
+    function bindEvents() {
+        const [tiger] = findNamesByLayer(stage.layer, ['tiger']);
+        if (tiger && !isEventBinded) {
+            tiger.addEventListener(EvtNameEnum.TOUCH_START, onTouchStarted);
+            tiger.addEventListener(EvtNameEnum.TOUCH_MOVE, throttle(onTouchMoving, 50));
+            tiger.addEventListener(EvtNameEnum.TOUCH_END, onTouchEnded);
+            isEventBinded = true;
+        }
+    }
+
+
+    /**
+     * 根据手指位置，计算得到象限代码
+     * @param pos 
+     * @param param1 
+     * 
+     * 象限说明：
+     * 
+     * ----------------------------------------------
+     * |        |        |   10   |        |        |
+     * ----------------------------------------------
+     * |        |   01   |   02   |   03   |        |
+     * ----------------------------------------------
+     * |   13   |   04   |   05   |   06   |   11   |
+     * ----------------------------------------------
+     * |        |   07   |   08   |   09   |        |
+     * ----------------------------------------------
+     * |        |        |   12   |        |        |
+     * ----------------------------------------------
+     * 
+     * 05: 正中央的圆圈范围
+     * 10: 上方相邻的圆圈范围
+     * 11: 右侧相邻的圆圈范围
+     * 12: 下方相邻的圆圈范围
+     * 13: 左侧相信的圆圈范围
+     * 04: 正在水平向左移动
+     * 06: 正在水平向右移动
+     * 02: 正在垂直向上移动
+     * 08: 正在垂直向下移动
+     * 
+     */
+    function getQuadrant(pos, { center, top, bottom, left, right }) {
+        const delta = 25;
+        const [anchorX, anchorY] = center;
+        const [posX, posY] = pos;
+
+        if (posX < anchorX - delta) {
+            if (posY < anchorY - delta) {
+                return 1;
+            } else if (posY > anchorY + delta) {
+                return 7;
+            } else {
+                if (left > 0 && posX < left + delta) {
+                    return 13;
+                } else {
+                    return 4;
+                }
+            }
+        } else if (posX > anchorX + delta) {
+            if (posY < anchorY - delta) {
+                return 3;
+            } else if (posY > anchorY + delta) {
+                return 9;
+            } else {
+                if (right > 0 && posX > right - delta) {
+                    return 11;
+                } else {
+                    return 6;
+                }
+            }
+        } else {
+            if (posY < anchorY - delta) {
+                if (top > 0 && posY < top + delta) {
+                    return 10;
+                } else {
+                    return 2;
+                }
+            } else if (posY > anchorY + delta) {
+                if (bottom > 0 && posY > bottom - delta) {
+                    return 12;
+                } else {
+                    return 8;
+                }
+            } else {
+                return 5;
+            }
+        }
+    }
+
+    function getAroundCoordinates() {
+        const [x, y] = state.current;
+        return {
+            center: configs.circle.coordinate[x][y],
+            top: y === 0 ? 0 : configs.circle.coordinate[x][y - 1][1],
+            bottom: y === 3 ? 0 : configs.circle.coordinate[x][y + 1][1],
+            left: x === 0 ? 0 : configs.circle.coordinate[x - 1][y][0],
+            right: x === 4 ? 0 : configs.circle.coordinate[x + 1][y][0],
+        }
+    }
+
+    function isBlock(posX, posY) {
+        let ret = false;
+        configs.blocks.forEach(([x, y]) => {
+            if (posX === x && posY === y) {
+                ret = true;
+            }
         });
-      });
-      activeBg()
+        return ret;
     }
-  }
-  /**
-   * @description 为了使用hook, 在外面监听事件
-   */
-  function bindMoveListener() {
-    moveElmsRef.current = findNamesByLayer(stage.layer, ['move', 'line']);
-    pointerElesRef.current = findNamesByLayer(stage.layer, ['pointer']);
-    bindDisabledElms();
-    if (moveElmsRef.current.length === 0) return;
-    const [move] = moveElmsRef.current;
-    if (!move) return;
-    move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
-    move.addEventListener(EvtNameEnum.TOUCH_END, evt => {
-      move.addEventListener(EvtNameEnum.TOUCH_MOVE, moveEventListener);
-    });
-  }
-  function moveEventListener(evt) {
-    const [move, line] = moveElmsRef.current;
-    throttleTouchMove(evt, {
-      move,
-      line,
-      pointerEles: pointerElesRef.current,
-    });
-  }
-  /**
-   * @description 绑定禁止走的点位
-   */
-  function bindDisabledElms() {
-    disabledRef.current = disabledPointer.map(idx => {
-      return pointerElesRef.current[idx];
-    });
-  }
-  /**
-   * @description 处理节点匹配成功添加节点事件
-   * @param param0
-   * @param pointerEles
-   */
-  function handleAddPointer([x, y]: number[], pointerEles) {
-    const { pattern, patternIndex } = patternPointer([x, y], pointerEles);
-    if (pattern && !isRepeat(pattern)) {
-      // 已滑动到点位
-      // 增加点位
-      linePoints.current = linePoints.current.concat([pattern]);
-      activeBg();
-    }
-  }
-  /**
-   * @description 是否重复了
-   * @param pos
-   */
-  function isRepeat(pos: number[]) {
-    return linePoints.current.find(ps => {
-      return ps.every((p, i) => p === pos[i]);
-    });
-  }
-  /**
-   * @description 高亮已连接的点
-   * @param idx
-   */
-  function activeBg() {
-    const indexs = findLinePointsIndex(linePoints.current);
-    indexs.forEach(idx => {
-      pointerElesRef.current[idx].attr({
-        bgcolor: success_color,
-        border: [2, success_border]
-        // borderColor: success_border,
-      });
-    });
-  }
-  /**
-   * @description 处理线的移动
-   * @param lineElm
-   * @param points
-   */
-  function handleLineEvent(lineElm, points: number[]) {
-    // points[0] = points[0] - moveW;
-    lineElm.attr(
-      'points',
-      fixLineAnchor([...linePoints.current.flat(), ...points]),
-    );
-  }
-  /**
-   * @description 是否跟当前默认的节点位置匹配
-   * 用点位的ele来判断是否进入，返回精确的默认点位
-   * @param pointer
-   */
-  function patternPointer([x, y], pointerEles) {
-    let patternIndex = undefined;
-    const pattern = defaultMarks.find((pointer, i) => {
-      if (pointerEles[i].isPointCollision(x, y)) {
-        patternIndex = i;
-        return pointer;
-      }
-    });
-    return {
-      pattern,
-      patternIndex,
-    };
-  }
-  /**
-   * @description 修正move的锚点
-   * @param pos
-   */
-  function fixMoveAnchor(pos: number[]) {
-    const [x, y] = pos;
-    return [x + moveW / 2, y + moveH / 2];
-  }
-  /**
-   * @description 修正线的锚点
-   * @param pointers
-   */
-  function fixLineAnchor(pointers: number[]) {
-    return pointers.map((p, i) => {
-      const isX = (i + 1) % 2 === 1;
-      return isX ? p + w / 2 : p + h / 2;
-    });
-  }
-  /**
-   * @description 是否已走完最后一个
-   * @param pos
-   */
-  function isCompleted() {
-    let len = linePoints.current.length;
-    if (len <= 5) return false; // 少于5个点，不校验
-    const lastPointer = linePoints.current.slice(len - 1);
-    return defaultMarks[defaultMarks.length - 1]
-      .flat()
-      .every((m, i) => lastPointer.flat()[i] === m);
-  }
-  /**
-   * @description 初始化点位
-   */
-  function createPointers() {
-    return defaultMarks.map(([posx, posy], idx) => {
-      const currX = posx + w / 2,
-        currY = posy + h / 2;
-      return {
-        type: EleTypeEnums.BLOCK,
-        option: {
-          name: 'pointer',
-          anchor: [0.5, 0.5],
-          size: [w, h],
-          border: [2, idx === 0 && success_border],
-          borderRadius: w / 2,
-          bgcolor: idx === 0 && success_color,
-          pos: [currX, currY],
-          zIndex: 21,
-        },
-      };
-    });
-  }
-  function initPage() {
-    setEles([
-      createHorn(),
-      createQuestionLabel('巧虎想去看大熊猫，请你试试看哪条路线才是正确的呢?'),
-      {
-        // 线
-        type: EleTypeEnums.POLYLINE,
-        option: {
-          name: 'line',
-          pos: [0, 0],
 
-          // points: fixLineAnchor([...defaultMarks[0], ...defaultMarks[4], ...defaultMarks[5], ...defaultMarks[6]]),
-          points: fixLineAnchor(defaultMarks[0]),
-          strokeColor: '#F79674',
-          lineWidth: 26,
-          smooth: true,
-          zIndex: 20,
-        },
-      },
-      {
-        // 拖动，巧虎
-        type: EleTypeEnums.SPRITE,
-        option: {
-          name: 'move',
-          anchor: [0.5, 0.5],
-          // pos: [84 + moveW / 2, 289 + moveH / 2],
-          pos: fixMoveAnchor([84, 289]),
-          size: [moveW, moveH],
-          texture: qiao,
-          zIndex: 99,
-        },
-      },
-      {
-        type: EleTypeEnums.SPRITE,
-        option: {
-          texture: bg,
-          size: [1024, 535.25],
-          pos: [0, 233],
-        },
-      },
-      {
-        type: EleTypeEnums.SPRITE,
-        option: {
-          texture: back,
-          size: [53, 53],
-          pos: [911, 167],
-        },
-        evt: [
-          {
-            type: EvtNameEnum.CLICK,
-            callback: () => {
-              reset();
+    function onTouchStarted() {
+        isTouchMoveEnabled = true;
+    }
+
+    function onTouchMoving(e) {
+        if (!isTouchMoveEnabled) return;
+
+        const [tiger, walking] = findNamesByLayer(stage.layer, ['tiger', 'walking']);
+        const [x, y] = state.current;
+        const [anchorX, anchorY] = configs.circle.coordinate[x][y];
+        const [polyX, polyY] = configs.polyline.coordinate[x][y];
+        const quadrant = getQuadrant([e.x, e.y], getAroundCoordinates());
+
+        function revert() {
+            tiger.attr({ pos: [anchorX, anchorY] });
+            walking.attr({ points: [] });
+        }
+
+        function moveHorizontal() {
+            tiger.attr({ pos: [e.x, anchorY] });
+            walking.attr({ points: [polyX, polyY, e.x, polyY] });
+        }
+
+        function moveVertical() {
+            tiger.attr({ pos: [anchorX, e.y] });
+            walking.attr({ points: [polyX, polyY, polyX, e.y] });
+        }
+
+        if (tiger && walking) {
+            switch (quadrant) {
+                case 2:
+                    moveVertical();
+                    break;
+                case 6:
+                    moveHorizontal();
+                    break;
+                case 8:
+                    moveVertical();
+                    break;
+                case 4:
+                    moveHorizontal();
+                    break;
+                case 11:
+                    if (isBlock(x + 1, y)) {
+                        revert();
+                        isTouchMoveEnabled = false;
+                    } else {
+                        moveHorizontal();
+                        commit([x + 1, y]);
+                    }
+                    break;
+                case 10:
+                    if (isBlock(x, y - 1)) {
+                        revert();
+                        isTouchMoveEnabled = false;
+                    } else {
+                        moveVertical();
+                        commit([x, y - 1]);
+                    }
+                    break;
+                case 13:
+                    if (isBlock(x - 1, y)) {
+                        revert();
+                        isTouchMoveEnabled = false;
+                    } else {
+                        moveHorizontal();
+                        commit([x - 1, y]);
+                    }
+                    break;
+                case 12:
+                    if (isBlock(x, y + 1)) {
+                        revert()
+                        isTouchMoveEnabled = false;
+                    } else {
+                        moveVertical();
+                        commit([x, y + 1]);
+                    }
+                    break;
+                default:
+                    revert();
+                    break;
+            }
+        }
+    }
+
+    function onTouchEnded() {
+        const [tiger, walking] = findNamesByLayer(stage.layer, ['tiger', 'walking']);
+        const [x, y] = state.current;
+        const [anchorX, anchorY] = configs.circle.coordinate[x][y];
+        tiger.attr({ pos: [anchorX, anchorY] });
+        walking.attr({ points: [] });
+    }
+
+    function equals(pos1, pos2) {
+        if (pos1 === null || pos2 === null) {
+            return false;
+        }
+
+        return (pos1[0] === pos2[0] && pos1[1] === pos2[1])
+    }
+
+    function init([x, y]) {
+        state.current = [x, y];
+        state.circles = [];
+        state.polylines = [];
+        update();
+    }
+
+    function commit([x, y]) {
+        if (!equals([x, y], state.current)) {
+            if (state.circles.length === 0) {
+                state.circles.push([...state.current]);
+                state.polylines.push([...state.current]);
+                state.current = [x, y];
+            } else {
+                const circles = state.circles.pop();
+                const point = state.polylines.pop();
+                console.log(circles, x, y);
+                if (circles[0] === x && circles[1] === y) {
+                    state.current = [x, y];
+                } else {
+                    state.circles.push(circles);
+                    state.polylines.push(point);
+                    state.circles.push([...state.current]);
+                    state.polylines.push([...state.current]);
+                    state.current = [x, y];
+                }
+            }
+            console.log(state.circles.length)
+            update();
+        }
+    }
+
+    function update() {
+        const names = ['tiger', 'polyline'];
+        [...state.circles, state.current].forEach(([x, y]) => {
+            names.push(`circle-${x}-${y}`);
+        });
+
+        const [tiger, polyline, ...circles] = findNamesByLayer(stage.layer, names);
+
+        if (tiger) {
+            const pos = state.current;
+            tiger.attr({ pos: configs.circle.coordinate[pos[0]][pos[1]] });
+        }
+
+        if (polyline) {
+            const points = [];
+            [...state.polylines, state.current].forEach(([x, y]) => {
+                const pos = configs.polyline.coordinate[x][y];
+                points.push(pos[0], pos[1]);
+            });
+            polyline.attr({ points });
+        }
+
+        // 此处要优化
+        const all = [];
+        for (let x = 0; x < 5; x++) {
+            for (let y = 0; y < 4; y++) {
+                all.push(`circle-${x}-${y}`);
+            }
+        }
+
+        findNamesByLayer(stage.layer, all).forEach(c => {
+            c.attr({
+                bgcolor: null,
+                border: null,
+            })
+        })
+
+        if (circles) {
+            circles.forEach(c => {
+                c.attr({
+                    bgcolor: configs.circle.color,
+                    border: [configs.circle.border.width, configs.circle.border.color],
+                });
+            });
+        }
+    }
+
+    function circles() {
+        const settings = [];
+        const diameter = configs.circle.radius * 2;
+        configs.circle.coordinate.forEach((rows, x) => {
+            rows.forEach((cell, y) => {
+                settings.push({
+                    type: EleTypeEnums.BLOCK,
+                    option: {
+                        name: `circle-${x}-${y}`,
+                        anchor: [0.5, 0.5],
+                        size: [diameter, diameter],
+                        border: null,
+                        borderRadius: configs.circle.radius,
+                        bgcolor: null,
+                        pos: [...cell],
+                        zIndex: 21,
+                    },
+                })
+            })
+        })
+        return settings;
+    }
+
+    function initPage() {
+        setEles([
+            createHorn(),
+            createQuestionLabel('巧虎想去看大熊猫，请你试试看哪条路线才是正确的呢?'),
+            {
+                // 线
+                type: EleTypeEnums.POLYLINE,
+                option: {
+                    name: 'polyline',
+                    pos: [0, 0],
+                    points: [],
+                    strokeColor: configs.polyline.color,
+                    lineWidth: configs.polyline.width,
+                    smooth: true,
+                    zIndex: 20,
+                },
             },
-          },
-        ],
-      },
-      ...createPointers(),
-    ]);
-  }
-  /**
-   * @description 重置页面
-   */
-  function reset() {
-    location.reload();
-    // linePoints.current = defaultMarks[0]
-    // const [move, line] = moveElmsRef.current
-    // move.attr({
-    //   pos: fixMoveAnchor([84, 289]),
-    //   size: [moveW, moveH],
-    // })
-    // line.attr({
-    //   points: fixLineAnchor(defaultMarks[0]),
-    // })
-    // pointerElesRef.current.forEach((elm, idx) => {
-    //   if (idx !== 0) {
-    //     elm.removeAttribute('bgcolor')
-    //     // elm.removeAttribute('borderColor')
-    //     elm.attr({
-    //       border: [0, '#fff']
-    //     })
-    //   }
-    // })
-  }
-  return (
-    <>
-      <div
-        id={canvasId}
-        style={{
-          width: '100vw',
-          height: '100vh',
-        }}
-      />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
-    </>
-  );
+            {
+                // 线
+                type: EleTypeEnums.POLYLINE,
+                option: {
+                    name: 'walking',
+                    pos: [0, 0],
+                    points: [],
+                    strokeColor: configs.polyline.color,
+                    lineWidth: configs.polyline.width,
+                    smooth: true,
+                    zIndex: 21,
+                },
+            },
+            {
+                // 拖动，巧虎
+                type: EleTypeEnums.SPRITE,
+                option: {
+                    name: 'tiger',
+                    anchor: [0.5, 0.5],
+                    pos: [...configs.circle.coordinate[0][0]],
+                    size: [configs.tiger.width, configs.tiger.height],
+                    texture: qiao,
+                    zIndex: 99,
+                },
+            },
+            {
+                type: EleTypeEnums.SPRITE,
+                option: {
+                    texture: bg,
+                    size: [configs.background.width, configs.background.height],
+                    pos: [...configs.background.coordinate],
+                },
+            },
+            {
+                type: EleTypeEnums.SPRITE,
+                option: {
+                    texture: back,
+                    size: [configs.backward.width, configs.backward.height],
+                    pos: [...configs.backward.coordinate],
+                },
+                evt: [{
+                    type: EvtNameEnum.CLICK,
+                    callback: () => {
+                        reset()
+                    }
+                }]
+            },
+            ...circles(),
+        ]);
+    }
+
+    /**
+     * @description 重置页面
+     */
+    function reset() {
+        location.reload()
+    }
+
+    return (
+        <>
+            <div
+                id={canvasId}
+                style={{
+                    width: '100vw',
+                    height: '100vh',
+                }}
+            />
+            <RewardModal visible={visible} star={3} onClose={onClose} />
+        </>
+    );
 };
 export default Delivery;

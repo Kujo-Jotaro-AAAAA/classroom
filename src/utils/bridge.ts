@@ -69,20 +69,21 @@ export const SHOW_TOAST = () => {
   }
 }
 /**
+ * @description 添加硬币
+ * @param num
+ */
+export const ADD_COIN = (num) => {
+  try {
+    addCoin.postMessage(`${num}`)
+  } catch (error) {
+    console.log('showToast');
+  }
+}
+/**
  * @description 截图
  */
-// export const GET_PICTURE = () => {
-//   try {
-//     getLocalPicture.postMessage('getLocalPicture')
-//   } catch (error) {
-//     console.log('getLocalPicture');
-//   }
-// }
-// @ts-ignore
-export const GET_PICTURE = function getLocalPicture (path) {
-  // @ts-ignore
-  console.log(this);
-  return path
+export const GET_COIN = function getCoin (num) {
+  return num
 }
 
 export default {
@@ -91,7 +92,8 @@ export default {
   VOICE_RECORD_END,
   VOICE_RECORD_PLAY,
   NEXT_STEP,
-  GET_PICTURE,
+  GET_COIN,
+  ADD_COIN,
   VOICE_RECORD_COMPLETE,
   SHOW_TOAST
 }

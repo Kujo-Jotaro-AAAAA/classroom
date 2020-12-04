@@ -38,3 +38,6 @@ declare namespace voiceRecordComplete {
 declare namespace showToast {
   export function postMessage (str?: string): void
 }
+declare namespace addCoin {
+  export function postMessage (str: string): void
+}

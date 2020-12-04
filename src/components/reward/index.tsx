@@ -4,6 +4,7 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
+import {GET_COIN, ADD_COIN} from '@/utils/bridge';
 import {BASE_WIDTH, BASE_HEIGHT} from '@/utils/detectOrient';
 const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const icon = require('@/assets/reward-gold.png');
@@ -14,6 +15,11 @@ interface PropTypes {
   onCompleted?: () => void // 关闭
   // visible: boolean
   // onClose?: () => void
+}
+let coinNum = 0
+function getCoin (num) {
+  coinNum = num
+  return num
 }
 const Reward: FC<PropTypes> = function(props) {
   const { stage } = useStage({
@@ -34,9 +40,6 @@ const Reward: FC<PropTypes> = function(props) {
     });
     await setTimeout(() => {
       assets.animate.tiger.animate([
-        // {
-        //   y: BASE_HEIGHT
-        // },
         {
           y: BASE_HEIGHT - 269 / 2 + 50
         },
@@ -101,7 +104,8 @@ const Reward: FC<PropTypes> = function(props) {
       );
     }, initTime + 900)
     await setTimeout(() => {
-      assets.animate.coin.attr('text', 18 + props.star)
+      assets.animate.coin.attr('text', coinNum + props.star)
+      ADD_COIN(coinNum + props.star)
       props.onCompleted && props.onCompleted()
     }, initTime + 1100)
   }
@@ -215,7 +219,7 @@ const Reward: FC<PropTypes> = function(props) {
     const count = new Label({
       pos: [920, 43],
       fontSize: 18,
-      text: 18,
+      text: coinNum || 0,
       fillColor: '#fff',
     });
     const addNum = new Label({
