@@ -66,7 +66,7 @@ const Balloons: FC<PropTypes> = function(props) {
   function initPage() {
     setEles([
       ...createStep(2),
-      createHorn(),
+      createHorn('L0003'),
       {
         type: EleTypeEnums.LABEL,
         option: {

@@ -41,3 +41,6 @@ declare namespace showToast {
 declare namespace addCoin {
   export function postMessage (str: string): void
 }
+declare namespace playAudio {
+  export function postMessage (str: string): void
+}

@@ -73,7 +73,6 @@ const MultipleTmp: FC<PropTypes> = function({
   function initPage() {
     setEles([
       ...createNav(),
-      createHorn(),
       // createQuestionLabel('哪两把钥匙是一模一样的呢?点点看吧'),
       ...createOptions(),
       ...optionElmInit,

@@ -80,7 +80,18 @@ export const ADD_COIN = (num) => {
   }
 }
 /**
- * @description 截图
+ * @description 播放录音
+ * @param num
+ */
+export const PLAY_AUDIO = (num) => {
+  try {
+    playAudio.postMessage(`${num}`)
+  } catch (error) {
+    console.log('PLAY_AUDIO');
+  }
+}
+/**
+ * @description 获取硬币
  */
 export const GET_COIN = function getCoin (num) {
   return num
@@ -95,5 +106,6 @@ export default {
   GET_COIN,
   ADD_COIN,
   VOICE_RECORD_COMPLETE,
-  SHOW_TOAST
+  SHOW_TOAST,
+  PLAY_AUDIO
 }

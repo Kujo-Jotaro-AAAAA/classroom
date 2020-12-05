@@ -1,8 +1,9 @@
 /**
  * @description 封装常见canvas项配置
  */
-import { useState, useEffect, useRef } from 'react';
+// import { useState, useEffect, useRef } from 'react';
 import { ElesConfig, EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
+import {PLAY_AUDIO} from '@/utils/bridge';
 import { main_color } from '@/utils/theme';
 const [reloadHorn] = [require('@/assets/重播按钮.png')];
 interface PropTypes {}
@@ -12,7 +13,7 @@ export default function useComponents() {
   /**
    * @description 喇叭
    */
-  function createHorn(): ElesConfig {
+  function createHorn(audioName?: string): ElesConfig {
     return {
       type: EleTypeEnums.SPRITE,
       option: {
@@ -20,6 +21,12 @@ export default function useComponents() {
         pos: [922, 99],
         size: [41.86, 35.33],
       },
+      evt: [{
+        type: EvtNameEnum.CLICK,
+        callback: () => {
+          PLAY_AUDIO(audioName)
+        }
+      }]
     };
   }
   /**

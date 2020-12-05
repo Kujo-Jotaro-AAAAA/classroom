@@ -64,7 +64,7 @@ const FindPark: FC<PropTypes> = function(props) {
   }
   function renderPage() {
     setEles([
-      createHorn(),
+      createHorn('L0013'),
       createQuestionLabel('今天你是小侦探噢，请在游乐园中点出圆圈里的事物'),
       ...Layout(assetsMap),
       {

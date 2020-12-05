@@ -60,7 +60,7 @@ const Blocks: FC<PropTypes> = function(props) {
   }, []);
   function initPage() {
     setEles([
-      createHorn(),
+      createHorn('L0007'),
       {
         type: EleTypeEnums.LABEL,
         option: {

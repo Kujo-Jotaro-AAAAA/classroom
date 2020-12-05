@@ -91,7 +91,7 @@ const BearAndCar: FC = function() {
   }, [elements]);
   function initPage() {
     setEles([
-      createHorn(),
+      createHorn('L0004'),
       createQuestionLabel('这里有很多玩具熊和玩具车，你想按照什么样的规律来'),
       createSubQuestionLabel('排列呢？试试看吧!'),
       {

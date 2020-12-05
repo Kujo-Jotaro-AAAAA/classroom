@@ -21,6 +21,7 @@ interface PropTypes {
   },
   label: string // 题干
   answer: string
+  hornPath: string
   tmp: string
 }
 const Part: FC<PropTypes> = function(props) {
@@ -51,7 +52,7 @@ const Part: FC<PropTypes> = function(props) {
   }
   function initPage() {
     setEles([
-      createHorn(),
+      createHorn(props.hornPath),
       ...createNav(),
       {
         type: EleTypeEnums.LABEL,

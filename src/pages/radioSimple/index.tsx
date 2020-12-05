@@ -31,7 +31,7 @@ export interface PageOptionTypes {
 }
 const RadioGroup: React.FC = function(props) {
   const [tmp, setTmp] = useState<string>(),
-    { createQuestionLabel, createStep } = useComponents(),
+    { createQuestionLabel, createStep, createHorn } = useComponents(),
     [pageOption, setPageOption] = useState<PageOptionTypes>();
   useEffect(() => {
     init();

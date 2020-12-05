@@ -32,7 +32,7 @@ export interface PageOptionTypes {
 
 }
 const RadioGroup: React.FC = function(props) {
-  const { createQuestionLabel, createStep } = useComponents(),
+  const { createQuestionLabel, createHorn } = useComponents(),
     [pageOption, setPageOption] = useState<PageOptionTypes>();
   useEffect(() => {
     init();
@@ -43,6 +43,7 @@ const RadioGroup: React.FC = function(props) {
       colorKey: {
         // 只有蘑菇和胡萝卜
         optionElmInit: [
+          createHorn('L0011'),
           createQuestionLabel('哪两把钥匙是一模一样的呢？点点看吧'),
           ...createImgs(),
         ],
@@ -51,6 +52,7 @@ const RadioGroup: React.FC = function(props) {
       },
       robot: {
         optionElmInit: [
+          createHorn('L0012'),
           createQuestionLabel('哪两个机器人是一模一样的呢？点点看吧'),
           ...createImgs(),
         ],
