@@ -6,6 +6,7 @@ import useComponents from '@/hooks/useComponents';
 import useCreateEle, { EleTypeEnums, EvtNameEnum } from '@/hooks/useCreateEle';
 import useReward from '@/hooks/useReward';
 import useStage from '@/hooks/useStage';
+// import {PLAY_AUDIO} from '@/utils/bridge';
 import { session } from '@/utils/store';
 import { throttle } from 'lodash';
 import React, { FC, useEffect } from 'react';
@@ -121,7 +122,7 @@ const configs = {
 };
 
 const Delivery: FC<PropTypes> = function(props) {
-  const { visible, onClose } = useReward();
+  const { visible, onClose, getSessionStar, setVisible } = useReward();
   const { stage } = useStage({ elId });
   const { elements, setEles, findNamesByLayer } = useCreateEle({ stage });
   const { createHorn, createQuestionLabel } = useComponents();
@@ -658,12 +659,13 @@ const Delivery: FC<PropTypes> = function(props) {
 
   function onSuccess() {
     console.log('You have done!');
+    setVisible(true)
   }
 
   return (
     <>
       <div id={elId} style={{ width: '100vw', height: '100vh' }} />
-      <RewardModal visible={visible} star={3} onClose={onClose} />
+      <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
     </>
   );
 };
