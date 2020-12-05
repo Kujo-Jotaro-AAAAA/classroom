@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { session } from '@/utils/store';
-import {SHOW_TOAST} from '@/utils/bridge';
+import { PLAY_AUDIO} from '@/utils/bridge';
 export const replySessionKey = 'reply'
 interface PropTypes {
 }
@@ -33,7 +33,8 @@ export default function useReward() {
    * @param num
    */
   function setSessionReply (num: number) {
-    SHOW_TOAST()
+    PLAY_AUDIO('L0019') // 再想想
+    PLAY_AUDIO('SE0001') // 错误音效
     session.setKey(replySessionKey, String(num))
   }
   function addSessionReply() {

@@ -4,7 +4,7 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 import * as spritejs from 'spritejs';
 import useStage from '@/hooks/useStage';
-import {GET_COIN, ADD_COIN} from '@/utils/bridge';
+import {GET_COIN, ADD_COIN, PLAY_AUDIO} from '@/utils/bridge';
 import {BASE_WIDTH, BASE_HEIGHT} from '@/utils/detectOrient';
 const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const icon = require('@/assets/reward-gold.png');
@@ -29,6 +29,18 @@ const Reward: FC<PropTypes> = function(props) {
     if (!stage) return;
     init();
   }, [stage]);
+  useEffect(() => { // 播放对应的录音
+    const playAudioMap = {
+      3: 'L0020',
+      2: 'L0021',
+      1: 'L0022'
+    }
+
+    PLAY_AUDIO('SE0002') // 答题正确
+    PLAY_AUDIO('SE0003') // 金币进账
+    PLAY_AUDIO(playAudioMap[props.star])
+    // props.star
+  }, [])
   /**
    * @description 初始化页面
    */

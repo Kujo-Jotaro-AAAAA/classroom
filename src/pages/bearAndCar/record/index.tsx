@@ -190,6 +190,7 @@ const Record: FC<PropTypes> = function(props) {
             callback: (evt, elm, { stage }) => {
               // 停止录音
               Bridge.VOICE_RECORD_END();
+              Bridge.PLAY_AUDIO('SE0005') // 咻 音效
               console.log('stage ==>', stage);
               getFrequency(stage).forEach(e => {
                 e.remove();

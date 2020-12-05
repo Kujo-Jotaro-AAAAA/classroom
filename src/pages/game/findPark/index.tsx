@@ -13,7 +13,7 @@ import useCreateEle, {
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
 import Layout from './layout';
-import { SHOW_TOAST } from '@/utils/bridge';
+import { PLAY_AUDIO} from '@/utils/bridge';
 const canvasId = 'FindPark-container';
 const assetsMap = {
   glass: require('./assets/游泳池@2x.png'),
@@ -80,6 +80,7 @@ const FindPark: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm, {stage}) => {
+              PLAY_AUDIO('L0016')
               magClick(elm, stage.layer);
             },
           },
@@ -280,7 +281,8 @@ const FindPark: FC<PropTypes> = function(props) {
                 hideMask(stage.layer.children);
                 if (reply.includes(elm.name)) {
                   // 已经点过啦
-                  SHOW_TOAST();
+                  PLAY_AUDIO('L0015');
+                  PLAY_AUDIO('SE0006');
                   return;
                 }
                 const elms = findNameByLayer(stage.layer, item.name);
@@ -303,6 +305,7 @@ const FindPark: FC<PropTypes> = function(props) {
     }
   }, [reply]);
   function submit() {
+    PLAY_AUDIO('L0017')
     setVisible(true);
   }
   return (
