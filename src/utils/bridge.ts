@@ -81,11 +81,12 @@ export const ADD_COIN = (num) => {
 }
 /**
  * @description 播放录音
- * @param num
+ * @param name 录音文件名
+ * @param type 录音文件类型
  */
-export const PLAY_AUDIO = (num) => {
+export const PLAY_AUDIO = (name, type='wav') => {
   try {
-    playAudio.postMessage(`${num}`)
+    playAudio.postMessage(`${name}`)
   } catch (error) {
     console.log('PLAY_AUDIO');
   }

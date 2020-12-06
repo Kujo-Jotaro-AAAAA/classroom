@@ -37,6 +37,7 @@ const FindPark: FC<PropTypes> = function(props) {
   });
   const maskRef = useRef<any[]>();
   const [reply, setReply] = useState<string[]>([]); // 答题
+  const sourceRectIndex = useRef<number>(); // 答题
 
   // const answer = ['glass', 'rbt', 'car', 'eleph', 'kite']; // 答案
   useEffect(() => {
@@ -102,8 +103,8 @@ const FindPark: FC<PropTypes> = function(props) {
               },
             ],
             config: {
-              delay: 30000,
-              duration: 800,
+              delay: 3000,
+              duration: 1200,
               easing: 'ease-in',
               direction: 'alternate',
               iterations: 1,
@@ -172,10 +173,10 @@ const FindPark: FC<PropTypes> = function(props) {
         sourceRect: [1296, 625, ...doubtSize], // 裁剪的位置
       },
     };
-
     const unChioces = Object.keys(sourceMap).filter(k => !reply.includes(k)); // 过滤掉已选中
-    const randomIdx = Math.floor(Math.random() * unChioces.length);
-    const source = sourceMap[unChioces[2]];
+    createRectIndex(unChioces)
+    const randomIdx = sourceRectIndex.current
+    const source = sourceMap[unChioces[randomIdx]];
     // 选中一个提示
     if (!unChioces[randomIdx]) return [];
     return [unChioces[randomIdx]].map((unKey, idx) => {
@@ -202,6 +203,22 @@ const FindPark: FC<PropTypes> = function(props) {
         ],
       };
     });
+  }
+  /**
+   * @description 生成index
+   * @param unChioces
+   */
+  function createRectIndex(unChioces) {
+    let randomIdx = Math.floor(Math.random() * unChioces.length);
+    if (unChioces.length === 1) {
+      sourceRectIndex.current = randomIdx
+      return
+    }
+    if (sourceRectIndex.current === randomIdx) {
+      createRectIndex(unChioces)
+      return
+    }
+    sourceRectIndex.current = randomIdx
   }
   function hideMask(elms) {
     findMaskElm(elms).forEach(elm => elm.remove());

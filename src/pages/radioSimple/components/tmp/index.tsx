@@ -1,8 +1,8 @@
 /**
  * @description 零件
  */
-import React, { FC, useState, useEffect, useRef } from 'react';
-import { session } from '@/utils/store';
+import React, { FC, useEffect, useRef } from 'react';
+// import { session } from '@/utils/store';
 import RewardModal from '@/components/rewardModal';
 import useStage from '@/hooks/useStage';
 import useReward from '@/hooks/useReward';
@@ -22,6 +22,7 @@ interface PropTypes extends PageOptionItemTypes{
   // },
   // label: string // 题干
   // answer: string
+  tmp: string
 }
 const Part: FC<PropTypes> = function(props) {
   const { visible, setVisible, onClose,setSessionReply, getSessionReply, clearSessionReply, getStarFn } = useReward();
@@ -115,6 +116,9 @@ const Part: FC<PropTypes> = function(props) {
       })
     }, 1000)
   }
+  const reloadMap = {
+    sgb2: '/radiosimple?tmp=sgb'
+  }
   return (
     <>
       <div
@@ -124,7 +128,7 @@ const Part: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} reload star={getStarFn(getSessionReply())} onClose={onClose} />
+      <RewardModal visible={visible} reload={reloadMap[props.tmp]} star={getStarFn(getSessionReply())} onClose={onClose} />
     </>
   );
 };

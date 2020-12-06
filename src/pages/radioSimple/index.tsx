@@ -235,6 +235,6 @@ const RadioGroup: React.FC = function(props) {
   useEffect(() => {
     setTmp(queryTmp);
   }, []);
-  return <>{tmp && <TmpPage {...pageOption[tmp]} />}</>;
+  return <>{tmp && <TmpPage tmp={tmp} {...pageOption[tmp]} />}</>;
 };
 export default RadioGroup;
