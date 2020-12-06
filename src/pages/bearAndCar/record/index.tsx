@@ -12,6 +12,8 @@ import useCreateEle, {
   EleTypeEnums,
   EvtNameEnum,
 } from '@/hooks/useCreateEle';
+
+import { RECORD_TIME } from '@/utils/const';
 import { session } from '@/utils/store';
 const canvasId = 'record-container';
 const assetsMap = {
@@ -218,6 +220,7 @@ const Record: FC<PropTypes> = function(props) {
    * @description 学生录音
    */
   function createStudent(): ElesConfig[] {
+    const recordLen = session.getKey(RECORD_TIME) // 录音时长
     return [
       {
         // 学生的banner
@@ -259,7 +262,7 @@ const Record: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.LABEL,
         option: {
-          text: '10"',
+          text: `${'10'}"`,
           fillColor: '#fff',
           fontSize: 30,
           pos: [776, 405],

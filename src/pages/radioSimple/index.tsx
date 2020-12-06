@@ -50,6 +50,8 @@ const RadioGroup: React.FC = function(props) {
         // 只有蘑菇和胡萝卜
         optionElmInit: [
           createQuestionLabel('哪一组蔬菜是有规律排列的呢？点点看吧！'),
+          ...createNav(),
+
           ...createRMC(),
         ],
         answer: '0',
@@ -58,6 +60,8 @@ const RadioGroup: React.FC = function(props) {
         // 蘑菇胡萝卜玉米
         optionElmInit: [
           createQuestionLabel('哪一组蔬菜是有规律排列的呢？点点看吧！'),
+          ...createNav(),
+
           ...createRMC2(),
         ],
         answer: '1',

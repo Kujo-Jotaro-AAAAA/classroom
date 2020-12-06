@@ -3,11 +3,10 @@
  */
 import React, { FC, useEffect } from 'react';
 import styles from './styles/index.less';
-import Reward from '../reward';
+import Reward, {PropTypes as RewardProps} from '../reward';
 import { history } from 'umi';
 import { NEXT_STEP } from '@/utils/bridge';
-interface PropTypes {
-  star: 1 | 2 | 3; // 评分
+interface PropTypes extends RewardProps {
   visible: boolean;
   onClose?: () => void;
   needNextStep?: boolean; // 是否需要调用原生, 默认需要

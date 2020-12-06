@@ -11,11 +11,14 @@ const { Scene, Sprite, Gradient, Rect, Block, Label } = spritejs;
 const icon = require('@/assets/reward-gold.png');
 const flyIcon = require('@/assets/fly-reward-gold.png');
 const tigerIcon = require('@/assets/巧虎.png');
-interface PropTypes {
+export interface PropTypes {
   star: 1 | 2 | 3; // 评分
   onCompleted?: () => void // 关闭
   // visible: boolean
   // onClose?: () => void
+  audioConfig?: { // 音频选项
+    exclude: string[]
+  }
 }
 const Reward: FC<PropTypes> = function(props) {
   const { stage } = useStage({
@@ -27,17 +30,21 @@ const Reward: FC<PropTypes> = function(props) {
     init();
   }, [stage]);
   useEffect(() => { // 播放对应的录音
+    playAudios()
+  }, [])
+  function playAudios() {
     const playAudioMap = {
       3: 'L0020',
       2: 'L0021',
       1: 'L0022'
-    }
-
-    PLAY_AUDIO('SE0002') // 答题正确
-    PLAY_AUDIO('SE0003') // 金币进账
-    PLAY_AUDIO(playAudioMap[props.star])
-    // props.star
-  }, [])
+    };
+    [playAudioMap[props.star], 'SE0002', 'SE0003'].forEach(name => {
+      if (Array.isArray(props.audioConfig?.exclude)) {
+        if (props.audioConfig?.exclude.includes(name)) return
+      }
+      PLAY_AUDIO(name)
+    })
+  }
   /**
    * @description 初始化页面
    */

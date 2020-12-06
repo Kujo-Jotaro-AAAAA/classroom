@@ -117,6 +117,7 @@ const Part: FC<PropTypes> = function(props) {
     }, 1000)
   }
   const reloadMap = {
+    rmc: '/radiosimple?tmp=rmc2',
     sgb2: '/radiosimple?tmp=sgb'
   }
   return (

@@ -335,6 +335,9 @@ const FindPark: FC<PropTypes> = function(props) {
         visible={visible}
         star={getSessionStar()}
         onClose={onClose}
+        audioConfig={{
+          exclude: ['L0022']
+        }}
       />
     </>
   );
