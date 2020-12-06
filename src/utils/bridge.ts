@@ -53,9 +53,9 @@ export const NEXT_STEP = () => {
  */
 export const VOICE_RECORD_COMPLETE = () => {
   try {
-    voiceRecordComplete.postMessage('savePicture')
+    voiceRecordComplete.postMessage('voiceRecordComplete')
   } catch (error) {
-    console.log('savePicture');
+    console.log('voiceRecordComplete');
   }
 }
 /**
@@ -76,7 +76,7 @@ export const ADD_COIN = (num) => {
   try {
     addCoin.postMessage(`${num}`)
   } catch (error) {
-    console.log('showToast');
+    console.log('ADD_COIN');
   }
 }
 /**
@@ -88,7 +88,7 @@ export const PLAY_AUDIO = (name, type='wav') => {
   try {
     playAudio.postMessage(`${name}`)
   } catch (error) {
-    console.log('PLAY_AUDIO');
+    console.log('PLAY_AUDIO', `${name}.${type}`);
   }
 }
 /**

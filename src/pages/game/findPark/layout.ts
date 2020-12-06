@@ -45,9 +45,9 @@ function replyNotice(assetsMap): ElesConfig[] {
             pos: [bx + boxSize / 2, by + boxSize / 2],
             size: [boxSize, boxSize],
             zIndex: 999,
-            innerRadius: 42,
-            outerRadius: 50,
-            fillColor: '#f40',
+            innerRadius: 43,
+            outerRadius: 44,
+            fillColor: '#E92222',
             // anchor: [.5, .5]
             opacity: 0,
           },
