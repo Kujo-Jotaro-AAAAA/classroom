@@ -18,6 +18,7 @@ const ResultModal: FC<PropTypes> = function({
   reload,
   onClose,
   needNextStep = true,
+  audioConfig
 }) {
   useEffect(() => {
     if (visible) {
@@ -46,7 +47,7 @@ const ResultModal: FC<PropTypes> = function({
           className={styles['reward_modal']}
           // onClick={closeModel}
         >
-          <Reward star={star} />
+          <Reward audioConfig={audioConfig} star={star}  />
         </div>
       )}
     </>

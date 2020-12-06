@@ -9,7 +9,6 @@ import useStage from '@/hooks/useStage';
 import { session } from '@/utils/store';
 import { throttle } from 'lodash';
 import React, { FC, useEffect } from 'react';
-import { createObjectBindingPattern, walkUpBindingElementsAndPatterns } from 'typescript';
 interface PropTypes { }
 
 const [bg, qiao, back] = [
@@ -65,10 +64,11 @@ const configs = {
 }
 
 const Delivery: FC<PropTypes> = function (props) {
+  const { visible, onClose, getSessionStar, setVisible } = useReward();
+
     const { stage } = useStage({ elId });
     const { elements, setEles, findNamesByLayer } = useCreateEle({ stage });
     const { createHorn, createQuestionLabel } = useComponents();
-    const { visible, onClose, getSessionStar, setVisible } = useReward();
 
     const state = {
         circles: [],
@@ -135,6 +135,7 @@ const Delivery: FC<PropTypes> = function (props) {
         INVALID_TOP_RIGHT: 3,
         INVALID_BOTTOM_LEFT: 7,
         INVALID_BOTTOM_RIGHT: 9,
+        OUT_OF_CANVAS: 0,
     }
 
 
@@ -166,6 +167,7 @@ const Delivery: FC<PropTypes> = function (props) {
      * 06: 正在水平向右移动
      * 02: 正在垂直向上移动
      * 08: 正在垂直向下移动
+     * 00: 手指离开画布区域
      *
      */
     function getQuadrant(pos) {
@@ -179,8 +181,16 @@ const Delivery: FC<PropTypes> = function (props) {
             currentX === 4 ? 0 : coordinate[currentX + 1][currentY][0],
             currentY === 0 ? 0 : coordinate[currentX][currentY - 1][1],
             currentY === 3 ? 0 : coordinate[currentX][currentY + 1][1]
-
         ];
+        const cornerLeftTop = coordinate[0][0];
+        const cornerRightBottom = coordinate[4][3];
+
+        if (posX < cornerLeftTop[0] - delta
+            || posX > cornerRightBottom[0] + delta
+            || posY < cornerLeftTop[1] - delta
+            || posY > cornerRightBottom[1] + delta) {
+            return QuadrantEnums.OUT_OF_CANVAS;
+        }
 
         if (posX < anchorX - delta) {
             if (posY < anchorY - delta) {
@@ -357,6 +367,13 @@ const Delivery: FC<PropTypes> = function (props) {
          * @param moveFunction - 移动函数，水平移动或者竖直移动
          */
         function trial([x, y], moveFunction) {
+            const rows = configs.circle.coordinate.length;
+            const columns = configs.circle.coordinate[0].length;
+            if (x < 0 || x > rows || y < 0 || y > columns) {
+                restore();
+                return;
+            }
+
             if (isBlock([x, y])) {
                 restore();
             } else {

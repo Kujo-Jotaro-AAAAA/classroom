@@ -123,7 +123,7 @@ const Record: FC<PropTypes> = function(props) {
       {
         type: EleTypeEnums.LABEL,
         option: {
-          text: '20 "',
+          text: '5 "',
           fontSize: 34,
           pos: [789, 255],
         },

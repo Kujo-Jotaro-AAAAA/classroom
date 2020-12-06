@@ -39,8 +39,12 @@ const Reward: FC<PropTypes> = function(props) {
       1: 'L0022'
     };
     [playAudioMap[props.star], 'SE0002', 'SE0003'].forEach(name => {
+          console.log('name', props.audioConfig?.exclude, name);
       if (Array.isArray(props.audioConfig?.exclude)) {
-        if (props.audioConfig?.exclude.includes(name)) return
+        if (props.audioConfig?.exclude.includes(name)) {
+
+          return
+        }
       }
       PLAY_AUDIO(name)
     })
