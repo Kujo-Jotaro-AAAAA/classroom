@@ -32,7 +32,7 @@ const sessionKey = 'optionPos';
 const Balloons: FC<PropTypes> = function(props) {
   const balloonElm = useRef<any[]>([]);
   const balloonBlockElm = useRef<any[]>([]);
-  const { visible, setVisible, onClose, setSessionReply, clearSessionReply, getSessionReply, getStarFn } = useReward();
+  const { visible, setVisible, onClose, setSessionReply, clearSessionReply, getSessionReply, getSessionStar } = useReward();
   const { createOptionsBlock, createStep } = useComponents();
   const replyRef = useRef(null);
   const answer = 'blue';
@@ -148,6 +148,7 @@ const Balloons: FC<PropTypes> = function(props) {
     })
     if (tmpMap[currIndex].answer === el.name) { // 正确，气球飞到答题区
       setVisible(true);
+
       el.attr({
         bgcolor: success_color,
         borderColor: success_border
@@ -300,66 +301,6 @@ const Balloons: FC<PropTypes> = function(props) {
     });
     return balloons;
   }
-  async function onOptionClick(el) {
-    // await el.animate([{ pos: replyRef.current.attr().pos }], {
-    //   duration: 400,
-    //   easing: 'ease-in',
-    //   direction: 'alternate',
-    //   iterations: 1,
-    //   fill: 'forwards',
-    // });
-    if (tmpMap[currIndex].answer === el.name) {
-      setVisible(true);
-      el.attr({
-        bgcolor: success_color,
-        borderColor: success_border
-      })
-    } else {
-      el.attr({
-        bgcolor: fail_color
-      })
-      setSessionReply(getSessionReply() + 1)
-      // resetBalloons();
-    }
-    // setTimeout(() => {
-    // }, 1000)
-  }
-  /**
-   * @description 选项拖拽结束
-   * @param evt
-   * @param el
-   * @param idx
-   */
-  async function onOptionDragEnd(evt, el, idx) {
-    el.attr('pos', replyRef.current.attr().pos)
-    const isCover = replyRef.current.isPointCollision(evt.x, evt.y);
-    if (isCover) {
-      const originPos = replyRef.current.attr().pos;
-      // 贴合到答案框中间
-      await el.animate([{ pos: originPos }], {
-        duration: 400,
-        easing: 'ease-in',
-        direction: 'alternate',
-        iterations: 1,
-        fill: 'forwards',
-      });
-      if (tmpMap[currIndex].answer === el.name) {
-        setVisible(true);
-      } else {
-        resetBalloons();
-      }
-      return;
-    }
-    // 未拖放到答案框
-    const defaultPos = session.getKey(sessionKey);
-    await el.animate([{ pos: [evt.x, evt.y] }, { pos: defaultPos[idx] }], {
-      duration: 400,
-      easing: 'ease-in',
-      direction: 'alternate',
-      iterations: 1,
-      fill: 'forwards',
-    });
-  }
   /**
    * @description 重置气球的位置
    */
@@ -370,20 +311,6 @@ const Balloons: FC<PropTypes> = function(props) {
       ball.attr({
         bgcolor: '#fff'
       })
-      // await ball.animate(
-      //   [
-      //     {
-      //       pos: ballPos[idx],
-      //     },
-      //   ],
-      //   {
-      //     duration: 400,
-      //     easing: 'ease-in',
-      //     direction: 'alternate',
-      //     iterations: 1,
-      //     fill: 'forwards',
-      //   },
-      // );
     });
   }
   return (
@@ -395,7 +322,7 @@ const Balloons: FC<PropTypes> = function(props) {
           height: '100vh',
         }}
       />
-      <RewardModal visible={visible} star={getStarFn(getSessionReply())} onClose={() => {
+      <RewardModal visible={visible} reload={queryTmp === '1' ? '' : '/balloons?tmp=1'} star={getSessionStar()} onClose={() => {
         onClose()
         clearSessionReply()
       }} />

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { session } from '@/utils/store';
+import { session, local } from '@/utils/store';
+import {COIN_NUM} from '@/utils/const';
 import { PLAY_AUDIO} from '@/utils/bridge';
 export const replySessionKey = 'reply'
 interface PropTypes {
@@ -49,6 +50,12 @@ export default function useReward() {
   function getSessionStar() {
     return getStarFn(getSessionReply())
   }
+  /**
+   * @description 获取原生端给的金币数量
+   */
+  function getCoinNum() {
+    return Number(local.getKey(COIN_NUM))
+  }
   return {
     replyNum,
     getStar,
@@ -63,6 +70,7 @@ export default function useReward() {
     setSessionReply,
     getSessionReply,
     getSessionStar,
-    clearSessionReply
+    clearSessionReply,
+    getCoinNum
   }
 }

@@ -27,7 +27,7 @@ export const local = {
     window.localStorage.setItem(key, str);
   },
   getKey(key: string) {
-    const val = window.localStorage.get(key);
+    const val = window.localStorage.getItem(key);
     return JSON.parse(val);
   },
   clear() {
