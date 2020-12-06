@@ -105,6 +105,7 @@ const Record: FC<PropTypes> = function(props) {
           {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm) => {
+              Bridge.PLAY_AUDIO('L0005')
               playRightRef.current.animate(
                 [{ opacity: 0.1 }, { opacity: 0.5 }, { opacity: 1 }],
                 {

@@ -225,8 +225,6 @@ const Reward: FC<PropTypes> = function(props) {
       size: [25, 25],
       // anchor: [0.5, 0.5],
     });
-    console.log('getCoinNum()', getCoinNum());
-
     const count = new Label({
       pos: [920, 43],
       fontSize: 18,

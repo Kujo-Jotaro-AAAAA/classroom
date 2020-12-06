@@ -64,6 +64,7 @@ const FindPark: FC<PropTypes> = function(props) {
     ]).filter(item => Boolean(item));
   }
   function renderPage() {
+    const mW = 43.76, mH = 49.78
     setEles([
       createHorn('L0013'),
       createQuestionLabel('今天你是小侦探噢，请在游乐园中点出圆圈里的事物'),
@@ -73,8 +74,8 @@ const FindPark: FC<PropTypes> = function(props) {
         type: EleTypeEnums.SPRITE,
         option: {
           texture: assetsMap.magnifier,
-          size: [43.76, 49.78],
-          pos: [921 + 43.76 / 2, 167 + 49.78 / 2],
+          size: [mW, mH],
+          pos: [921 + mW / 2, 167 + mH / 2],
           anchor: [0.5, 0.5],
         },
         evt: [
@@ -82,6 +83,7 @@ const FindPark: FC<PropTypes> = function(props) {
             type: EvtNameEnum.CLICK,
             callback: (evt, elm, {stage}) => {
               PLAY_AUDIO('L0016')
+              elm.deactivateAnimations()
               magClick(elm, stage.layer);
             },
           },
@@ -90,24 +92,19 @@ const FindPark: FC<PropTypes> = function(props) {
           {
             animate: [
               {
-                scale: [1.25, 1.25],
+                // scale: [1.25, 1.25],
+                size: [mW * 1.25, mH * 1.25]
               },
               {
-                scale: [1, 1],
-              },
-              {
-                scale: [1.25, 1.25],
-              },
-              {
-                scale: [1, 1],
+                size: [mW, mH]
               },
             ],
             config: {
-              delay: 3000,
-              duration: 1200,
+              delay: 30000,
+              duration: 800,
               easing: 'ease-in',
               direction: 'alternate',
-              iterations: 1,
+              iterations: Infinity,
               fill: 'none',
             },
           },

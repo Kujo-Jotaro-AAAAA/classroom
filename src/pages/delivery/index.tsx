@@ -65,10 +65,10 @@ const configs = {
 }
 
 const Delivery: FC<PropTypes> = function (props) {
-    const { visible, onClose } = useReward();
     const { stage } = useStage({ elId });
     const { elements, setEles, findNamesByLayer } = useCreateEle({ stage });
     const { createHorn, createQuestionLabel } = useComponents();
+    const { visible, onClose, getSessionStar, setVisible } = useReward();
 
     const state = {
         circles: [],
@@ -633,13 +633,14 @@ const Delivery: FC<PropTypes> = function (props) {
 
     function onSuccess() {
         console.log('You have done!');
+        setVisible(true)
     }
 
 
     return (
         <>
             <div id={elId} style={{ width: '100vw', height: '100vh' }} />
-            <RewardModal visible={visible} star={3} onClose={onClose} />
+            <RewardModal visible={visible} star={getSessionStar()} onClose={onClose} />
         </>
     );
 };
